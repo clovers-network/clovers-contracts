@@ -18,30 +18,45 @@ contract('Clovers', async function(accounts)  {
   before((done) => {
     (async () => {
       try {
+        var totalGas = new web3.BigNumber(0)
 
         // Deploy Clovers.sol (NFT)
         clovers = await Clovers.new()
+        var tx = web3.eth.getTransactionReceipt(clovers.transactionHash)
+        totalGas = totalGas.plus(tx.gasUsed)
+        console.log(_+tx.gasUsed+' - Deploy clovers')
         clovers = await Clovers.deployed()
         // console.log('clovers', clovers.address)
 
         // Deploy CloversMetadata.sol
         // -w Clovers address
         cloversMetadata = await CloversMetadata.new(clovers.address)
+        var tx = web3.eth.getTransactionReceipt(cloversMetadata.transactionHash)
+        totalGas = totalGas.plus(tx.gasUsed)
+        console.log(_+tx.gasUsed+' - Deploy cloversMetadata')
         cloversMetadata = await CloversMetadata.deployed()
         // console.log('cloversMetadata', cloversMetadata.address)
 
         // Update Clovers.sol 
         // -w CloversMetadata address
-        await clovers.updateCloversMetadataAddress(cloversMetadata.address)
+        var tx = await clovers.updateCloversMetadataAddress(cloversMetadata.address)
+        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        console.log(_+tx.receipt.gasUsed+' - Update clovers')
 
         // Deploy ClubToken.sol (ERC20)
         clubToken = await ClubToken.new()
+        var tx = web3.eth.getTransactionReceipt(clubToken.transactionHash)
+        totalGas = totalGas.plus(tx.gasUsed)
+        console.log(_+tx.gasUsed+' - Deploy clubToken')
         clubToken = await ClubToken.deployed()
         // console.log('clubToken', clubToken.address)
 
         // Deploy Reversi.sol
         // -link w cloversController
-        reversi = await Reversi.new();
+        reversi = await Reversi.new()
+        var tx = web3.eth.getTransactionReceipt(reversi.transactionHash)
+        totalGas = totalGas.plus(tx.gasUsed)
+        console.log(_+tx.gasUsed+' - Deploy reversi')
         reversi = await Reversi.deployed()
         await CloversController.link('Reversi', reversi.address)
         // await deployer.link(Reversi, CloversController);
@@ -52,23 +67,36 @@ contract('Clovers', async function(accounts)  {
         // -w Clovers address
         // -w ClubToken address
         cloversController = await CloversController.new(clovers.address, reversi.address)
+        var tx = web3.eth.getTransactionReceipt(cloversController.transactionHash)
+        totalGas = totalGas.plus(tx.gasUsed)
+        console.log(_+tx.gasUsed+' - Deploy cloversController')
         cloversController = await CloversController.deployed()
 
         // Update Clovers.sol
         // -w CloversController address
-        await clovers.updateCloversControllerAddress(cloversController.address)
-
+        var tx = await clovers.updateCloversControllerAddress(cloversController.address)
+        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        console.log(_+tx.receipt.gasUsed+' - Update clovers')
         // Update ClubToken.sol
         // -w CloversController address
-        await clubToken.updateCloversControllerAddress(cloversController.address)
-
+        var tx = await clubToken.updateCloversControllerAddress(cloversController.address)
+        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        console.log(_+tx.receipt.gasUsed+' - Update clubToken')
         // Update CloversController.sol
         // -w stakeAmount
         // -w stakePeriod
         // -w payMultiplier
-        await cloversController.updateStakeAmount(stakeAmount)
-        await cloversController.updateStakePeriod(stakePeriod)
-        await cloversController.updatePayMultipier(multiplier)
+        var tx = await cloversController.updateStakeAmount(stakeAmount)
+        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        console.log(_+tx.receipt.gasUsed+' - Update cloversController')
+        var tx = await cloversController.updateStakePeriod(stakePeriod)
+        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        console.log(_+tx.receipt.gasUsed+' - Update cloversController')
+        var tx = await cloversController.updatePayMultipier(multiplier)
+        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        console.log(_+tx.receipt.gasUsed+' - Update cloversController')
+
+        console.log(_+totalGas.toFormat(0) + ' - Total Gas')
         done()
       } catch (error) {
         console.error(error)
@@ -87,10 +115,18 @@ contract('Clovers', async function(accounts)  {
 
   describe('CloversController.sol', function() {
     let balance, _balance, tx, clubBalance, gasEstimate, newStakeAmount, gasSpent
-    let _tokenId = '0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'
-    let _moves = [
+
+    let _invalidTokenId = '0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'
+    let _invalidMoves = [
       new web3.BigNumber('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF', 16),
       new web3.BigNumber('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF', 16)
+    ]
+
+
+    let _tokenId = '0x5555555565556955695566955aa55555'
+    let _moves = [
+      new web3.BigNumber('0xcb76aedd77baf6cfcfbeeb5362d6affb54f9d53971d37f37de9bf87c', 16),
+      new web3.BigNumber('0xc5670faa513068f1effd8f32a14ba11b64ca7461c193223c', 16)
     ]
 
     it('should read parameters that were set', async function () {
@@ -119,7 +155,7 @@ contract('Clovers', async function(accounts)  {
         let options = [
           _moves,
           new web3.BigNumber(_tokenId, 16), 
-          new web3.BigNumber('0x1F', 16),
+          new web3.BigNumber('0x1F', 16), // invalid symmetries
           accounts[0], 
           {
             value: new web3.BigNumber(stakeAmount),
@@ -217,42 +253,7 @@ contract('Clovers', async function(accounts)  {
       let result = balance.minus(gasCost)
       assert(result.eq(_balance), 'original balance ' + web3.fromWei(balance).toString() + ' minus all gas costs ' + web3.fromWei(gasCost).toString() + ' did not equal new balance ' + web3.fromWei(_balance).toString() + ' but rather ' + result.toString())
     })
-
-
-    let _realTokenId = '0x5555555565556955695566955aa55555'
-    let _realMoves = [
-      new web3.BigNumber('0xcb76aedd77baf6cfcfbeeb5362d6affb54f9d53971d37f37de9bf87c', 16),
-      new web3.BigNumber('0xc5670faa513068f1effd8f32a14ba11b64ca7461c193223c', 16)
-    ]
-
-    it ('should check the cost of validating a real game', async()=> {
-      try {
-        let currentStakeAmount = await cloversController.currentStakeAmount()
-        let options = [
-          _realMoves,
-          new web3.BigNumber(_realTokenId, 16), 
-          new web3.BigNumber('0x1F', 16),
-          accounts[0], 
-          {
-            value: new web3.BigNumber(currentStakeAmount),
-            gasPrice
-          }
-        ]
-
-        tx = await cloversController.claimClover(...options)
-        console.log(_+'claimClover gasCost ' + tx.receipt.cumulativeGasUsed)
-        gasSpent = tx.receipt.cumulativeGasUsed
-        assert(new web3.BigNumber(tx.receipt.status).eq(1), 'claimClover tx receipt should have been 0x01 (successful) but was instead ' + tx.receipt.status);
-          
-        gasEstimate = await cloversController.challengeClover.estimateGas(new web3.BigNumber(_realTokenId, 16), accounts[0])
-        console.log(_+'challengeClover gasEstimate', gasEstimate.toString())
-      } catch (error) {
-        console.log(error)
-        assert(false, 'claimClover tx receipt should not have thrown an error')
-      }
-    })
   })
-
 })
 
 function getBlockNumber () {
@@ -276,7 +277,6 @@ function increaseBlocks (blocks) {
     })
   })
 }
-
 
 function increaseBlock() {
   return new Promise((resolve, reject) => {

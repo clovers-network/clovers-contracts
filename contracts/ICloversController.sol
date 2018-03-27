@@ -7,11 +7,10 @@ pragma solidity ^0.4.19;
 
 contract ICloversController {
 
-    event cloverCommited(bytes32 movesHash, address miner);
-    event cloverRevealed(bytes28[2] moves, uint256 _tokenId, address miner);
-    event cloverClaimed(bytes28[2] moves, uint256 _tokenId, address miner);
-    event stakeRetrieved(bytes28[2] moves, uint256 _tokenId, address miner);
-    event cloverChallenged(bytes28[2] moves, uint256 _tokenId, address miner, address challenger);
+    event cloverCommited(bytes32 movesHash, address owner);
+    event cloverClaimed(bytes28[2] moves, uint256 tokenId, address owner, uint stake, uint reward, bytes1 symmetries);
+    event stakeAndRewardRetrieved(uint256 tokenId, address owner, uint stake, uint reward);
+    event cloverChallenged(bytes28[2] moves, uint256 tokenId, address owner, address challenger, uint stake);
 
     function currentStakeAmount() public constant returns (uint256);
     function currentStakePeriod() public constant returns (uint256);

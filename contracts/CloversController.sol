@@ -15,11 +15,10 @@ import "zeppelin-solidity/contracts/math/SafeMath.sol";
 
 
 contract CloversController is ICloversController, HasNoTokens, HasNoEther {
-    event cloverCommited(bytes32 movesHash, address miner);
-    event cloverRevealed(bytes28[2] moves, uint256 _tokenId, address miner);
-    event cloverClaimed(bytes28[2] moves, uint256 _tokenId, address miner);
-    event stakeRetrieved(bytes28[2] moves, uint256 _tokenId, address miner);
-    event cloverChallenged(bytes28[2] moves, uint256 _tokenId, address miner, address challenger);
+    event cloverCommited(bytes32 movesHash, address owner);
+    event cloverClaimed(bytes28[2] moves, uint256 tokenId, address owner, uint stake, uint reward, bytes1 symmetries);
+    event stakeAndRewardRetrieved(uint256 tokenId, address owner, uint stake, uint reward);
+    event cloverChallenged(bytes28[2] moves, uint256 tokenId, address owner, address challenger, uint stake);
 
     using SafeMath for uint256;
 
@@ -144,6 +143,7 @@ contract CloversController is ICloversController, HasNoTokens, HasNoEther {
             IClovers(clovers).setReward(_tokenId, reward);
         }
         IClovers(clovers).mint(_to, _tokenId);
+        cloverClaimed(moves, _tokenId, _to, stakeAmount, reward, _symmetries);
         return true;
     }
     /**
@@ -159,6 +159,7 @@ contract CloversController is ICloversController, HasNoTokens, HasNoEther {
         IClovers(clovers).setCommit(movesHash, _to);
         IClovers(clovers).setStake(movesHash, stakeAmount);
         clovers.transfer(stakeAmount);
+        cloverCommited(movesHash, _to);
         return true;
     }
     /**
@@ -181,6 +182,8 @@ contract CloversController is ICloversController, HasNoTokens, HasNoEther {
             IClovers(clovers).setReward(_tokenId, reward);
         }
         IClovers(clovers).mint(commiter, _tokenId);
+        uint256 stake = IClovers(clovers).getStake(movesHash);
+        cloverClaimed(moves, _tokenId, commiter, stake, reward, _symmetries);
         return true;
     }
     /**
@@ -201,6 +204,7 @@ contract CloversController is ICloversController, HasNoTokens, HasNoEther {
         uint256 reward = IClovers(clovers).getReward(_tokenId);
         require(IMintable(clubToken).mint(commiter, reward));
         require(IClovers(clovers).moveEth(commiter, stake));
+        stakeAndRewardRetrieved(_tokenId, commiter, stake, reward);
         return true;
     }
     /**
@@ -226,20 +230,21 @@ contract CloversController is ICloversController, HasNoTokens, HasNoEther {
         } else {
             valid = false;
         }
-        if (!valid) {
-            IClovers(clovers).deleteClover(_tokenId);
-            bytes32 movesHash = keccak256(moves);
-            if (!isVerified(_tokenId)) {
-                uint256 stake = IClovers(clovers).getStake(movesHash);
-                IClovers(clovers).moveEth(_to, stake);
-            }
-            IClovers(clovers).unmint(_tokenId);
-            IClovers(clovers).setCommit(movesHash, 0);
-            IClovers(clovers).setStake(movesHash, 0);
-            removeSymmetries(_tokenId);
-        } else {
-            revert();
+        require(!valid);
+
+        IClovers(clovers).deleteClover(_tokenId);
+        bytes32 movesHash = keccak256(moves);
+        if (!isVerified(_tokenId)) {
+            uint256 stake = IClovers(clovers).getStake(movesHash);
+            IClovers(clovers).moveEth(_to, stake);
         }
+        IClovers(clovers).unmint(_tokenId);
+        IClovers(clovers).setCommit(movesHash, 0);
+        IClovers(clovers).setStake(movesHash, 0);
+        removeSymmetries(_tokenId);
+
+        address commiter = IClovers(clovers).getCommit(movesHash);
+        cloverChallenged(moves, _tokenId, commiter, _to, stake);
         return true;
     }
 
