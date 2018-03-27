@@ -5,7 +5,8 @@ pragma experimental ABIEncoderV2;
 * CloversMetadata contract is upgradeable and returns metadata about Clovers
 */
 
-import "./strings.sol";
+import "./helpers/strings.sol";
+
 
 contract CloversMetadata {
     using strings for *;

@@ -1,7 +1,7 @@
 var utils = require('web3-utils')
 var Reversi_ = artifacts.require("./Reversi.sol")
-var ReversiMock = artifacts.require("./ReversiMock.sol")
-var Reversi = require('../app/src/assets/reversi.js')
+var ReversiMock = artifacts.require("./mocks/ReversiMock.sol")
+// var Reversi = require('clovers-reversi')
 let _ = '        '
 
 contract('Reversi', async function(accounts)  {

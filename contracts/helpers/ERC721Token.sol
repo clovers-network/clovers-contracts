@@ -6,6 +6,7 @@ import "zeppelin-solidity/contracts/math/SafeMath.sol";
 /**
  * @title ERC721Token
  * Generic implementation for the required functionality of the ERC721 standard
+ * mint permissions modified for use w Clovers
  */
 contract ERC721Token is ERC721 {
   using SafeMath for uint256;

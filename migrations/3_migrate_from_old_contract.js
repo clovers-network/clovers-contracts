@@ -3,73 +3,68 @@ var Clovers = artifacts.require("./Clovers.sol");
 var ClubToken = artifacts.require("./ClubToken.sol");
 var OldToken = artifacts.require('../contracts/OldToken.sol');
 
-var Reversi = require('../app/src/assets/reversi.js')
+// var Reversi = require('../app/src/assets/reversi.js')
+var Reversi = require('clovers-reversi')
 
 module.exports = async function(deployer, helper, accounts)  {
+
+  var doFors = (n, i = 0, func) => {
+    return new Promise((resolve, reject) => {
+      try {
+        if (i === n) {
+          resolve()
+        } else {
+          func(i).then(() => {
+            doFors(n, i + 1).then(() => {
+              resolve()
+            })
+          })
+        }
+      } catch(error) {
+        reject(error)
+      }
+    })
+  }
+
   deployer.then(async () => {
     try {
-      var doFors = (n, i = 0) => {
-        return new Promise((resolve, reject) => {
-          try {
-            if (i === n) {
-              resolve()
-            } else {
-              doFor(i).then(() => {
-                doFors(n, i + 1).then(() => {
-                  resolve()
-                })
-              })
-            }
-          } catch(error) {
-            reject(error)
-          }
-        })
-      }
-      var doFor = (i) => {
-        return new Promise(async (resolve, reject) => {
-          try{
-            var tx = await oldToken.adminMineClover(
-              new web3.BigNumber(i).add('0xFFF'),
-              new web3.BigNumber(i).add('0xFFF'),
-              new web3.BigNumber(i).add('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'),
-              new web3.BigNumber(i)
-            )
-            resolve()
-          } catch(error) {
-            reject(error)
-          }
-        })
-      }
 
       var clovers = await Clovers.deployed()
       if (deployer.network === 'rinkeby'){
           var oldToken = await OldToken.at('0xcc0604514f71b8d39e13315d59f4115702b42646')
           var getCloversCount = await oldToken.getCloversCount()
       } else {
+
         return
+
+        // add fake old style clovers to test the move process
+
         // var oldToken = await deploy(deployer, OldToken)
         // await deployer.deploy(OldToken)
         // let oldToken = await OldToken.deployed()
         var oldToken = await OldToken.at('0xd8672a4A1bf37D36beF74E36edb4f17845E76F4e')
-
         var getCloversCount = await oldToken.getCloversCount()
 
         if (!getCloversCount.eq(10)) {
-
-          await doFors(10)
-          // for (var i = 0; i < 10; i ++) {
-          //   var tx = await oldToken.adminMineClover(
-          //     new web3.BigNumber(i).add('0xFFF'),
-          //     new web3.BigNumber(i).add('0xFFF'),
-          //     new web3.BigNumber(i).add('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'),
-          //     new web3.BigNumber(i)
-          //   )
-          //   // console.log(tx.receipt.status)
-          // }
+          await doFors(10, 0, (i) => {
+            return new Promise(async (resolve, reject) => {
+              try{
+                var tx = await oldToken.adminMineClover(
+                  new web3.BigNumber(i).add('0xFFF'),
+                  new web3.BigNumber(i).add('0xFFF'),
+                  new web3.BigNumber(i).add('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'),
+                  new web3.BigNumber(i)
+                )
+                resolve()
+              } catch(error) {
+                reject(error)
+              }
+            })
+          })
         }
       }
 
-      var doFor = (i) => {
+      await doFors(getCloversCount.toNumber(), 0, (i) => {
         return new Promise(async (resolve, reject) => {
           try{
             var clover = await oldToken.getCloverByKey(i)
@@ -123,8 +118,7 @@ module.exports = async function(deployer, helper, accounts)  {
             reject(error)
           }
         })
-      }
-      await doFors(getCloversCount.toNumber())
+      })
     } catch (error) {
       console.log(error)
     }

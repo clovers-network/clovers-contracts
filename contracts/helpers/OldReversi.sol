@@ -1,5 +1,6 @@
 pragma solidity ^0.4.19;
 
+
 library Reversi {
   // event DebugGame(bytes16 board, bool error, bool complete, bool symmetrical, bool RotSym, bool Y0Sym, bool X0Sym, bool XYSym, bool XnYSym);
   // event DebugGame2(bytes16 board, bool error, string message, uint8 moveKey, uint8 blackScore, uint8 whiteScore);

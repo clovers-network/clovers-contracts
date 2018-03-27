@@ -5,7 +5,7 @@ pragma solidity ^0.4.19;
  */
 
 
-contract CloversFactory {
+contract ICloversController {
 
     event cloverCommited(bytes32 movesHash, address miner);
     event cloverRevealed(bytes28[2] moves, uint256 _tokenId, address miner);

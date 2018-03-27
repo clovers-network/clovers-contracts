@@ -1,7 +1,6 @@
 
 var Reversi = artifacts.require("./Reversi.sol");
 var Clovers = artifacts.require("./Clovers.sol");
-var CloversFrontend = artifacts.require("./CloversFrontend.sol");
 var CloversMetadata = artifacts.require("./CloversMetadata.sol");
 var CloversController = artifacts.require("./CloversController.sol");
 var ClubToken = artifacts.require("./ClubToken.sol");
@@ -17,13 +16,10 @@ module.exports = (deployer, helper, accounts) => {
       await deployer.deploy(Clovers)
       let clovers = await Clovers.deployed()
 
-      // console.log('clovers', clovers.address)
-
       // Deploy CloversMetadata.sol
       // -w Clovers address
       await deployer.deploy(CloversMetadata, clovers.address)
       let cloversMetadata = await CloversMetadata.deployed()
-      // console.log('cloversMetadata', cloversMetadata.address)
 
       // Update Clovers.sol 
       // -w CloversMetadata address
@@ -32,7 +28,6 @@ module.exports = (deployer, helper, accounts) => {
       // Deploy ClubToken.sol (ERC20)
       await deployer.deploy(ClubToken)
       let clubToken = await ClubToken.deployed()
-      // console.log('clubToken', clubToken.address)
 
       // Deploy Reversi.sol
       // -link w cloversController
@@ -43,14 +38,12 @@ module.exports = (deployer, helper, accounts) => {
       // await deployer.link(Reversi, CloversController);
       // await deployer.link(Reversi);
       // await CloversController.link(reversi);
-      // console.log('Reversi', Reversi.address)
 
       // Deploy CloversController.sol
       // -w Clovers address
       // -w ClubToken address
       await deployer.deploy(CloversController, clovers.address, clubToken.address)
       let cloversController = await CloversController.deployed()
-      // console.log('cloversController', cloversController.address)
 
       // Update Clovers.sol
       // -w CloversController address
@@ -60,8 +53,6 @@ module.exports = (deployer, helper, accounts) => {
       // -w CloversController address
       await clubToken.updateCloversControllerAddress(cloversController.address)
 
-      // Deploy CloversFrontend.sol
-      // -w CloversController address
 
       // Update CloversController.sol
       // -w stakeAmount

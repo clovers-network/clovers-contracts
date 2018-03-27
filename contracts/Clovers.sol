@@ -7,10 +7,11 @@ pragma experimental ABIEncoderV2;
  */
 
 import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
-import "./ERC721Token.sol";
+import "./helpers/ERC721Token.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./IClovers.sol";
 import "./CloversMetadata.sol";
+
 
 contract Clovers is IClovers, ERC721Token, Ownable {
 

@@ -2,25 +2,24 @@ pragma solidity ^0.4.19;
 pragma experimental ABIEncoderV2;
 
 /**
- * The CloversController is upgradeable and contains the logic used by CloversFrontend
- * Both adhere to the CloversFactory interface design
+ * The CloversController is replaceable endpoint for minting and unminting Clovers.sol and ClubToken.sol
  */
-import "./IClovers.sol";
+
 import "./Reversi.sol";
-import "./Mintable.sol";
-import "./CloversFactory.sol";
+import "./IClovers.sol";
+import "./helpers/IMintable.sol";
+import "./ICloversController.sol";
 import "zeppelin-solidity/contracts/ownership/HasNoTokens.sol";
 import "zeppelin-solidity/contracts/ownership/HasNoEther.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 
-contract CloversController is CloversFactory, HasNoTokens, HasNoEther {
+
+contract CloversController is ICloversController, HasNoTokens, HasNoEther {
     event cloverCommited(bytes32 movesHash, address miner);
     event cloverRevealed(bytes28[2] moves, uint256 _tokenId, address miner);
     event cloverClaimed(bytes28[2] moves, uint256 _tokenId, address miner);
     event stakeRetrieved(bytes28[2] moves, uint256 _tokenId, address miner);
     event cloverChallenged(bytes28[2] moves, uint256 _tokenId, address miner, address challenger);
-    event DebugGame(bytes16 board, bool error, bool complete, bool symmetrical, bool RotSym, bool Y0Sym, bool X0Sym, bool XYSym, bool XnYSym, uint256 moveKey);
-    event DebugBool(bool boolean);
 
     using SafeMath for uint256;
 
@@ -71,24 +70,14 @@ contract CloversController is CloversFactory, HasNoTokens, HasNoEther {
     */
     function isValid(bytes28[2] moves) public constant returns (bool) {
         Reversi.Game memory game = Reversi.playGame(moves);
-        if (isValidGame(game)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    function _isValid(bytes28[2] moves) public {
-        Reversi.Game memory game = Reversi.playGame(moves);
-        // DebugBool(game.complete);
-        // return game.msg;
-        // return game.moveKey;
+        return isValidGame(game);
     }
     /**
     * @dev Checks whether the game is valid.
     * @param game The pre-played game.
     * @return A boolean representing whether or not the game is valid.
     */
-    function isValidGame(Reversi.Game game) public constant returns (bool) {
+    function isValidGame(Reversi.Game game) public pure returns (bool) {
         if (game.error) return false;
         if (!game.complete) return false;
         return true;
@@ -103,9 +92,6 @@ contract CloversController is CloversFactory, HasNoTokens, HasNoEther {
         if(_blockMinted == 0) return false;
         // require(block.number > _blockMinted);
         return (block.number - _blockMinted) > stakePeriod;
-    }
-    function returnBlock() public constant returns (uint) {
-        return block.number;
     }
     /**
     * @dev Calculates the reward of the board.
@@ -213,7 +199,7 @@ contract CloversController is CloversFactory, HasNoTokens, HasNoEther {
         addSymmetries(_tokenId);
         address commiter = IClovers(clovers).getCommit(movesHash);
         uint256 reward = IClovers(clovers).getReward(_tokenId);
-        require(Mintable(clubToken).mint(commiter, reward));
+        require(IMintable(clubToken).mint(commiter, reward));
         require(IClovers(clovers).moveEth(commiter, stake));
         return true;
     }
