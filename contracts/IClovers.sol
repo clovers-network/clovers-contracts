@@ -8,8 +8,6 @@ pragma solidity ^0.4.19;
 
 contract IClovers {
 
-    function IClovers () public {}
-
     function tokenMetadata(uint _tokenId) public view returns (string _infoUrl);
     function getStake(bytes32 movesHash) public view returns (uint256);
     function getCommit(bytes32 movesHash) public view returns (address);

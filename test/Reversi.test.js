@@ -8,12 +8,16 @@ contract('Reversi', async function(accounts)  {
   let reversi, reversiMock
   before((done) => {
     (async () => {
-      reversi = await Reversi_.new();
+      try {
+        reversi = await Reversi_.new();
 
-      await ReversiMock.link('Reversi', reversi.address)
-      reversiMock = await ReversiMock.new()
-
-      done()
+        await ReversiMock.link('Reversi', reversi.address)
+        reversiMock = await ReversiMock.new()
+        done()
+      } catch (error) {
+        console.error(error)
+        done(false)
+      }
     })()
   })
 

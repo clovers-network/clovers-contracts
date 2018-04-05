@@ -13,7 +13,7 @@ module.exports = (deployer, helper, accounts) => {
   deployer.then(async () => {
     try {
       // Deploy Clovers.sol (NFT)
-      await deployer.deploy(Clovers)
+      await deployer.deploy(Clovers, 'Clovers', 'CLVR')
       let clovers = await Clovers.deployed()
 
       // Deploy CloversMetadata.sol

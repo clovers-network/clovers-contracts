@@ -21,7 +21,7 @@ contract('Clovers', async function(accounts)  {
         var totalGas = new web3.BigNumber(0)
 
         // Deploy Clovers.sol (NFT)
-        clovers = await Clovers.new()
+        clovers = await Clovers.new('Clovers', 'CLVR')
         var tx = web3.eth.getTransactionReceipt(clovers.transactionHash)
         totalGas = totalGas.plus(tx.gasUsed)
         console.log(_+tx.gasUsed+' - Deploy clovers')
@@ -100,7 +100,7 @@ contract('Clovers', async function(accounts)  {
         done()
       } catch (error) {
         console.error(error)
-        done()
+        done(false)
       }
     })();
   })
