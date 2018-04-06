@@ -3,8 +3,8 @@
   "abi": [],
   "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a723058207c5dfae92cdd2612b3e291c08160764d1aaaf0ed4977256996190c192653d7750029",
   "deployedBytecode": "0x6060604052600080fd00a165627a7a723058207c5dfae92cdd2612b3e291c08160764d1aaaf0ed4977256996190c192653d7750029",
-  "sourceMap": "86:518:13:-;;;;;;;;;;;;;;;;;",
-  "deployedSourceMap": "86:518:13:-;;;;;",
+  "sourceMap": "86:518:5:-;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "86:518:5:-;;;;;",
   "source": "pragma solidity ^0.4.18;\n\n/**\n * Utility library of inline functions on addresses\n */\nlibrary AddressUtils {\n\n  /**\n   * Returns whether there is code in the target address\n   * @dev This function will return false if invoked during the constructor of a contract,\n   *  as the code is not actually created until after the constructor finishes.\n   * @param addr address address to check\n   * @return whether there is code in the target address\n   */\n  function isContract(address addr) internal view returns (bool) {\n    uint256 size;\n    assembly { size := extcodesize(addr) }\n    return size > 0;\n  }\n\n}\n",
   "sourcePath": "zeppelin-solidity/contracts/AddressUtils.sol",
   "ast": {
@@ -12,7 +12,7 @@
       "absolutePath": "zeppelin-solidity/contracts/AddressUtils.sol",
       "exportedSymbols": {
         "AddressUtils": [
-          9757
+          4283
         ]
       }
     },
@@ -26,9 +26,9 @@
             ".18"
           ]
         },
-        "id": 9740,
+        "id": 4266,
         "name": "PragmaDirective",
-        "src": "0:24:13"
+        "src": "0:24:5"
       },
       {
         "attributes": {
@@ -42,10 +42,10 @@
           "documentation": "Utility library of inline functions on addresses",
           "fullyImplemented": true,
           "linearizedBaseContracts": [
-            9757
+            4283
           ],
           "name": "AddressUtils",
-          "scope": 9758
+          "scope": 4284
         },
         "children": [
           {
@@ -58,7 +58,7 @@
               ],
               "name": "isContract",
               "payable": false,
-              "scope": 9757,
+              "scope": 4283,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "internal"
@@ -70,7 +70,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "addr",
-                      "scope": 9756,
+                      "scope": 4282,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -83,19 +83,19 @@
                           "name": "address",
                           "type": "address"
                         },
-                        "id": 9741,
+                        "id": 4267,
                         "name": "ElementaryTypeName",
-                        "src": "471:7:13"
+                        "src": "471:7:5"
                       }
                     ],
-                    "id": 9742,
+                    "id": 4268,
                     "name": "VariableDeclaration",
-                    "src": "471:12:13"
+                    "src": "471:12:5"
                   }
                 ],
-                "id": 9743,
+                "id": 4269,
                 "name": "ParameterList",
-                "src": "470:14:13"
+                "src": "470:14:5"
               },
               {
                 "children": [
@@ -103,7 +103,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "",
-                      "scope": 9756,
+                      "scope": 4282,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bool",
@@ -116,19 +116,19 @@
                           "name": "bool",
                           "type": "bool"
                         },
-                        "id": 9744,
+                        "id": 4270,
                         "name": "ElementaryTypeName",
-                        "src": "508:4:13"
+                        "src": "508:4:5"
                       }
                     ],
-                    "id": 9745,
+                    "id": 4271,
                     "name": "VariableDeclaration",
-                    "src": "508:4:13"
+                    "src": "508:4:5"
                   }
                 ],
-                "id": 9746,
+                "id": 4272,
                 "name": "ParameterList",
-                "src": "507:6:13"
+                "src": "507:6:5"
               },
               {
                 "children": [
@@ -144,7 +144,7 @@
                         "attributes": {
                           "constant": false,
                           "name": "size",
-                          "scope": 9756,
+                          "scope": 4282,
                           "stateVariable": false,
                           "storageLocation": "default",
                           "type": "uint256",
@@ -157,38 +157,38 @@
                               "name": "uint256",
                               "type": "uint256"
                             },
-                            "id": 9747,
+                            "id": 4273,
                             "name": "ElementaryTypeName",
-                            "src": "520:7:13"
+                            "src": "520:7:5"
                           }
                         ],
-                        "id": 9748,
+                        "id": 4274,
                         "name": "VariableDeclaration",
-                        "src": "520:12:13"
+                        "src": "520:12:5"
                       }
                     ],
-                    "id": 9749,
+                    "id": 4275,
                     "name": "VariableDeclarationStatement",
-                    "src": "520:12:13"
+                    "src": "520:12:5"
                   },
                   {
                     "attributes": {
                       "externalReferences": [
                         {
                           "size": {
-                            "declaration": 9748,
+                            "declaration": 4274,
                             "isOffset": false,
                             "isSlot": false,
-                            "src": "549:4:13",
+                            "src": "549:4:5",
                             "valueSize": 1
                           }
                         },
                         {
                           "addr": {
-                            "declaration": 9742,
+                            "declaration": 4268,
                             "isOffset": false,
                             "isSlot": false,
-                            "src": "569:4:13",
+                            "src": "569:4:5",
                             "valueSize": 1
                           }
                         }
@@ -196,13 +196,13 @@
                       "operations": "{\n    size := extcodesize(addr)\n}"
                     },
                     "children": [],
-                    "id": 9750,
+                    "id": 4276,
                     "name": "InlineAssembly",
-                    "src": "538:49:13"
+                    "src": "538:49:5"
                   },
                   {
                     "attributes": {
-                      "functionReturnParameters": 9746
+                      "functionReturnParameters": 4272
                     },
                     "children": [
                       {
@@ -226,13 +226,13 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 9748,
+                              "referencedDeclaration": 4274,
                               "type": "uint256",
                               "value": "size"
                             },
-                            "id": 9751,
+                            "id": 4277,
                             "name": "Identifier",
-                            "src": "588:4:13"
+                            "src": "588:4:5"
                           },
                           {
                             "attributes": {
@@ -247,39 +247,39 @@
                               "type": "int_const 0",
                               "value": "0"
                             },
-                            "id": 9752,
+                            "id": 4278,
                             "name": "Literal",
-                            "src": "595:1:13"
+                            "src": "595:1:5"
                           }
                         ],
-                        "id": 9753,
+                        "id": 4279,
                         "name": "BinaryOperation",
-                        "src": "588:8:13"
+                        "src": "588:8:5"
                       }
                     ],
-                    "id": 9754,
+                    "id": 4280,
                     "name": "Return",
-                    "src": "581:15:13"
+                    "src": "581:15:5"
                   }
                 ],
-                "id": 9755,
+                "id": 4281,
                 "name": "Block",
-                "src": "514:87:13"
+                "src": "514:87:5"
               }
             ],
-            "id": 9756,
+            "id": 4282,
             "name": "FunctionDefinition",
-            "src": "451:150:13"
+            "src": "451:150:5"
           }
         ],
-        "id": 9757,
+        "id": 4283,
         "name": "ContractDefinition",
-        "src": "86:518:13"
+        "src": "86:518:5"
       }
     ],
-    "id": 9758,
+    "id": 4284,
     "name": "SourceUnit",
-    "src": "0:605:13"
+    "src": "0:605:5"
   },
   "compiler": {
     "name": "solc",
@@ -287,5 +287,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-04-05T17:44:39.708Z"
+  "updatedAt": "2018-04-06T02:10:48.101Z"
 }

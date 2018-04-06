@@ -49,7 +49,7 @@ contract Clovers is IClovers, ERC721Token, Ownable {
         return cloversMetadata;
     }
 
-    function tokenMetadata(uint _tokenId) public view returns (string _infoUrl) {
+    function tokenURI(uint _tokenId) public view returns (string _infoUrl) {
         // require(ownerOf(_tokenId) != 0);
         address _impl = implementation();
         bytes memory data = msg.data;

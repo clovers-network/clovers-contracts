@@ -44,7 +44,7 @@ contract('Clovers', async function(accounts)  {
         console.log(_+tx.receipt.gasUsed+' - Update clovers')
 
         // Deploy ClubToken.sol (ERC20)
-        clubToken = await ClubToken.new()
+        clubToken = await ClubToken.new('ClubToken', 'CLB', 18)
         var tx = web3.eth.getTransactionReceipt(clubToken.transactionHash)
         totalGas = totalGas.plus(tx.gasUsed)
         console.log(_+tx.gasUsed+' - Deploy clubToken')

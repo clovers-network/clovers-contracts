@@ -9,15 +9,20 @@ var Reversi = require('clovers-reversi')
 module.exports = async function(deployer, helper, accounts)  {
 
   var doFors = (n, i = 0, func) => {
+    console.log(n, i, func)
     return new Promise((resolve, reject) => {
       try {
         if (i === n) {
           resolve()
         } else {
           func(i).then(() => {
-            doFors(n, i + 1).then(() => {
+            doFors(n, i + 1, func).then(() => {
               resolve()
+            }).catch((error) => {
+              console.log(error)
             })
+          }).catch((error) => {
+            console.log(error)
           })
         }
       } catch(error) {
@@ -46,29 +51,34 @@ module.exports = async function(deployer, helper, accounts)  {
         var getCloversCount = await oldToken.getCloversCount()
 
         if (!getCloversCount.eq(10)) {
-          await doFors(10, 0, (i) => {
-            return new Promise(async (resolve, reject) => {
-              try{
-                var tx = await oldToken.adminMineClover(
-                  new web3.BigNumber(i).add('0xFFF'),
-                  new web3.BigNumber(i).add('0xFFF'),
-                  new web3.BigNumber(i).add('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'),
-                  new web3.BigNumber(i)
-                )
-                resolve()
-              } catch(error) {
-                reject(error)
-              }
+          try {
+            await doFors(10, 0, (i) => {
+              return new Promise(async (resolve, reject) => {
+                try{
+                  var tx = await oldToken.adminMineClover(
+                    new web3.BigNumber(i).add('0xFFF'),
+                    new web3.BigNumber(i).add('0xFFF'),
+                    new web3.BigNumber(i).add('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'),
+                    new web3.BigNumber(i)
+                  )
+                  resolve()
+                } catch(error) {
+                  reject(error)
+                }
+              })
             })
-          })
+          } catch (error) {
+            console.log(error)
+          }
         }
       }
 
-      await doFors(getCloversCount.toNumber(), 0, (i) => {
+      await doFors(getCloversCount.toNumber(), 11, (i) => {
+        console.log(i)
         return new Promise(async (resolve, reject) => {
           try{
             var clover = await oldToken.getCloverByKey(i)
-            var _tokenId = clover[1]
+            var _tokenId = clover[0]
             var reversi = new Reversi()
             reversi.byteBoardPopulateBoard(_tokenId.toString(16))
             reversi.isSymmetrical()
@@ -98,9 +108,10 @@ module.exports = async function(deployer, helper, accounts)  {
             // console.log(tx.receipt.status)
 
             if (reversi.symmetrical) {
+              console.log('is symmetrical')
               // setSymmetries
-            tx = await clovers.setSymmetries(_tokenId, symmetries)
-            // console.log(tx.receipt.status)
+              tx = await clovers.setSymmetries(_tokenId, symmetries)
+              // console.log(tx.receipt.status)
               // setAllSymmetries
               var allSymmetries = await clovers.getAllSymmetries()
               allSymmetries[0] = allSymmetries[0].add(1)
@@ -108,8 +119,8 @@ module.exports = async function(deployer, helper, accounts)  {
               allSymmetries[2] = allSymmetries[2].add(reversi.X0Sym  ? 1 : 0)
               allSymmetries[3] = allSymmetries[3].add(reversi.XYSym  ? 1 : 0)
               allSymmetries[4] = allSymmetries[4].add(reversi.XnYSym ? 1 : 0)
-            tx = await clovers.setAllSymmetries(...allSymmetries)
-            // console.log(tx.receipt.status)
+              tx = await clovers.setAllSymmetries(...allSymmetries)
+              // console.log(tx.receipt.status)
             }
             tx = await clovers.mint(_to, _tokenId)
             // console.log(tx.receipt.status)

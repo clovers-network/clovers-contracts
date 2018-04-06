@@ -26,7 +26,7 @@ module.exports = (deployer, helper, accounts) => {
       await clovers.updateCloversMetadataAddress(cloversMetadata.address)
 
       // Deploy ClubToken.sol (ERC20)
-      await deployer.deploy(ClubToken)
+      await deployer.deploy(ClubToken, 'ClubToken', 'CLB', 18)
       let clubToken = await ClubToken.deployed()
 
       // Deploy Reversi.sol
