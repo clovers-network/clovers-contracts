@@ -7,7 +7,7 @@ pragma solidity ^0.4.19;
 
 contract ICloversController {
 
-    event cloverCommited(bytes32 movesHash, address owner);
+    event cloverCommitted(bytes32 movesHash, address owner);
     event cloverClaimed(bytes28[2] moves, uint256 tokenId, address owner, uint stake, uint reward, bytes1 symmetries);
     event stakeAndRewardRetrieved(uint256 tokenId, address owner, uint stake, uint reward);
     event cloverChallenged(bytes28[2] moves, uint256 tokenId, address owner, address challenger, uint stake);
