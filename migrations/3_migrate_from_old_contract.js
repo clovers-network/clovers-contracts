@@ -10,7 +10,7 @@ var Web3 = require('web3')
 module.exports = async function(deployer, helper, accounts)  {
 
   var doFors = (n, i = 0, func) => {
-    console.log(n, i, func)
+    // console.log(n, i, func)
     return new Promise((resolve, reject) => {
       try {
         if (i === n) {
@@ -51,8 +51,8 @@ module.exports = async function(deployer, helper, accounts)  {
         })
       })
       console.log(getCloversCount)
-      await doFors(getCloversCount.toNumber(), 11, (i) => {
-        console.log(i)
+      await doFors(getCloversCount.toNumber(), 0, (i) => {
+        console.log(i + '/' + getCloversCount.toNumber())
         return new Promise(async (resolve, reject) => {
           try{
             var clover = await new Promise((resolve, reject) => {
@@ -106,7 +106,7 @@ module.exports = async function(deployer, helper, accounts)  {
               // console.log(tx.receipt.status)
             }
             tx = await clovers.mint(_to, _tokenId)
-            // console.log(tx.receipt.status)
+            // console.log(tx)
             resolve()
           } catch(error) {
             reject(error)
