@@ -51,7 +51,7 @@ module.exports = async function(deployer, helper, accounts)  {
         })
       })
       console.log(getCloversCount)
-      await doFors(getCloversCount.toNumber(), 0, (i) => {
+      await doFors(getCloversCount.toNumber(), 700, (i) => {
         console.log(i + '/' + getCloversCount.toNumber())
         return new Promise(async (resolve, reject) => {
           try{
@@ -106,7 +106,7 @@ module.exports = async function(deployer, helper, accounts)  {
               // console.log(tx.receipt.status)
             }
             tx = await clovers.mint(_to, _tokenId)
-            // console.log(tx)
+            console.log(tx.logs)
             resolve()
           } catch(error) {
             reject(error)
