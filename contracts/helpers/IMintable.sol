@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity ^0.4.18;
 
 /**
  * Mintable is a contract interface for CloversController to use

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity ^0.4.18;
 
 /**
  * Interface for Digital Asset Registry for the Non Fungible Token Clover

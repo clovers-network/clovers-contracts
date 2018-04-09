@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity ^0.4.18;
 
 /**
  * ClubToken adheres to ERC827 and by extension ERC20
