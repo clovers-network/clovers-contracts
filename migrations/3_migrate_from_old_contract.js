@@ -51,7 +51,7 @@ module.exports = async function(deployer, helper, accounts)  {
         })
       })
       console.log(getCloversCount)
-      await doFors(getCloversCount.toNumber(), 700, (i) => {
+      await doFors(getCloversCount.toNumber(), 0, (i) => {
         console.log(i + '/' + getCloversCount.toNumber())
         return new Promise(async (resolve, reject) => {
           try{
