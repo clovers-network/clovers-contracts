@@ -2,7 +2,7 @@
 var Clovers = artifacts.require("./Clovers.sol");
 var ClubToken = artifacts.require("./ClubToken.sol");
 var OldToken = artifacts.require('../contracts/OldToken.sol');
-const ZeroClientProvider = require('web3-provider-engine/zero.js')
+var ethers = require('ethers');
 
 // var Reversi = require('../app/src/assets/reversi.js')
 var Reversi = require('clovers-reversi')
@@ -34,33 +34,32 @@ module.exports = async function(deployer, helper, accounts)  {
 
   deployer.then(async () => {
     try {
+      var providers = require('ethers').providers;
+      var network = providers.networks.rinkeby;
+      var infuraProvider = new providers.InfuraProvider(network);
+      var etherscanProvider = new providers.EtherscanProvider(network);
+      var fallbackProvider = new providers.FallbackProvider([
+          infuraProvider,
+          etherscanProvider
+      ]);
+      var provider = providers.getDefaultProvider(network)
 
       var clovers = await Clovers.deployed()
+      // var web3Provider = ZeroClientProvider({
+      //   getAccounts: function(){},
+      //   rpcUrl: 'https://rinkeby.infura.io/Q5I7AA6unRLULsLTYd6d',
+      // })
+      // var _web3 = new Web3(web3Provider)
+      var address = '0xcc0604514f71b8d39e13315d59f4115702b42646';
+      var oldToken = new ethers.Contract(address, OldToken.abi, provider);
 
-      var web3Provider = ZeroClientProvider({
-        getAccounts: function(){},
-        rpcUrl: 'https://rinkeby.infura.io/Q5I7AA6unRLULsLTYd6d',
-      })
-      var _web3 = new Web3(web3Provider)
-      var _oldToken = _web3.eth.contract(OldToken.abi)
-      var oldToken = _oldToken.at('0xcc0604514f71b8d39e13315d59f4115702b42646')
-      var getCloversCount = await new Promise((resolve, reject) => {
-        oldToken.getCloversCount((err, result) => {
-          if (err) reject(err)
-          resolve(result)
-        })
-      })
-      console.log(getCloversCount)
+      var getCloversCount = await oldToken.getCloversCount()
+      // console.log(getCloversCount)
       await doFors(getCloversCount.toNumber(), 0, (i) => {
         console.log(i + '/' + getCloversCount.toNumber())
         return new Promise(async (resolve, reject) => {
           try{
-            var clover = await new Promise((resolve, reject) => {
-              oldToken.getCloverByKey(i, (err, result) => {
-                if (err) reject(err)
-                resolve(result)
-              })
-            })
+            var clover = await oldToken.getCloverByKey(i)
             var _tokenId = clover[0]
             var reversi = new Reversi()
             reversi.byteBoardPopulateBoard(_tokenId.toString(16))
