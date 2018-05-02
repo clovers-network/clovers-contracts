@@ -23,7 +23,7 @@ contract Clovers is IClovers, ERC721Token, Ownable {
 
     mapping (uint256 => Clover) public clovers;
     struct Clover {
-        bytes1 symmetries;
+        uint256 symmetries;
         bytes28[2] cloverMoves;
         uint256 blockMinted;
         uint256 rewards;
@@ -82,7 +82,7 @@ contract Clovers is IClovers, ERC721Token, Ownable {
     function getReward(uint256 _tokenId) public view returns (uint256) {
         return clovers[_tokenId].rewards;
     }
-    function getSymmetries(uint256 _tokenId) public view returns (bytes1) {
+    function getSymmetries(uint256 _tokenId) public view returns (uint256) {
         return clovers[_tokenId].symmetries;
     }
     function getAllSymmetries() public view returns (uint256, uint256, uint256, uint256, uint256, uint256) {
@@ -125,7 +125,7 @@ contract Clovers is IClovers, ERC721Token, Ownable {
     function setReward(uint256 _tokenId, uint256 _amount) public onlyOwnerOrController {
         clovers[_tokenId].rewards = _amount;
     }
-    function setSymmetries(uint256 _tokenId, bytes1 _symmetries) public onlyOwnerOrController {
+    function setSymmetries(uint256 _tokenId, uint256 _symmetries) public onlyOwnerOrController {
         clovers[_tokenId].symmetries = _symmetries;
     }
     function setAllSymmetries(uint256 _totalSymmetries, uint256 RotSym, uint256 Y0Sym, uint256 X0Sym, uint256 XYSym, uint256 XnYSym) public onlyOwnerOrController {

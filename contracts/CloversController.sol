@@ -16,7 +16,7 @@ import "zeppelin-solidity/contracts/math/SafeMath.sol";
 
 contract CloversController is ICloversController, HasNoTokens, HasNoEther {
     event cloverCommitted(bytes32 movesHash, address owner);
-    event cloverClaimed(bytes28[2] moves, uint256 tokenId, address owner, uint stake, uint reward, bytes1 symmetries);
+    event cloverClaimed(bytes28[2] moves, uint256 tokenId, address owner, uint stake, uint reward, uint256 symmetries);
     event stakeAndRewardRetrieved(uint256 tokenId, address owner, uint stake, uint reward);
     event cloverChallenged(bytes28[2] moves, uint256 tokenId, address owner, address challenger, uint stake);
 
@@ -94,10 +94,10 @@ contract CloversController is ICloversController, HasNoTokens, HasNoEther {
     }
     /**
     * @dev Calculates the reward of the board.
-    * @param _symmetries symmetries saved as a bytes1 value like 00010101 where bits represent symmetry types.
+    * @param _symmetries symmetries saved as a uint256 value like 00010101 where bits represent symmetry types.
     * @return A uint256 representing the reward that would be returned for claiming the board.
     */
-    function calculateReward(bytes1 _symmetries) public constant returns (uint256) {
+    function calculateReward(uint256 _symmetries) public constant returns (uint256) {
         uint256 Symmetricals;
         uint256 RotSym;
         uint256 Y0Sym;
@@ -123,11 +123,11 @@ contract CloversController is ICloversController, HasNoTokens, HasNoEther {
     * @dev Claim the Clover without a commit or reveal.
     * @param moves The moves that make up the Clover reversi game.
     * @param _tokenId The board that results from the moves.
-    * @param _symmetries symmetries saved as a bytes1 value like 00010101 where bits represent symmetry types.
+    * @param _symmetries symmetries saved as a uint256 value like 00010101 where bits represent symmetry types.
     * @param _to The address claiming the Clover.
     * @return A boolean representing whether or not the claim was successful.
     */
-    function claimClover(bytes28[2] moves, uint256 _tokenId, bytes1 _symmetries, address _to) public payable returns (bool) {
+    function claimClover(bytes28[2] moves, uint256 _tokenId, uint256 _symmetries, address _to) public payable returns (bool) {
         require(moves[0] != 0);
         require(msg.value == stakeAmount);
         bytes32 movesHash = keccak256(moves);
@@ -166,10 +166,10 @@ contract CloversController is ICloversController, HasNoTokens, HasNoEther {
     * @dev Reveal the solution to the previous commit to claim the Clover.
     * @param moves The moves that make up the Clover reversi game.
     * @param _tokenId The board that results from the moves.
-    * @param _symmetries symmetries saved as a bytes1 value like 00010101 where bits represent symmetry types.
+    * @param _symmetries symmetries saved as a uint256 value like 00010101 where bits represent symmetry types.
     * @return A boolean representing whether or not the reveal and claim was successful.
     */
-    function claimCloverReveal(bytes28[2] moves, uint256 _tokenId, bytes1 _symmetries) public returns (bool) {
+    function claimCloverReveal(bytes28[2] moves, uint256 _tokenId, uint256 _symmetries) public returns (bool) {
         require(moves[0] != 0);
         bytes32 movesHash = keccak256(moves);
         address commiter = IClovers(clovers).getCommit(movesHash);
@@ -219,7 +219,7 @@ contract CloversController is ICloversController, HasNoTokens, HasNoEther {
         require(moves[0] != 0);
         Reversi.Game memory game = Reversi.playGame(moves);
         if(isValidGame(game)) {
-            bytes1 _symmetries = IClovers(clovers).getSymmetries(_tokenId);
+            uint256 _symmetries = IClovers(clovers).getSymmetries(_tokenId);
 
             valid = (_symmetries >> 4 & 1) > 0 == game.RotSym ? valid : false;
             valid = (_symmetries >> 3 & 1) > 0 == game.Y0Sym ? valid : false;
@@ -286,7 +286,7 @@ contract CloversController is ICloversController, HasNoTokens, HasNoEther {
         X0Sym,
         XYSym,
         XnYSym) = IClovers(clovers).getAllSymmetries();
-        bytes1 _symmetries = IClovers(clovers).getSymmetries(_tokenId);
+        uint256 _symmetries = IClovers(clovers).getSymmetries(_tokenId);
         Symmetricals = Symmetricals.add(_symmetries > 0 ? 1 : 0);
         RotSym = RotSym.add(uint256(_symmetries >> 4 & 1));
         Y0Sym = Y0Sym.add(uint256(_symmetries >> 3 & 1));
@@ -312,7 +312,7 @@ contract CloversController is ICloversController, HasNoTokens, HasNoEther {
         X0Sym,
         XYSym,
         XnYSym) = IClovers(clovers).getAllSymmetries();
-        bytes1 _symmetries = IClovers(clovers).getSymmetries(_tokenId);
+        uint256 _symmetries = IClovers(clovers).getSymmetries(_tokenId);
         Symmetricals = Symmetricals.sub(_symmetries > 0 ? 1 : 0);
         RotSym = RotSym.sub(uint256(_symmetries >> 4 & 1));
         Y0Sym = Y0Sym.sub(uint256(_symmetries >> 3 & 1));

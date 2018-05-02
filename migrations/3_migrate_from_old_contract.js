@@ -64,14 +64,7 @@ module.exports = async function(deployer, helper, accounts)  {
             var reversi = new Reversi()
             reversi.byteBoardPopulateBoard(_tokenId.toString(16))
             reversi.isSymmetrical()
-            var symmetries = new web3.BigNumber(0)
-            if (reversi.symmetrical) {
-              symmetries = symmetries.add(reversi.RotSym ? '0x10000' : 0)
-              symmetries = symmetries.add(reversi.Y0Sym  ? '0x01000' : 0)
-              symmetries = symmetries.add(reversi.X0Sym  ? '0x00100' : 0)
-              symmetries = symmetries.add(reversi.XYSym  ? '0x00010' : 0)
-              symmetries = symmetries.add(reversi.XnYSym ? '0x00001' : 0)
-            }
+
             var _to = clover[3]
             var first32Moves = clover[4]
             var lastMoves = clover[5]
@@ -91,9 +84,17 @@ module.exports = async function(deployer, helper, accounts)  {
 
             if (reversi.symmetrical) {
               console.log('is symmetrical')
+              // console.log(reversi)
+
+              var symmetries = new web3.BigNumber(0)
+
+              symmetries = symmetries.add(reversi.RotSym ? '0b10000' : 0)
+              symmetries = symmetries.add(reversi.Y0Sym  ? '0b01000' : 0)
+              symmetries = symmetries.add(reversi.X0Sym  ? '0b00100' : 0)
+              symmetries = symmetries.add(reversi.XYSym  ? '0b00010' : 0)
+              symmetries = symmetries.add(reversi.XnYSym ? '0b00001' : 0)
               // setSymmetries
               tx = await clovers.setSymmetries(_tokenId, symmetries)
-              // console.log(tx.receipt.status)
               // setAllSymmetries
               var allSymmetries = await clovers.getAllSymmetries()
               allSymmetries[0] = allSymmetries[0].add(1)
