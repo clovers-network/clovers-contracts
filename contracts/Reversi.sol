@@ -88,6 +88,10 @@ library Reversi {
             move = readMove(currentMoves, game.moveKey % 32, 32);
             (col, row) = convertMove(move);
             skip = !validMove(move);
+            if (i == 0 && (col != 2 || row != 3)) {
+                skip = true; // this is to force the first move to always be C4 to avoid repeatable boards via mirroring translations
+                game.error = true
+            }
             if (!skip && col < 8 && row < 8 && col >= 0 && row >= 0) {
                 // game.msg = "make a move";
                 game = makeMove(game, col, row);

@@ -1,9 +1,8 @@
-
-var Reversi = artifacts.require("./Reversi.sol");
-var Clovers = artifacts.require("./Clovers.sol");
-var CloversMetadata = artifacts.require("./CloversMetadata.sol");
-var CloversController = artifacts.require("./CloversController.sol");
-var ClubToken = artifacts.require("./ClubToken.sol");
+var Reversi = artifacts.require('./Reversi.sol')
+var Clovers = artifacts.require('./Clovers.sol')
+var CloversMetadata = artifacts.require('./CloversMetadata.sol')
+var CloversController = artifacts.require('./CloversController.sol')
+var ClubToken = artifacts.require('./ClubToken.sol')
 
 let stakeAmount = 529271 * 1000000000 * 40 // gasPrice * 1GWEI * 40
 let stakePeriod = 100
@@ -21,7 +20,7 @@ module.exports = (deployer, helper, accounts) => {
       await deployer.deploy(CloversMetadata, clovers.address)
       let cloversMetadata = await CloversMetadata.deployed()
 
-      // Update Clovers.sol 
+      // Update Clovers.sol
       // -w CloversMetadata address
       await clovers.updateCloversMetadataAddress(cloversMetadata.address)
 
@@ -31,8 +30,8 @@ module.exports = (deployer, helper, accounts) => {
 
       // Deploy Reversi.sol
       // -link w cloversController
-      await deployer.deploy(Reversi);
-      let reversi = await Reversi.deployed();
+      await deployer.deploy(Reversi)
+      let reversi = await Reversi.deployed()
 
       await CloversController.link('Reversi', reversi.address)
       // await deployer.link(Reversi, CloversController);
@@ -42,7 +41,11 @@ module.exports = (deployer, helper, accounts) => {
       // Deploy CloversController.sol
       // -w Clovers address
       // -w ClubToken address
-      await deployer.deploy(CloversController, clovers.address, clubToken.address)
+      await deployer.deploy(
+        CloversController,
+        clovers.address,
+        clubToken.address
+      )
       let cloversController = await CloversController.deployed()
 
       // Update Clovers.sol
@@ -52,7 +55,6 @@ module.exports = (deployer, helper, accounts) => {
       // Update ClubToken.sol
       // -w CloversController address
       await clubToken.updateCloversControllerAddress(cloversController.address)
-
 
       // Update CloversController.sol
       // -w stakeAmount
@@ -65,4 +67,4 @@ module.exports = (deployer, helper, accounts) => {
       console.log(error)
     }
   })
-};
+}
