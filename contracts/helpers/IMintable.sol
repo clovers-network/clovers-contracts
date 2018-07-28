@@ -7,8 +7,8 @@ pragma solidity ^0.4.18;
 
 contract IMintable {
 
-    function IMintable() public {}
+    constructor() public {}
 
     function mint(address _to, uint256 amount) public returns(bool);
-  
+
 }
