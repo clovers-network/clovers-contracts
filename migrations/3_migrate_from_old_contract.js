@@ -55,64 +55,64 @@ module.exports = async function(deployer, helper, accounts)  {
 
       var getCloversCount = await oldToken.getCloversCount()
       // console.log(getCloversCount)
-      await doFors(getCloversCount.toNumber(), 0, (i) => {
-        console.log(i + '/' + getCloversCount.toNumber())
-        return new Promise(async (resolve, reject) => {
-          try{
-            var clover = await oldToken.getCloverByKey(i)
-            var _tokenId = clover[0]
-            var reversi = new Reversi()
-            reversi.byteBoardPopulateBoard(_tokenId.toString(16))
-            reversi.isSymmetrical()
+      // await doFors(getCloversCount.toNumber(), 0, (i) => {
+      //   console.log(i + '/' + getCloversCount.toNumber())
+      //   return new Promise(async (resolve, reject) => {
+      //     try{
+      //       var clover = await oldToken.getCloverByKey(i)
+      //       var _tokenId = clover[0]
+      //       var reversi = new Reversi()
+      //       reversi.byteBoardPopulateBoard(_tokenId.toString(16))
+      //       reversi.isSymmetrical()
 
-            var _to = clover[3]
-            var first32Moves = clover[4]
-            var lastMoves = clover[5]
-            var moves = [first32Moves, lastMoves]
-            var movesHash = await clovers.getHash(moves)
-            var blockNumber = await getBlockNumber()
+      //       var _to = clover[3]
+      //       var first32Moves = clover[4]
+      //       var lastMoves = clover[5]
+      //       var moves = [first32Moves, lastMoves]
+      //       var movesHash = await clovers.getHash(moves)
+      //       var blockNumber = await getBlockNumber()
 
-            // setCommit
-            var tx = await clovers.setCommit(movesHash, _to)
-            // console.log(tx.receipt.status)
-            // setBlockMinted
-            tx = await clovers.setBlockMinted(_tokenId, blockNumber)
-            // console.log(tx.receipt.status)
-            // setCloverMoves
-            tx = await clovers.setCloverMoves(_tokenId, moves)
-            // console.log(tx.receipt.status)
+      //       // setCommit
+      //       var tx = await clovers.setCommit(movesHash, _to)
+      //       // console.log(tx.receipt.status)
+      //       // setBlockMinted
+      //       tx = await clovers.setBlockMinted(_tokenId, blockNumber)
+      //       // console.log(tx.receipt.status)
+      //       // setCloverMoves
+      //       tx = await clovers.setCloverMoves(_tokenId, moves)
+      //       // console.log(tx.receipt.status)
 
-            if (reversi.symmetrical) {
-              console.log('is symmetrical')
-              // console.log(reversi)
+      //       if (reversi.symmetrical) {
+      //         console.log('is symmetrical')
+      //         // console.log(reversi)
 
-              var symmetries = new web3.BigNumber(0)
+      //         var symmetries = new web3.BigNumber(0)
 
-              symmetries = symmetries.add(reversi.RotSym ? '0b10000' : 0)
-              symmetries = symmetries.add(reversi.Y0Sym  ? '0b01000' : 0)
-              symmetries = symmetries.add(reversi.X0Sym  ? '0b00100' : 0)
-              symmetries = symmetries.add(reversi.XYSym  ? '0b00010' : 0)
-              symmetries = symmetries.add(reversi.XnYSym ? '0b00001' : 0)
-              // setSymmetries
-              tx = await clovers.setSymmetries(_tokenId, symmetries)
-              // setAllSymmetries
-              var allSymmetries = await clovers.getAllSymmetries()
-              allSymmetries[0] = allSymmetries[0].add(1)
-              allSymmetries[1] = allSymmetries[1].add(reversi.Y0Sym  ? 1 : 0)
-              allSymmetries[2] = allSymmetries[2].add(reversi.X0Sym  ? 1 : 0)
-              allSymmetries[3] = allSymmetries[3].add(reversi.XYSym  ? 1 : 0)
-              allSymmetries[4] = allSymmetries[4].add(reversi.XnYSym ? 1 : 0)
-              tx = await clovers.setAllSymmetries(...allSymmetries)
-              // console.log(tx.receipt.status)
-            }
-            tx = await clovers.mint(_to, _tokenId)
-            console.log(tx.logs)
-            resolve()
-          } catch(error) {
-            reject(error)
-          }
-        })
-      })
+      //         symmetries = symmetries.add(reversi.RotSym ? '0b10000' : 0)
+      //         symmetries = symmetries.add(reversi.Y0Sym  ? '0b01000' : 0)
+      //         symmetries = symmetries.add(reversi.X0Sym  ? '0b00100' : 0)
+      //         symmetries = symmetries.add(reversi.XYSym  ? '0b00010' : 0)
+      //         symmetries = symmetries.add(reversi.XnYSym ? '0b00001' : 0)
+      //         // setSymmetries
+      //         tx = await clovers.setSymmetries(_tokenId, symmetries)
+      //         // setAllSymmetries
+      //         var allSymmetries = await clovers.getAllSymmetries()
+      //         allSymmetries[0] = allSymmetries[0].add(1)
+      //         allSymmetries[1] = allSymmetries[1].add(reversi.Y0Sym  ? 1 : 0)
+      //         allSymmetries[2] = allSymmetries[2].add(reversi.X0Sym  ? 1 : 0)
+      //         allSymmetries[3] = allSymmetries[3].add(reversi.XYSym  ? 1 : 0)
+      //         allSymmetries[4] = allSymmetries[4].add(reversi.XnYSym ? 1 : 0)
+      //         tx = await clovers.setAllSymmetries(...allSymmetries)
+      //         // console.log(tx.receipt.status)
+      //       }
+      //       tx = await clovers.mint(_to, _tokenId)
+      //       console.log(tx.logs)
+      //       resolve()
+      //     } catch(error) {
+      //       reject(error)
+      //     }
+      //   })
+      // })
     } catch (error) {
       console.log(error)
     }

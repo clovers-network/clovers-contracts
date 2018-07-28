@@ -107,8 +107,8 @@ contract('Clovers', async function(accounts)  {
 
   describe('Clovers.sol', function () {
     it('should be able to read metadata', async function () {
-      let metadata = await clovers.tokenMetadata(666)
-      let _metadata = await cloversMetadata.tokenMetadata(666)
+      let metadata = await clovers.tokenURI(666)
+      let _metadata = await cloversMetadata.tokenURI(666)
       assert(_metadata === metadata, '_metadata != metadata')
     })
   })

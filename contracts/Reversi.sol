@@ -1,6 +1,5 @@
 pragma solidity ^0.4.18;
-pragma experimental ABIEncoderV2;
-
+/* pragma experimental ABIEncoderV2; */
 
 library Reversi {
     // event DebugBool(bool boolean);
@@ -31,10 +30,6 @@ library Reversi {
     }
 
 
-    function showColors () public pure returns(uint8, uint8, uint8) {
-        return (EMPTY, BLACK, WHITE);
-    }
-
     function isValid (bytes28[2] moves) public pure returns (bool) {
       Game memory game = playGame(moves);
       if (game.error) {
@@ -57,6 +52,10 @@ library Reversi {
          game.moveKey
          // game.msg
       );
+    }
+
+    function showColors () public pure returns(uint8, uint8, uint8) {
+        return (EMPTY, BLACK, WHITE);
     }
 
     function playGame (bytes28[2] moves) internal pure returns (Game)  {
@@ -90,7 +89,7 @@ library Reversi {
             skip = !validMove(move);
             if (i == 0 && (col != 2 || row != 3)) {
                 skip = true; // this is to force the first move to always be C4 to avoid repeatable boards via mirroring translations
-                game.error = true
+                game.error = true;
             }
             if (!skip && col < 8 && row < 8 && col >= 0 && row >= 0) {
                 // game.msg = "make a move";
@@ -113,13 +112,13 @@ library Reversi {
             }
         }
         if (!game.error) {
-            game.error = false; 
+            game.error = false;
             game = isComplete(game);
             game = isSymmetrical(game);
         }
         return game;
     }
-    
+
     function makeMove (Game memory game, uint8 col, uint8 row) internal pure returns (Game)  {
         // square is already occupied
         if (returnTile(game.board, col, row) != EMPTY){
@@ -294,7 +293,7 @@ library Reversi {
                 uint8[2] memory move;
                 for (i = 0; i < emptiesLength && !validMovesRemains; i++) {
                     move = empties[i];
-                    
+
                     game.currentPlayer = BLACK;
                     game.error = false;
                     game.board = board;
@@ -311,7 +310,7 @@ library Reversi {
                     }
                 }
                 game.board = board;
-            } 
+            }
             if (validMovesRemains) {
                 game.error = true;
                 // game.msg = "Invalid Game (moves still available)";

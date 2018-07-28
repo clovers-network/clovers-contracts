@@ -1,19 +1,19 @@
 pragma solidity ^0.4.18;
 
 /**
- * ClubToken adheres to ERC827 and by extension ERC20
+ * ClubToken adheres to ERC20
  * it is a continuously mintable token administered by CloversController
  */
- 
+
+import "zeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
 import "zeppelin-solidity/contracts/token/ERC20/DetailedERC20.sol";
-import "zeppelin-solidity/contracts/token/ERC827/ERC827Token.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
 
-contract ClubToken is DetailedERC20, ERC827Token, Ownable {
+contract ClubToken is StandardToken, DetailedERC20, Ownable {
     event Burn(address indexed burner, uint256 value);
     event Mint(address indexed to, uint256 amount);
-    
+
     address cloversController;
 
     modifier onlyOwnerOrController() {
@@ -24,7 +24,7 @@ contract ClubToken is DetailedERC20, ERC827Token, Ownable {
         _;
     }
 
-    function ClubToken(string _name, string _symbol, uint8 _decimals) public 
+    function ClubToken(string _name, string _symbol, uint8 _decimals) public
         DetailedERC20(_name, _symbol, _decimals)
     {}
 

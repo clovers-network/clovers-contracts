@@ -16,7 +16,7 @@ import "./CloversMetadata.sol";
 
 contract Clovers is IClovers, ERC721Token, Ownable {
 
-    address private cloversMetadata;
+    address cloversMetadata;
     uint256 totalSymmetries;
     uint256[5] symmetries; // RotSym, Y0Sym, X0Sym, XYSym, XnYSym
     address cloversController;
