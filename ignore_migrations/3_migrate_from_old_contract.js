@@ -7,6 +7,7 @@ var ethers = require("ethers");
 var Reversi = require("clovers-reversi").default;
 var Web3 = require("web3");
 module.exports = async function(deployer, helper, accounts) {
+  return
   var doFors = (n, i = 0, func) => {
     // console.log(n, i, func)
     return new Promise((resolve, reject) => {
@@ -119,7 +120,7 @@ module.exports = async function(deployer, helper, accounts) {
               allSymmetries[2] = allSymmetries[2].add(reversi.X0Sym ? 1 : 0);
               allSymmetries[3] = allSymmetries[3].add(reversi.XYSym ? 1 : 0);
               allSymmetries[4] = allSymmetries[4].add(reversi.XnYSym ? 1 : 0);
-              tx = await clovers.setAllSymmetries(...allSymmetries);
+              tx = await clover s.setAllSymmetries(...allSymmetries);
               console.log(tx.receipt.status);
             }
             if (!(await clovers.exists(_tokenId))) {

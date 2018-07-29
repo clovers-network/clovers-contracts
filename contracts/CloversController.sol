@@ -2,19 +2,19 @@ pragma solidity ^0.4.18;
 pragma experimental ABIEncoderV2;
 
 /**
- * The CloversController is replaceable endpoint for minting and unminting Clovers.sol and ClubToken.sol
+ * The CloversController is a replaceable endpoint for minting and unminting Clovers.sol and ClubToken.sol
  */
 
 import "./Reversi.sol";
 import "./IClovers.sol";
-import "./helpers/IMintable.sol";
+import "./ClubToken.sol";
 import "./ICloversController.sol";
 import "zeppelin-solidity/contracts/ownership/HasNoTokens.sol";
 import "zeppelin-solidity/contracts/ownership/HasNoEther.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 
 
-contract CloversController is ICloversController, HasNoTokens, HasNoEther {
+contract CloversController is ICloversController, HasNoTokens {
     event cloverCommitted(bytes32 movesHash, address owner);
     event cloverClaimed(bytes28[2] moves, uint256 tokenId, address owner, uint stake, uint reward, uint256 symmetries);
     event stakeAndRewardRetrieved(uint256 tokenId, address owner, uint stake, uint reward);
@@ -22,39 +22,18 @@ contract CloversController is ICloversController, HasNoTokens, HasNoEther {
 
     using SafeMath for uint256;
 
-    address clovers;
-    address clubToken;
+    address public clovers;
+    address public clubToken;
 
-    uint256 payMultiplier;
-    uint256 stakeAmount;
-    uint256 stakePeriod;
-
-    function CloversController(address _clovers, address _clubToken) public {
+    uint256 public payMultiplier;
+    uint256 public stakeAmount;
+    uint256 public stakePeriod;
+    
+    constructor(address _clovers, address _clubToken) public {
         clovers = _clovers;
         clubToken = _clubToken;
-    }    
+    }
 
-    /**
-    * @dev Gets the current staking amount needed to claim a Clover.
-    * @return A uint256 value of how much stake is needed.
-    */
-    function currentStakeAmount() public constant returns (uint256) {
-        return stakeAmount;
-    }
-    /**
-    * @dev Gets the current staking period needed to verify a Clover.
-    * @return A uint256 value of stake period in seconds.
-    */
-    function currentStakePeriod() public constant returns (uint256) {
-        return stakePeriod;
-    }
-    /**
-    * @dev Gets the current staking period needed to verify a Clover.
-    * @return A uint256 value of stake period in seconds.
-    */
-    function getMultiplier() public constant returns (uint256) {
-        return payMultiplier;
-    }
     /**
     * @dev Gets the current staking period needed to verify a Clover.
     * @return A uint256 value of stake period in seconds.
@@ -118,6 +97,11 @@ contract CloversController is ICloversController, HasNoTokens, HasNoEther {
         if (_symmetries & 1 == 1) base = base.add(payMultiplier.mul(Symmetricals + 1).div(XnYSym + 1));
         return base;
     }
+
+
+    /* ClubToken Specific Functions */
+
+    /* Clover Specific Functions */
 
     /**
     * @dev Claim the Clover without a commit or reveal.
@@ -202,7 +186,7 @@ contract CloversController is ICloversController, HasNoTokens, HasNoEther {
         addSymmetries(_tokenId);
         address commiter = IClovers(clovers).getCommit(movesHash);
         uint256 reward = IClovers(clovers).getReward(_tokenId);
-        require(IMintable(clubToken).mint(commiter, reward));
+        require(ClubToken(clubToken).mint(commiter, reward));
         require(IClovers(clovers).moveEth(commiter, stake));
         stakeAndRewardRetrieved(_tokenId, commiter, stake, reward);
         return true;

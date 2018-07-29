@@ -7,7 +7,6 @@ pragma experimental ABIEncoderV2;
  */
 
 import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
-
 import "zeppelin-solidity/contracts/token/ERC721/ERC721Token.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./IClovers.sol";
@@ -154,13 +153,6 @@ contract Clovers is IClovers, ERC721Token, Ownable {
     }
     function unmint (uint256 _tokenId) public onlyOwnerOrController {
         super._burn(ownerOf(_tokenId), _tokenId);
-        // address _owner = ownerOf(_tokenId); // needs to be changed from private to internal
-        // if (getApproved(_tokenId) != 0) {
-        //     tokenApprovals[_tokenId] = 0;
-        //     Approval(_owner, 0x0, _tokenId);
-        // }
-        // removeTokenFrom(_owner, _tokenId); // needs to be changed from private to internal
-        // Transfer(_owner, 0x0, _tokenId);
     }
 
 }

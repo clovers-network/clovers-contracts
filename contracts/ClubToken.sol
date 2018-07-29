@@ -2,62 +2,63 @@ pragma solidity ^0.4.18;
 
 /**
  * ClubToken adheres to ERC20
- * it is a continuously mintable token administered by CloversController
+ * it is a continuously mintable token administered by CloversController/ClubTokenController
  */
 
 import "zeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
 import "zeppelin-solidity/contracts/token/ERC20/DetailedERC20.sol";
-import "zeppelin-solidity/contracts/ownership/Ownable.sol";
+import "zeppelin-solidity/contracts/token/ERC20/MintableToken.sol";
+import "zeppelin-solidity/contracts/token/ERC20/BurnableToken.sol";
 
-
-contract ClubToken is StandardToken, DetailedERC20, Ownable {
-    event Burn(address indexed burner, uint256 value);
-    event Mint(address indexed to, uint256 amount);
+contract ClubToken is StandardToken, DetailedERC20, MintableToken, BurnableToken {
 
     address cloversController;
+    address clubTokenController;
 
-    modifier onlyOwnerOrController() {
-        require(
-            msg.sender == cloversController ||
-            msg.sender == owner
-        );
-        _;
+    modifier hasMintPermission() {
+      require(
+          msg.sender == clubTokenController ||
+          msg.sender == cloversController ||
+          msg.sender == owner
+      );
+      _;
     }
 
+    /**
+    * @dev constructor for the ClubTokens contract
+    * @param _name The name of the token
+    * @param _symbol The symbol of the token
+    * @param _decimals The decimals of the token
+    */
     function ClubToken(string _name, string _symbol, uint8 _decimals) public
         DetailedERC20(_name, _symbol, _decimals)
     {}
+
+    function updateClubTokenControllerAddress(address _clubTokenController) public onlyOwner {
+        require(_clubTokenController != 0);
+        clubTokenController = _clubTokenController;
+    }
 
     function updateCloversControllerAddress(address _cloversController) public onlyOwner {
         require(_cloversController != 0);
         cloversController = _cloversController;
     }
+
     /**
      * @dev Burns a specific amount of tokens.
      * @param _value The amount of token to be burned.
+     * NOTE: Disabled as tokens should not be burned under circumstances beside selling tokens.
      */
-    function burn(address _from, uint256 _value) public onlyOwnerOrController {
-        require(_value <= balances[_from]);
-        // no need to require value <= totalSupply, since that would imply the
-        // sender's balance is greater than the totalSupply, which *should* be an assertion failure
-
-        address burner = _from;
-        balances[burner] = balances[burner].sub(_value);
-        totalSupply_ = totalSupply_.sub(_value);
-        Burn(burner, _value);
+    function burn(uint256 _value) public {
+        revert();
     }
 
     /**
-     * @dev Function to mint tokens
-     * @param _to The address that will receive the minted tokens.
-     * @param _amount The amount of tokens to mint.
-     * @return A boolean that indicates if the operation was successful.
+     * @dev Burns a specific amount of tokens.
+     * @param _burner The address of the token holder burning their tokens.
+     * @param _value The amount of token to be burned.
      */
-    function mint(address _to, uint256 _amount) public onlyOwnerOrController returns (bool) {
-        totalSupply_ = totalSupply_.add(_amount);
-        balances[_to] = balances[_to].add(_amount);
-        Mint(_to, _amount);
-        Transfer(address(0), _to, _amount);
-        return true;
+    function burn(address _burner, uint256 _value) public hasMintPermission {
+      _burn(_burner, _value);
     }
 }

@@ -7,12 +7,13 @@
     "test": "test"
   },
   "scripts": {
-    "test": "truffle test"
+    "compile": "truffle compile --reset --compile-all",
+    "test": "yarn compile && truffle test"
   },
   "author": "Billy Rennekamp <billy.rennekamp@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "clovers-reversi": "^1.0.0",
+    "bancor-contracts": "github:bancorprotocol/contracts",
     "dotenv": "^6.0.0",
     "ethers": "^3.0.9",
     "truffle": "^4.1.13",

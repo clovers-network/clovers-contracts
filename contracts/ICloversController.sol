@@ -12,12 +12,10 @@ contract ICloversController {
     event stakeAndRewardRetrieved(uint256 tokenId, address owner, uint stake, uint reward);
     event cloverChallenged(bytes28[2] moves, uint256 tokenId, address owner, address challenger, uint stake);
 
-    function currentStakeAmount() public constant returns (uint256);
-    function currentStakePeriod() public constant returns (uint256);
     function isValid(bytes28[2] moves) public constant returns (bool);
     function isVerified(uint256 _tokenId) public constant returns (bool);
     function calculateReward(uint256 _symmetries) public constant returns (uint256);
-    
+
     // function claimClover(bytes28[2] moves, uint256 _tokenId) public payable returns (bool);
     // function claimClover(bytes28[2] moves, uint256 _tokenId, address _to) public payable returns (bool);
     // function claimClover(bytes28[2] moves, uint256 _tokenId, uint256 _symmetries) public payable returns (bool);
