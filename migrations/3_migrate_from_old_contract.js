@@ -70,9 +70,7 @@ module.exports = async function(deployer, helper, accounts) {
             var _to = clover[3];
             var first32Moves = clover[4];
             var lastMoves = clover[5];
-            console.log(_tokenId);
-            console.log(first32Moves);
-            console.log(lastMoves);
+
             reversi.playGameByteMoves(first32Moves, lastMoves);
             let stringMoves = reversi.movesString;
             reversi.translateToC4Version();
@@ -83,10 +81,6 @@ module.exports = async function(deployer, helper, accounts) {
               _tokenId = "0x" + reversi.byteBoard;
               first32Moves = "0x" + reversi.byteFirst32Moves;
               lastMoves = "0x" + reversi.byteLastMoves;
-
-              console.log(_tokenId);
-              console.log(first32Moves);
-              console.log(lastMoves);
             }
             var moves = [first32Moves, lastMoves];
 
@@ -128,13 +122,19 @@ module.exports = async function(deployer, helper, accounts) {
               tx = await clovers.setAllSymmetries(...allSymmetries);
               console.log(tx.receipt.status);
             }
-            if (!(await clovers.exists())) {
+            if (!(await clovers.exists(_tokenId))) {
               tx = await clovers.mint(_to, _tokenId);
               console.log(tx.logs);
             }
             resolve();
           } catch (error) {
-            reject(error);
+            if (error.message.indexOf("impossibru!!!") !== -1) {
+              console.log("found a bad game!!!!");
+              console.log(reversi);
+              resolve();
+            } else {
+              reject(error);
+            }
           }
         });
       });
