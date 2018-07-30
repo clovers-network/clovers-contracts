@@ -9,8 +9,9 @@ import "zeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
 import "zeppelin-solidity/contracts/token/ERC20/DetailedERC20.sol";
 import "zeppelin-solidity/contracts/token/ERC20/MintableToken.sol";
 import "zeppelin-solidity/contracts/token/ERC20/BurnableToken.sol";
+import "./IClubToken.sol";
 
-contract ClubToken is StandardToken, DetailedERC20, MintableToken, BurnableToken {
+contract ClubToken is IClubToken, StandardToken, DetailedERC20, MintableToken, BurnableToken {
 
     address cloversController;
     address clubTokenController;
@@ -30,7 +31,7 @@ contract ClubToken is StandardToken, DetailedERC20, MintableToken, BurnableToken
     * @param _symbol The symbol of the token
     * @param _decimals The decimals of the token
     */
-    function ClubToken(string _name, string _symbol, uint8 _decimals) public
+    constructor(string _name, string _symbol, uint8 _decimals) public
         DetailedERC20(_name, _symbol, _decimals)
     {}
 
@@ -60,5 +61,36 @@ contract ClubToken is StandardToken, DetailedERC20, MintableToken, BurnableToken
      */
     function burn(address _burner, uint256 _value) public hasMintPermission {
       _burn(_burner, _value);
+    }
+
+    /**
+    * @dev Moves Eth to a certain address for use in the ClubTokenController
+    * @param _to The address to receive the Eth.
+    * @param _amount The amount of Eth to be transferred.
+    */
+    function moveEth(address _to, uint256 _amount) public hasMintPermission {
+        require(this.balance >= _amount);
+        _to.transfer(_amount);
+    }
+    /**
+    * @dev Moves Tokens to a certain address for use in the ClubTokenController
+    * @param _to The address to receive the Tokens.
+    * @param _amount The amount of Tokens to be transferred.
+    * @param _token The address of the relevant token contract.
+    * @return bool Whether or not the move was successful
+    */
+    function moveToken(address _to, uint256 _amount, address _token) public hasMintPermission returns (bool) {
+        require(_amount <= StandardToken(_token).balanceOf(this));
+        return StandardToken(_token).transfer(_to, _amount);
+    }
+    /**
+    * @dev Approves Tokens to a certain address for use in the ClubTokenController
+    * @param _to The address to be approved.
+    * @param _amount The amount of Tokens to be approved.
+    * @param _token The address of the relevant token contract.
+    * @return bool Whether or not the approval was successful
+    */
+    function approveToken(address _to, uint256 _amount, address _token) public hasMintPermission returns (bool) {
+        return StandardToken(_token).approve(_to, _amount);
     }
 }

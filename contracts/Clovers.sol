@@ -27,8 +27,6 @@ contract Clovers is IClovers, ERC721Token, Ownable {
         uint256 blockMinted;
         uint256 rewards;
     }
-    mapping (bytes32 => address) public commits;
-    mapping (bytes32 => uint256) public stakes;
 
     modifier onlyOwnerOrController() {
         require(
@@ -38,7 +36,7 @@ contract Clovers is IClovers, ERC721Token, Ownable {
         _;
     }
 
-    function Clovers (string name, string symbol) public
+    constructor(string name, string symbol) public
         ERC721Token(name, symbol)
     { }
 
@@ -63,14 +61,8 @@ contract Clovers is IClovers, ERC721Token, Ownable {
         }
         // return CloversMetadata(cloversMetadata).tokenMetadata(_tokenId);
     }
-    function getHash(bytes28[2] moves) public view returns (bytes32) {
+    function getHash(bytes28[2] moves) public pure returns (bytes32) {
         return keccak256(moves);
-    }
-    function getStake(bytes32 movesHash) public view returns (uint256) {
-        return stakes[movesHash];
-    }
-    function getCommit(bytes32 movesHash) public view returns (address) {
-        return commits[movesHash];
     }
     function getBlockMinted(uint256 _tokenId) public view returns (uint256) {
         return clovers[_tokenId].blockMinted;
@@ -97,24 +89,24 @@ contract Clovers is IClovers, ERC721Token, Ownable {
 
 /* ---------------------------------------------------------------------------------------------------------------------- */
 
-    function moveEth(address _to, uint256 amount) public onlyOwnerOrController returns (bool) {
-        require(amount <= this.balance);
-        return _to.send(amount);
+    /**
+     * @dev Moves Eth to a certain address for use in the ClubTokenController
+     * @param _to The address to receive the Eth.
+     * @param _amount The amount of Eth to be transferred.
+     */
+    function moveEth(address _to, uint256 _amount) public onlyOwnerOrController {
+        require(_amount <= this.balance);
+        _to.transfer(_amount);
     }
-    function moveToken(uint256 amount, address _to, address token) public onlyOwnerOrController returns (bool) {
-        require(amount <= ERC20(token).balanceOf(this));
-        return ERC20(token).transfer(_to, amount);
+    function moveToken(address _to, uint256 _amount, address _token) public onlyOwnerOrController returns (bool) {
+        require(_amount <= ERC20(_token).balanceOf(this));
+        return ERC20(_token).transfer(_to, _amount);
     }
-    function approveToken(uint256 amount, address _to, address token) public onlyOwnerOrController returns (bool) {
-        return ERC20(token).approve(_to, amount);
+    function approveToken(address _to, uint256 _amount, address _token) public onlyOwnerOrController returns (bool) {
+        return ERC20(_token).approve(_to, _amount);
     }
 
-    function setStake(bytes32 movesHash, uint256 stake) public onlyOwnerOrController {
-        stakes[movesHash] = stake;
-    }
-    function setCommit(bytes32 movesHash, address commiter) public onlyOwnerOrController {
-        commits[movesHash] = commiter;
-    }
+
     function setBlockMinted(uint256 _tokenId, uint256 value) public onlyOwnerOrController {
         clovers[_tokenId].blockMinted = value;
     }
@@ -141,6 +133,13 @@ contract Clovers is IClovers, ERC721Token, Ownable {
 
     function updateCloversControllerAddress(address _cloversController) public onlyOwner {
         require(_cloversController != 0);
+
+        operatorApprovals[address(this)][cloversController] = false;
+        emit ApprovalForAll(address(this), cloversController, false);
+
+        operatorApprovals[address(this)][_cloversController] = true;
+        emit ApprovalForAll(address(this), _cloversController, true);
+
         cloversController = _cloversController;
     }
     function updateCloversMetadataAddress(address _cloversMetadata) public onlyOwner {
@@ -154,5 +153,6 @@ contract Clovers is IClovers, ERC721Token, Ownable {
     function unmint (uint256 _tokenId) public onlyOwnerOrController {
         super._burn(ownerOf(_tokenId), _tokenId);
     }
+
 
 }

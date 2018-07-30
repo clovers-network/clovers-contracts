@@ -28,8 +28,36 @@ contract ClubTokenController is BancorFormula, Ownable {
     }
 
     /**
+    * @dev gets the amount of tokens returned from spending Eth
+    * @param buyValue The amount of Eth to be spent
+    * @return A uint256 representing the amount of tokens gained in exchange for the Eth.
+    */
+    function getBuy(uint256 buyValue) public constant returns(uint256) {
+        return calculatePurchaseReturn(
+            safeAdd(ClubToken(clubToken).totalSupply(), virtualSupply),
+            safeAdd(poolBalance, virtualBalance),
+            reserveRatio,
+            buyValue);
+    }
+
+
+    /**
+    * @dev gets the amount of Eth returned from selling tokens
+    * @param sellAmount The amount of tokens to be sold
+    * @return A uint256 representing the amount of Eth gained in exchange for the tokens.
+    */
+
+    function getSell(uint256 sellAmount) public constant returns(uint256) {
+        return calculateSaleReturn(
+            safeAdd(ClubToken(clubToken).totalSupply(), virtualSupply),
+            safeAdd(poolBalance, virtualBalance),
+            reserveRatio,
+            sellAmount);
+    }
+
+    /**
     * @dev updates the Reserve Ratio variable
-  * @param _reserveRatio The reserve ratio that determines the curve
+    * @param _reserveRatio The reserve ratio that determines the curve
     * @return A boolean representing whether or not the update was successful.
     */
     function updateReserveRatio(uint32 _reserveRatio) public onlyOwner returns(bool){
@@ -63,6 +91,7 @@ contract ClubTokenController is BancorFormula, Ownable {
     function donate() public payable {
         require(msg.value > 0);
         poolBalance = safeAdd(poolBalance, msg.value);
+        clubToken.transfer(msg.value);
     }
 
     /**
@@ -71,15 +100,13 @@ contract ClubTokenController is BancorFormula, Ownable {
     */
     function buy(address buyer) public payable returns(bool) {
         require(msg.value > 0);
-        uint256 tokens = calculatePurchaseReturn(
-            safeAdd(ClubToken(clubToken).totalSupply(), virtualSupply),
-            safeAdd(poolBalance, virtualBalance),
-            reserveRatio,
-            msg.value);
+        uint256 tokens = getBuy(msg.value);
         require(tokens > 0);
         require(ClubToken(clubToken).mint(buyer, tokens));
         poolBalance = safeAdd(poolBalance, msg.value);
+        clubToken.transfer(msg.value);
     }
+
 
     /**
     * @dev sell Sell ClubTokens for Eth
@@ -88,16 +115,14 @@ contract ClubTokenController is BancorFormula, Ownable {
     function sell(uint256 sellAmount) public returns(bool) {
         require(sellAmount > 0);
         require(ClubToken(clubToken).balanceOf(msg.sender) >= sellAmount);
-        uint256 saleReturn = calculateSaleReturn(
-            safeAdd(ClubToken(clubToken).totalSupply(), virtualSupply),
-            safeAdd(poolBalance, virtualBalance),
-            reserveRatio,
-            sellAmount);
+        uint256 saleReturn = getSell(sellAmount);
         require(saleReturn > 0);
         require(saleReturn <= poolBalance);
+        require(saleReturn <= clubToken.balance);
         ClubToken(clubToken).burn(msg.sender, sellAmount);
         poolBalance = safeSub(poolBalance, saleReturn);
-        msg.sender.transfer(saleReturn);
+        ClubToken(clubToken).moveEth(msg.sender, saleReturn);
     }
+
 
  }

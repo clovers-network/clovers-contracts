@@ -11,8 +11,6 @@ import "./helpers/strings.sol";
 contract CloversMetadata {
     using strings for *;
 
-    function TokenMetadataController () public {}
-
     function tokenURI(uint _tokenId) public view returns (string _infoUrl) {
         string memory base = "https://api.clovers.network/clovers/0x";
         string memory id = uint2hexstr(_tokenId);

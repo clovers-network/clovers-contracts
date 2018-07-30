@@ -39,8 +39,6 @@ contract("Clovers", async function(accounts) {
         var tx = web3.eth.getTransactionReceipt(clovers.transactionHash);
         totalGas = totalGas.plus(tx.gasUsed);
         console.log(_ + tx.gasUsed + " - Deploy clovers");
-        // clovers = await Clovers.deployed();
-        // console.log('clovers', clovers.address)
 
         // Deploy CloversMetadata.sol
         // -w Clovers address
@@ -50,8 +48,6 @@ contract("Clovers", async function(accounts) {
         );
         totalGas = totalGas.plus(tx.gasUsed);
         console.log(_ + tx.gasUsed + " - Deploy cloversMetadata");
-        // cloversMetadata = await CloversMetadata.deployed();
-        // console.log('cloversMetadata', cloversMetadata.address)
 
         // Update Clovers.sol
         // -w CloversMetadata address
@@ -66,8 +62,6 @@ contract("Clovers", async function(accounts) {
         var tx = web3.eth.getTransactionReceipt(clubToken.transactionHash);
         totalGas = totalGas.plus(tx.gasUsed);
         console.log(_ + tx.gasUsed + " - Deploy clubToken");
-        // clubToken = await ClubToken.deployed();
-        // console.log('clubToken', clubToken.address)
 
         // Deploy Reversi.sol
         // -link w cloversController
@@ -75,25 +69,7 @@ contract("Clovers", async function(accounts) {
         var tx = web3.eth.getTransactionReceipt(reversi.transactionHash);
         totalGas = totalGas.plus(tx.gasUsed);
         console.log(_ + tx.gasUsed + " - Deploy reversi");
-        // reversi = await Reversi.deployed();
         await CloversController.link("Reversi", reversi.address);
-        // await deployer.link(Reversi, CloversController);
-        // await deployer.link(Reversi);
-        // await CloversController.link(reversi);
-
-        // Deploy CloversController.sol
-        // -w Clovers address
-        // -w ClubToken address
-        cloversController = await CloversController.new(
-          clovers.address,
-          clubToken.address
-        );
-        var tx = web3.eth.getTransactionReceipt(
-          cloversController.transactionHash
-        );
-        totalGas = totalGas.plus(tx.gasUsed);
-        console.log(_ + tx.gasUsed + " - Deploy cloversController");
-        // cloversController = await CloversController.deployed();
 
         // Deploy ClubTokenController.sol
         // -w ClubToken address
@@ -103,7 +79,21 @@ contract("Clovers", async function(accounts) {
         );
         totalGas = totalGas.plus(tx.gasUsed);
         console.log(_ + tx.gasUsed + " - Deploy clubTokenController");
-        // clubTokenController = await ClubTokenController.deployed();
+
+        // Deploy CloversController.sol
+        // -w Clovers address
+        // -w ClubToken address
+        // -w ClubTokenController address
+        cloversController = await CloversController.new(
+          clovers.address,
+          clubToken.address,
+          clubTokenController.address
+        );
+        var tx = web3.eth.getTransactionReceipt(
+          cloversController.transactionHash
+        );
+        totalGas = totalGas.plus(tx.gasUsed);
+        console.log(_ + tx.gasUsed + " - Deploy cloversController");
 
         // Update Clovers.sol
         // -w CloversController address
