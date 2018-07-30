@@ -17,17 +17,19 @@ import "zeppelin-solidity/contracts/math/SafeMath.sol";
 
 contract CloversController is HasNoEther, HasNoTokens {
     event cloverCommitted(bytes32 movesHash, address owner);
-    event cloverClaimed(bytes28[2] moves, uint256 tokenId, address owner, uint stake, uint reward, uint256 symmetries);
+    event cloverClaimed(bytes28[2] moves, uint256 tokenId, address owner, uint stake, uint reward, uint256 symmetries, bool keep);
     event stakeRetrieved(uint256 tokenId, address owner, uint stake);
 
     event cloverChallenged(bytes28[2] moves, uint256 tokenId, address owner, address challenger, uint stake);
 
     using SafeMath for uint256;
 
+    address public oracle;
     address public clovers;
     address public clubToken;
     address public clubTokenController;
 
+    uint256 public basePrice;
     uint256 public priceMultiplier;
     uint256 public payMultiplier;
     uint256 public stakeAmount;
@@ -50,9 +52,9 @@ contract CloversController is HasNoEther, HasNoTokens {
         return stakes[movesHash];
     }
     /**
-    * @dev Gets the address of the commiter of a Clover based on the hash of the moves.
+    * @dev Gets the address of the committer of a Clover based on the hash of the moves.
     * @param movesHash The hash of the moves that make up the clover.
-    * @return The address of the commiter.
+    * @return The address of the committer.
     */
     function getCommit(bytes32 movesHash) public view returns (address) {
         return commits[movesHash];
@@ -93,6 +95,7 @@ contract CloversController is HasNoEther, HasNoTokens {
         uint256 _blockMinted = IClovers(clovers).getBlockMinted(_tokenId);
         if(_blockMinted == 0) return false;
         if (msg.sender == owner) return true;
+        if (msg.sender == oracle) return true;
         return block.number.sub(_blockMinted) > stakePeriod;
     }
     /**
@@ -122,9 +125,10 @@ contract CloversController is HasNoEther, HasNoTokens {
         return base;
     }
 
-
-    function synchronousClaim(bytes28[2] moves, bool _keep) public payable returns (bool) {
-        /* Reversi.Game memory game = Reversi.playGame(moves);
+/*
+    // NOTE: Disabled to reduce contract size
+    function legacyRegister(bytes28[2] moves, bool _keep) public payable returns (bool) {
+        Reversi.Game memory game = Reversi.playGame(moves);
         require(isValidGame(game));
         uint256 tokenId = uint256(game.board);
         require(IClovers(clovers).getBlockMinted(tokenId) == 0);
@@ -132,12 +136,7 @@ contract CloversController is HasNoEther, HasNoTokens {
         IClovers(clovers).setBlockMinted(tokenId, block.number);
         IClovers(clovers).setCloverMoves(tokenId, moves);
 
-        uint256 symmetries = (game.RotSym ? 1  : 0) << 1;
-        symmetries = (symmetries & (game.Y0Sym ? 1 : 0)) << 1;
-        symmetries = (symmetries & (game.X0Sym ? 1 : 0)) << 1;
-        symmetries = (symmetries & (game.XYSym ? 1 : 0)) << 1;
-        symmetries = symmetries & (game.XnYSym ? 1 : 0);
-
+        uint256 symmetries = Reversi.returnSymmetricals(game.RotSym, game.Y0Sym, game.X0Sym, game.XYSym, game.XnYSym);
         uint256 reward;
 
         if (uint256(symmetries) > 0) {
@@ -163,84 +162,115 @@ contract CloversController is HasNoEther, HasNoTokens {
                 require(IClubToken(clubToken).mint(msg.sender, reward));
             }
             IClovers(clovers).mint(clovers, tokenId);
-        } */
+        }
 
-    }
+    } */
 
     /**
-    * @dev Claim the Clover without a commit or reveal.
+    * @dev Claim the Clover without a commit or reveal. Payable so you can attach enough for the stake,
+    * as well as enough to buy tokens if needed to keep the Clover.
     * @param moves The moves that make up the Clover reversi game.
     * @param _tokenId The board that results from the moves.
-    * @param _symmetries symmetries saved as a uint256 value like 00010101 where bits represent symmetry types.
-    * @param _to The address claiming the Clover.
+    * @param _symmetries symmetries saved as a uint256 value like 00010101 where bits represent symmetry
+    * types.
     * @return A boolean representing whether or not the claim was successful.
     */
-    function claimClover(bytes28[2] moves, uint256 _tokenId, uint256 _symmetries, address _to) public payable returns (bool) {
-        require(moves[0] != 0);
-        require(msg.value == stakeAmount);
+    function claimClover(bytes28[2] moves, uint256 _tokenId, uint256 _symmetries, bool _keep) public payable returns (bool) {
         bytes32 movesHash = keccak256(moves);
+
+        require(msg.value >= stakeAmount);
         require(getCommit(movesHash) == 0);
-        setCommit(movesHash, _to);
+
+        setCommit(movesHash, msg.sender);
         setStake(movesHash, stakeAmount);
+
         clovers.transfer(stakeAmount);
-        emit cloverCommitted(movesHash, _to);
+
+        emit cloverCommitted(movesHash, msg.sender);
+
         require(!IClovers(clovers).exists(_tokenId));
         require(IClovers(clovers).getBlockMinted(_tokenId) == 0);
+
         IClovers(clovers).setBlockMinted(_tokenId, block.number);
         IClovers(clovers).setCloverMoves(_tokenId, moves);
+        IClovers(clovers).setKeep(_tokenId, _keep);
+
+        uint256 reward;
         if (_symmetries > 0) {
             IClovers(clovers).setSymmetries(_tokenId, _symmetries);
-            uint256 reward = calculateReward(_symmetries);
+            reward = calculateReward(_symmetries);
             IClovers(clovers).setReward(_tokenId, reward);
         }
-        emit cloverClaimed(moves, _tokenId, _to, stakeAmount, reward, _symmetries);
+
+        if (_keep) {
+            if (IClubToken(clubToken).balanceOf(msg.sender) < basePrice.add(reward)) {
+                IClubTokenController(clubTokenController).buy(msg.sender);
+            }
+            IClubToken(clubToken).increaseApproval(address(this), basePrice.add(reward));
+        }
+        IClovers(clovers).mint(clovers, _tokenId);
+        emit cloverClaimed(moves, _tokenId, msg.sender, stakeAmount, reward, _symmetries, _keep);
+
         return true;
     }
     /**
-    * @dev Commit the hash of the moves needed to claim the Clover. A stake should be made for counterfactual verification.
-    * @param movesHash The hash of the moves that makes up the Clover reversi game.
-    * @param _to The address claiming the Clover.
+    * @dev Commit the hash of the moves needed to claim the Clover. A stake should be
+    * made for counterfactual verification.
+    * @param movesHash The hash of the moves that makes up the Clover reversi
+    * game.
     * @return A boolean representing whether or not the commit was successful.
+    NOTE: Disabled for contract size, if front running becomes a problem it can be
+    implemented with an upgrade
     */
-    function claimCloverCommit(bytes32 movesHash, address _to) public payable returns (bool) {
-        require(_to != 0);
-        require(msg.value == stakeAmount);
+    /* function claimCloverCommit(bytes32 movesHash) public payable returns (bool) {
+        require(msg.value <= stakeAmount);
         require(getCommit(movesHash) == 0);
-        setCommit(movesHash, _to);
+
+        setCommit(movesHash, msg.sender);
         setStake(movesHash, stakeAmount);
+
         clovers.transfer(stakeAmount);
-        emit cloverCommitted(movesHash, _to);
+
+        emit cloverCommitted(movesHash, msg.sender);
         return true;
-    }
+    } */
     /**
     * @dev Reveal the solution to the previous commit to claim the Clover.
     * @param moves The moves that make up the Clover reversi game.
     * @param _tokenId The board that results from the moves.
     * @param _symmetries symmetries saved as a uint256 value like 00010101 where bits represent symmetry types.
     * @return A boolean representing whether or not the reveal and claim was successful.
+    NOTE: Disabled for contract size, if front running becomes a problem it can be implemented with an upgrade
     */
-    function claimCloverReveal(bytes28[2] moves, uint256 _tokenId, uint256 _symmetries) public returns (bool) {
-        require(moves[0] != 0);
+    /* function claimCloverReveal(bytes28[2] moves, uint256 _tokenId, uint256 _symmetries, bool _keep) public returns (bool) {
         bytes32 movesHash = keccak256(moves);
-        address commiter = getCommit(movesHash);
+        address committer = getCommit(movesHash);
+
         require(IClovers(clovers).getBlockMinted(_tokenId) == 0);
+
         IClovers(clovers).setBlockMinted(_tokenId, block.number);
         IClovers(clovers).setCloverMoves(_tokenId, moves);
+        IClovers(clovers).setKeep(_tokenId, _keep);
+        uint256 reward;
         if (_symmetries > 0) {
             IClovers(clovers).setSymmetries(_tokenId, _symmetries);
-            uint256 reward = calculateReward(_symmetries);
+            reward = calculateReward(_symmetries);
             IClovers(clovers).setReward(_tokenId, reward);
         }
+        if (_keep) {
+            IClubToken(clubToken).increaseApproval(address(this), basePrice.add(reward));
+        }
         uint256 stake = getStake(movesHash);
-        emit cloverClaimed(moves, _tokenId, commiter, stake, reward, _symmetries);
+        emit cloverClaimed(moves, _tokenId, committer, stake, reward, _symmetries, _keep);
         return true;
-    }
+    } */
+
     /**
-    * @dev Retrieve the stake from a Clover claim after the stake period has ended.
+    * @dev Retrieve the stake from a Clover claim after the stake period has ended, or with the authority of the oracle.
     * @param _tokenId The board which holds the stake.
     * @return A boolean representing whether or not the retrieval was successful.
     */
-    function retrieveStake(uint256 _tokenId, bool _keep) public payable returns (bool) {
+    function retrieveStake(uint256 _tokenId) public payable returns (bool) {
         bytes28[2] memory moves = IClovers(clovers).getCloverMoves(_tokenId);
         require(moves[0] != 0);
         bytes32 movesHash = keccak256(moves);
@@ -249,30 +279,32 @@ contract CloversController is HasNoEther, HasNoTokens {
         require(isVerified(_tokenId));
         setStake(movesHash, 0);
         addSymmetries(_tokenId);
-        address commiter = getCommit(movesHash);
-        require(msg.sender == commiter);
+        address committer = getCommit(movesHash);
+        require(msg.sender == committer);
+
         uint256 reward = IClovers(clovers).getReward(_tokenId);
+        bool _keep = IClovers(clovers).getKeep(_tokenId);
+
         if (_keep) {
-            /* If the user decides to keep the Clover, they must
-            pay for it in club tokens according to the reward price. */
-            if (IClubToken(clubToken).balanceOf(commiter) < reward) {
-                IClubTokenController(clubTokenController).buy(commiter); // msg.value needs to be enough to buy "reward" amount of Club Token
+            // If the user decides to keep the Clover, they must
+            // pay for it in club tokens according to the reward price.
+            if (IClubToken(clubToken).balanceOf(committer) < basePrice.add(reward) && committer == msg.sender) {
+                IClubTokenController(clubTokenController).buy(committer); // msg.value needs to be enough to buy "reward" amount of Club Token
             }
-            if (reward > 0) {
-                IClubToken(clubToken).burn(commiter, reward);
+            if (basePrice.add(reward) > 0) {
+                IClubToken(clubToken).burn(committer, basePrice.add(reward));
             }
-            IClovers(clovers).mint(commiter, _tokenId);
+            IClovers(clovers).transferFrom(clovers, committer, _tokenId);
         } else {
-            /* If the user decides not to keep the Clover, they will
-            receive the reward price in club tokens, and the clover will
-            go for sale at 10x the reward price. */
+            // If the user decides not to keep the Clover, they will
+            // receive the reward price in club tokens, and the clover will
+            // go for sale at the reward price times the priceMultiplier.
             if (reward > 0) {
-                require(IClubToken(clubToken).mint(commiter, reward));
+                require(IClubToken(clubToken).mint(committer, reward));
             }
-            IClovers(clovers).mint(clovers, _tokenId);
         }
-        IClovers(clovers).moveEth(commiter, stake);
-        emit stakeRetrieved(_tokenId, commiter, stake);
+        IClovers(clovers).moveEth(committer, stake);
+        emit stakeRetrieved(_tokenId, committer, stake);
         return true;
     }
 
@@ -283,7 +315,7 @@ contract CloversController is HasNoEther, HasNoTokens {
     */
     function buyCloverFromContract(uint256 _tokenId) public payable returns(bool) {
         uint256 reward = IClovers(clovers).getReward(_tokenId);
-        uint256 toPay = reward.mul(priceMultiplier);
+        uint256 toPay = basePrice.add(reward.mul(priceMultiplier));
         if (IClubToken(clubToken).balanceOf(msg.sender) < toPay) {
             IClubTokenController(clubTokenController).buy(msg.sender); // msg.value needs to be enough to buy "toPay" amount of Club Token
         }
@@ -294,18 +326,42 @@ contract CloversController is HasNoEther, HasNoTokens {
         return true;
     }
 
+    function v (bytes28[2] moves) public view returns(bool){
+        Reversi.Game memory game = Reversi.playGame(moves);
+        return isValidGame(game);
+    }
+    function getBoard (bytes28[2] moves) public view returns(bytes16){
+        Reversi.Game memory game = Reversi.playGame(moves);
+        return game.board;
+    }
+    function convertBytes16ToUint(bytes16 board) public view returns(uint256 number) {
+        for(uint i=0;i<board.length;i++){
+            number = number + uint(board[i])*(2**(8*(board.length-(i+1))));
+        }
+    }
+    function doItAll(bytes28[2] moves) public view returns(uint256) {
+        return convertBytes16ToUint(getBoard(moves));
+    }
+    function compareItAll(bytes28[2] moves, uint256 tokenId) public view returns(bool) {
+        return doItAll(moves) == tokenId;
+    }
+
     /**
     * @dev Challenge a staked Clover for being invalid.
     * @param _tokenId The board being challenged.
-    * @param _to The address challenging the Clover.
     * @return A boolean representing whether or not the challenge was successful.
     */
-    function challengeClover(uint256 _tokenId, address _to) public returns (bool) {
+    function challengeClover(uint256 _tokenId) public returns (bool) {
         bool valid = true;
         bytes28[2] memory moves = IClovers(clovers).getCloverMoves(_tokenId);
         require(moves[0] != 0);
         Reversi.Game memory game = Reversi.playGame(moves);
-        require(game.board == bytes16(_tokenId));
+        /* bytes memory b = new bytes(32); */
+        /* assembly { mstore(add(b, 16), _tokenId) } */
+
+        if(convertBytes16ToUint(game.board) != _tokenId) {
+            valid = false;
+        }
         if(isValidGame(game)) {
             uint256 _symmetries = IClovers(clovers).getSymmetries(_tokenId);
 
@@ -320,26 +376,34 @@ contract CloversController is HasNoEther, HasNoTokens {
         }
         require(!valid);
 
-        IClovers(clovers).deleteClover(_tokenId);
         bytes32 movesHash = keccak256(moves);
         if (!isVerified(_tokenId)) {
             uint256 stake = getStake(movesHash);
-            IClovers(clovers).moveEth(_to, stake);
+            IClovers(clovers).moveEth(msg.sender, stake);
         }
+        IClovers(clovers).deleteClover(_tokenId);
         IClovers(clovers).unmint(_tokenId);
         setCommit(movesHash, 0);
         setStake(movesHash, 0);
         removeSymmetries(_tokenId);
 
-        address commiter = getCommit(movesHash);
-        emit cloverChallenged(moves, _tokenId, commiter, _to, stake);
+        address committer = getCommit(movesHash);
+        emit cloverChallenged(moves, _tokenId, committer, msg.sender, stake);
         return true;
     }
 
 
     /**
+    * @dev Updates oracle Address.
+    * @param _oracle The new oracle Address.
+    */
+    function updateOracle(address _oracle) public onlyOwner {
+        oracle = _oracle;
+    }
+
+    /**
     * @dev Updates clubTokenController Address.
-    * @param _clubTokenController The new amount needed to stake.
+    * @param _clubTokenController The new clubTokenController address.
     */
     function updateClubTokenController(address _clubTokenController) public onlyOwner {
         clubTokenController = _clubTokenController;
@@ -372,6 +436,13 @@ contract CloversController is HasNoEther, HasNoTokens {
     function updatePriceMultipier(uint256 _priceMultiplier) public onlyOwner {
         priceMultiplier = _priceMultiplier;
     }
+    /**
+    * @dev Updates the base price, used to calculate the clover cost.
+    * @param _basePrice The uint256 value of the base price.
+    */
+    function updateBasePrice(uint256 _basePrice) public onlyOwner {
+        basePrice = _basePrice;
+    }
 
     /**
     * @dev Sets the stake of a Clover based on the hash of the moves.
@@ -383,12 +454,12 @@ contract CloversController is HasNoEther, HasNoTokens {
     }
 
     /**
-    * @dev Sets the address of the commiter of a Clover based on the hash of the moves.
+    * @dev Sets the address of the committer of a Clover based on the hash of the moves.
     * @param movesHash The hash of the moves that make up the clover.
-    * @param commiter The address of the commiter.
+    * @param committer The address of the committer.
     */
-    function setCommit(bytes32 movesHash, address commiter) private {
-        commits[movesHash] = commiter;
+    function setCommit(bytes32 movesHash, address committer) private {
+        commits[movesHash] = committer;
     }
 
     /**

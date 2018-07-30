@@ -369,6 +369,15 @@ library Reversi {
 
     // Utilities
 
+    function returnSymmetricals (bool RotSym, bool Y0Sym, bool X0Sym, bool XYSym, bool XnYSym) public constant returns (uint256) {
+        uint256 symmetries = (RotSym ? 1  : 0) << 1;
+        symmetries = (symmetries & (Y0Sym ? 1 : 0)) << 1;
+        symmetries = (symmetries & (X0Sym ? 1 : 0)) << 1;
+        symmetries = (symmetries & (XYSym ? 1 : 0)) << 1;
+        symmetries = symmetries & (XnYSym ? 1 : 0);
+        return symmetries;
+    }
+
 
     function returnBytes (bytes16 board, uint8 col, uint8 row) internal pure returns (bytes16) {
         uint128 push = posToPush(col, row);

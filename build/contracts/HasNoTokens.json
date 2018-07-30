@@ -114,14 +114,14 @@
     "absolutePath": "zeppelin-solidity/contracts/ownership/HasNoTokens.sol",
     "exportedSymbols": {
       "HasNoTokens": [
-        13361
+        13557
       ]
     },
-    "id": 13362,
+    "id": 13558,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 13338,
+        "id": 13534,
         "literals": [
           "solidity",
           "^",
@@ -134,10 +134,10 @@
       {
         "absolutePath": "zeppelin-solidity/contracts/ownership/CanReclaimToken.sol",
         "file": "./CanReclaimToken.sol",
-        "id": 13339,
+        "id": 13535,
         "nodeType": "ImportDirective",
-        "scope": 13362,
-        "sourceUnit": 13301,
+        "scope": 13558,
+        "sourceUnit": 13497,
         "src": "26:31:25",
         "symbolAliases": [],
         "unitAlias": ""
@@ -148,94 +148,94 @@
             "arguments": null,
             "baseName": {
               "contractScope": null,
-              "id": 13340,
+              "id": 13536,
               "name": "CanReclaimToken",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 13300,
+              "referencedDeclaration": 13496,
               "src": "376:15:25",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_CanReclaimToken_$13300",
+                "typeIdentifier": "t_contract$_CanReclaimToken_$13496",
                 "typeString": "contract CanReclaimToken"
               }
             },
-            "id": 13341,
+            "id": 13537,
             "nodeType": "InheritanceSpecifier",
             "src": "376:15:25"
           }
         ],
         "contractDependencies": [
-          13300,
-          13447
+          13496,
+          13643
         ],
         "contractKind": "contract",
         "documentation": "@title Contracts that should not own Tokens\n@author Remco Bloemen <remco@2π.com>\n@dev This blocks incoming ERC223 tokens to prevent accidental loss of tokens.\nShould tokens (any ERC20Basic compatible) end up in the contract, it allows the\nowner to reclaim the tokens.",
         "fullyImplemented": true,
-        "id": 13361,
+        "id": 13557,
         "linearizedBaseContracts": [
-          13361,
-          13300,
-          13447
+          13557,
+          13496,
+          13643
         ],
         "name": "HasNoTokens",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "body": {
-              "id": 13359,
+              "id": 13555,
               "nodeType": "Block",
               "src": "713:53:25",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 13350,
+                    "id": 13546,
                     "name": "from_",
                     "nodeType": "Identifier",
                     "overloadedDeclarations": [],
-                    "referencedDeclaration": 13343,
+                    "referencedDeclaration": 13539,
                     "src": "719:5:25",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
                     }
                   },
-                  "id": 13351,
+                  "id": 13547,
                   "nodeType": "ExpressionStatement",
                   "src": "719:5:25"
                 },
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 13352,
+                    "id": 13548,
                     "name": "value_",
                     "nodeType": "Identifier",
                     "overloadedDeclarations": [],
-                    "referencedDeclaration": 13345,
+                    "referencedDeclaration": 13541,
                     "src": "730:6:25",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
-                  "id": 13353,
+                  "id": 13549,
                   "nodeType": "ExpressionStatement",
                   "src": "730:6:25"
                 },
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 13354,
+                    "id": 13550,
                     "name": "data_",
                     "nodeType": "Identifier",
                     "overloadedDeclarations": [],
-                    "referencedDeclaration": 13347,
+                    "referencedDeclaration": 13543,
                     "src": "742:5:25",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes_calldata_ptr",
                       "typeString": "bytes calldata"
                     }
                   },
-                  "id": 13355,
+                  "id": 13551,
                   "nodeType": "ExpressionStatement",
                   "src": "742:5:25"
                 },
@@ -245,21 +245,21 @@
                     "arguments": [],
                     "expression": {
                       "argumentTypes": [],
-                      "id": 13356,
+                      "id": 13552,
                       "name": "revert",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        15312,
-                        15313
+                        15508,
+                        15509
                       ],
-                      "referencedDeclaration": 15312,
+                      "referencedDeclaration": 15508,
                       "src": "753:6:25",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_revert_pure$__$returns$__$",
                         "typeString": "function () pure"
                       }
                     },
-                    "id": 13357,
+                    "id": 13553,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -273,14 +273,14 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 13358,
+                  "id": 13554,
                   "nodeType": "ExpressionStatement",
                   "src": "753:8:25"
                 }
               ]
             },
             "documentation": "@dev Reject all ERC223 compatible tokens\n@param from_ address The address that is transferring the tokens\n@param value_ uint256 the amount of the specified token\n@param data_ Bytes The data passed from the caller.",
-            "id": 13360,
+            "id": 13556,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -288,15 +288,15 @@
             "name": "tokenFallback",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 13348,
+              "id": 13544,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 13343,
+                  "id": 13539,
                   "name": "from_",
                   "nodeType": "VariableDeclaration",
-                  "scope": 13360,
+                  "scope": 13556,
                   "src": "660:13:25",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -305,7 +305,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 13342,
+                    "id": 13538,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "660:7:25",
@@ -319,10 +319,10 @@
                 },
                 {
                   "constant": false,
-                  "id": 13345,
+                  "id": 13541,
                   "name": "value_",
                   "nodeType": "VariableDeclaration",
-                  "scope": 13360,
+                  "scope": 13556,
                   "src": "675:14:25",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -331,7 +331,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 13344,
+                    "id": 13540,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "675:7:25",
@@ -345,10 +345,10 @@
                 },
                 {
                   "constant": false,
-                  "id": 13347,
+                  "id": 13543,
                   "name": "data_",
                   "nodeType": "VariableDeclaration",
-                  "scope": 13360,
+                  "scope": 13556,
                   "src": "691:11:25",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -357,7 +357,7 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 13346,
+                    "id": 13542,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
                     "src": "691:5:25",
@@ -374,19 +374,19 @@
             },
             "payable": false,
             "returnParameters": {
-              "id": 13349,
+              "id": 13545,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "713:0:25"
             },
-            "scope": 13361,
+            "scope": 13557,
             "src": "637:129:25",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 13362,
+        "scope": 13558,
         "src": "352:417:25"
       }
     ],
@@ -396,14 +396,14 @@
     "absolutePath": "zeppelin-solidity/contracts/ownership/HasNoTokens.sol",
     "exportedSymbols": {
       "HasNoTokens": [
-        13361
+        13557
       ]
     },
-    "id": 13362,
+    "id": 13558,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 13338,
+        "id": 13534,
         "literals": [
           "solidity",
           "^",
@@ -416,10 +416,10 @@
       {
         "absolutePath": "zeppelin-solidity/contracts/ownership/CanReclaimToken.sol",
         "file": "./CanReclaimToken.sol",
-        "id": 13339,
+        "id": 13535,
         "nodeType": "ImportDirective",
-        "scope": 13362,
-        "sourceUnit": 13301,
+        "scope": 13558,
+        "sourceUnit": 13497,
         "src": "26:31:25",
         "symbolAliases": [],
         "unitAlias": ""
@@ -430,94 +430,94 @@
             "arguments": null,
             "baseName": {
               "contractScope": null,
-              "id": 13340,
+              "id": 13536,
               "name": "CanReclaimToken",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 13300,
+              "referencedDeclaration": 13496,
               "src": "376:15:25",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_CanReclaimToken_$13300",
+                "typeIdentifier": "t_contract$_CanReclaimToken_$13496",
                 "typeString": "contract CanReclaimToken"
               }
             },
-            "id": 13341,
+            "id": 13537,
             "nodeType": "InheritanceSpecifier",
             "src": "376:15:25"
           }
         ],
         "contractDependencies": [
-          13300,
-          13447
+          13496,
+          13643
         ],
         "contractKind": "contract",
         "documentation": "@title Contracts that should not own Tokens\n@author Remco Bloemen <remco@2π.com>\n@dev This blocks incoming ERC223 tokens to prevent accidental loss of tokens.\nShould tokens (any ERC20Basic compatible) end up in the contract, it allows the\nowner to reclaim the tokens.",
         "fullyImplemented": true,
-        "id": 13361,
+        "id": 13557,
         "linearizedBaseContracts": [
-          13361,
-          13300,
-          13447
+          13557,
+          13496,
+          13643
         ],
         "name": "HasNoTokens",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "body": {
-              "id": 13359,
+              "id": 13555,
               "nodeType": "Block",
               "src": "713:53:25",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 13350,
+                    "id": 13546,
                     "name": "from_",
                     "nodeType": "Identifier",
                     "overloadedDeclarations": [],
-                    "referencedDeclaration": 13343,
+                    "referencedDeclaration": 13539,
                     "src": "719:5:25",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
                     }
                   },
-                  "id": 13351,
+                  "id": 13547,
                   "nodeType": "ExpressionStatement",
                   "src": "719:5:25"
                 },
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 13352,
+                    "id": 13548,
                     "name": "value_",
                     "nodeType": "Identifier",
                     "overloadedDeclarations": [],
-                    "referencedDeclaration": 13345,
+                    "referencedDeclaration": 13541,
                     "src": "730:6:25",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     }
                   },
-                  "id": 13353,
+                  "id": 13549,
                   "nodeType": "ExpressionStatement",
                   "src": "730:6:25"
                 },
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 13354,
+                    "id": 13550,
                     "name": "data_",
                     "nodeType": "Identifier",
                     "overloadedDeclarations": [],
-                    "referencedDeclaration": 13347,
+                    "referencedDeclaration": 13543,
                     "src": "742:5:25",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes_calldata_ptr",
                       "typeString": "bytes calldata"
                     }
                   },
-                  "id": 13355,
+                  "id": 13551,
                   "nodeType": "ExpressionStatement",
                   "src": "742:5:25"
                 },
@@ -527,21 +527,21 @@
                     "arguments": [],
                     "expression": {
                       "argumentTypes": [],
-                      "id": 13356,
+                      "id": 13552,
                       "name": "revert",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        15312,
-                        15313
+                        15508,
+                        15509
                       ],
-                      "referencedDeclaration": 15312,
+                      "referencedDeclaration": 15508,
                       "src": "753:6:25",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_revert_pure$__$returns$__$",
                         "typeString": "function () pure"
                       }
                     },
-                    "id": 13357,
+                    "id": 13553,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -555,14 +555,14 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 13358,
+                  "id": 13554,
                   "nodeType": "ExpressionStatement",
                   "src": "753:8:25"
                 }
               ]
             },
             "documentation": "@dev Reject all ERC223 compatible tokens\n@param from_ address The address that is transferring the tokens\n@param value_ uint256 the amount of the specified token\n@param data_ Bytes The data passed from the caller.",
-            "id": 13360,
+            "id": 13556,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -570,15 +570,15 @@
             "name": "tokenFallback",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 13348,
+              "id": 13544,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 13343,
+                  "id": 13539,
                   "name": "from_",
                   "nodeType": "VariableDeclaration",
-                  "scope": 13360,
+                  "scope": 13556,
                   "src": "660:13:25",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -587,7 +587,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 13342,
+                    "id": 13538,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "660:7:25",
@@ -601,10 +601,10 @@
                 },
                 {
                   "constant": false,
-                  "id": 13345,
+                  "id": 13541,
                   "name": "value_",
                   "nodeType": "VariableDeclaration",
-                  "scope": 13360,
+                  "scope": 13556,
                   "src": "675:14:25",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -613,7 +613,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 13344,
+                    "id": 13540,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "675:7:25",
@@ -627,10 +627,10 @@
                 },
                 {
                   "constant": false,
-                  "id": 13347,
+                  "id": 13543,
                   "name": "data_",
                   "nodeType": "VariableDeclaration",
-                  "scope": 13360,
+                  "scope": 13556,
                   "src": "691:11:25",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -639,7 +639,7 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 13346,
+                    "id": 13542,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
                     "src": "691:5:25",
@@ -656,19 +656,19 @@
             },
             "payable": false,
             "returnParameters": {
-              "id": 13349,
+              "id": 13545,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "713:0:25"
             },
-            "scope": 13361,
+            "scope": 13557,
             "src": "637:129:25",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 13362,
+        "scope": 13558,
         "src": "352:417:25"
       }
     ],
@@ -680,5 +680,5 @@
   },
   "networks": {},
   "schemaVersion": "2.0.1",
-  "updatedAt": "2018-07-30T11:33:38.061Z"
+  "updatedAt": "2018-07-30T17:25:16.499Z"
 }

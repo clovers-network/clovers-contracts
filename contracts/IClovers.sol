@@ -9,6 +9,8 @@ pragma solidity ^0.4.18;
 contract IClovers {
 
     function tokenURI(uint _tokenId) public view returns (string _infoUrl);
+
+    function getKeep(uint256 _tokenId) public view returns (bool);
     function getBlockMinted(uint256 _tokenId) public view returns (uint256);
     function getCloverMoves(uint256 _tokenId) public view returns (bytes28[2]);
     function getReward(uint256 _tokenId) public view returns (uint256);
@@ -19,6 +21,7 @@ contract IClovers {
     function moveToken(address _to, uint256 _amount, address _token) public returns (bool);
     function approveToken(address _to, uint256 _amount, address _token) public returns (bool);
 
+    function setKeep(uint256 _tokenId, bool value) public;
     function setBlockMinted(uint256 _tokenId, uint256 value) public;
     function setCloverMoves(uint256 _tokenId, bytes28[2] moves) public;
     function setReward(uint256 _tokenId, uint256 _amount) public;
