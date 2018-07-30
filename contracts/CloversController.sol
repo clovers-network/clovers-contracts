@@ -15,7 +15,7 @@ import "zeppelin-solidity/contracts/ownership/HasNoEther.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 
 
-contract CloversController is ICloversController, HasNoEther {
+contract CloversController is ICloversController, HasNoEther, HasNoTokens {
     event cloverCommitted(bytes32 movesHash, address owner);
     event cloverClaimed(bytes28[2] moves, uint256 tokenId, address owner, uint stake, uint reward, uint256 symmetries);
     event stakeRetrieved(uint256 tokenId, address owner, uint stake);
@@ -92,7 +92,7 @@ contract CloversController is ICloversController, HasNoEther {
     function isVerified(uint256 _tokenId) public constant returns (bool) {
         uint256 _blockMinted = IClovers(clovers).getBlockMinted(_tokenId);
         if(_blockMinted == 0) return false;
-        // require(block.number > _blockMinted);
+        if (msg.sender == owner) return true;
         return block.number.sub(_blockMinted) > stakePeriod;
     }
     /**
@@ -123,6 +123,50 @@ contract CloversController is ICloversController, HasNoEther {
     }
 
 
+    function synchronousClaim(bytes28[2] moves, bool _keep) public payable returns (bool) {
+        Reversi.Game memory game = Reversi.playGame(moves);
+        require(isValidGame(game));
+        uint256 tokenId = uint256(game.board);
+        require(IClovers(clovers).getBlockMinted(tokenId) == 0);
+        require(!IClovers(clovers).exists(tokenId));
+        IClovers(clovers).setBlockMinted(tokenId, block.number);
+        IClovers(clovers).setCloverMoves(tokenId, moves);
+
+        uint256 symmetries = (game.RotSym ? 1  : 0) << 1;
+        symmetries = (symmetries & (game.Y0Sym ? 1 : 0)) << 1;
+        symmetries = (symmetries & (game.X0Sym ? 1 : 0)) << 1;
+        symmetries = (symmetries & (game.XYSym ? 1 : 0)) << 1;
+        symmetries = symmetries & (game.XnYSym ? 1 : 0);
+
+        uint256 reward;
+
+        if (uint256(symmetries) > 0) {
+            IClovers(clovers).setSymmetries(tokenId, uint256(symmetries));
+            reward = calculateReward(uint256(symmetries));
+            IClovers(clovers).setReward(tokenId, reward);
+        }
+        if (_keep) {
+            /* If the user decides to keep the Clover, they must
+            pay for it in club tokens according to the reward price. */
+            if (IClubToken(clubToken).balanceOf(msg.sender) < reward) {
+                ClubTokenController(clubTokenController).buy(msg.sender); // msg.value needs to be enough to buy "reward" amount of Club Token
+            }
+            if (reward > 0) {
+                IClubToken(clubToken).burn(msg.sender, reward);
+            }
+            IClovers(clovers).mint(msg.sender, tokenId);
+        } else {
+            /* If the user decides not to keep the Clover, they will
+            receive the reward price in club tokens, and the clover will
+            go for sale at 10x the reward price. */
+            if (reward > 0) {
+                require(IClubToken(clubToken).mint(msg.sender, reward));
+            }
+            IClovers(clovers).mint(clovers, tokenId);
+        }
+
+    }
+
     /**
     * @dev Claim the Clover without a commit or reveal.
     * @param moves The moves that make up the Clover reversi game.
@@ -135,9 +179,12 @@ contract CloversController is ICloversController, HasNoEther {
         require(moves[0] != 0);
         require(msg.value == stakeAmount);
         bytes32 movesHash = keccak256(moves);
+        require(getCommit(movesHash) == 0);
         setCommit(movesHash, _to);
         setStake(movesHash, stakeAmount);
         clovers.transfer(stakeAmount);
+        emit cloverCommitted(movesHash, _to);
+        require(!IClovers(clovers).exists(_tokenId));
         require(IClovers(clovers).getBlockMinted(_tokenId) == 0);
         IClovers(clovers).setBlockMinted(_tokenId, block.number);
         IClovers(clovers).setCloverMoves(_tokenId, moves);
@@ -203,20 +250,25 @@ contract CloversController is ICloversController, HasNoEther {
         setStake(movesHash, 0);
         addSymmetries(_tokenId);
         address commiter = getCommit(movesHash);
+        require(msg.sender == commiter);
         uint256 reward = IClovers(clovers).getReward(_tokenId);
         if (_keep) {
             /* If the user decides to keep the Clover, they must
             pay for it in club tokens according to the reward price. */
             if (IClubToken(clubToken).balanceOf(commiter) < reward) {
-                ClubTokenController(clubTokenController).buy(msg.sender); // msg.value needs to be enough to buy "reward" amount of Club Token
+                ClubTokenController(clubTokenController).buy(commiter); // msg.value needs to be enough to buy "reward" amount of Club Token
             }
-            IClubToken(clubToken).burn(commiter, reward);
+            if (reward > 0) {
+                IClubToken(clubToken).burn(commiter, reward);
+            }
             IClovers(clovers).mint(commiter, _tokenId);
         } else {
             /* If the user decides not to keep the Clover, they will
             receive the reward price in club tokens, and the clover will
             go for sale at 10x the reward price. */
-            require(IClubToken(clubToken).mint(commiter, reward));
+            if (reward > 0) {
+                require(IClubToken(clubToken).mint(commiter, reward));
+            }
             IClovers(clovers).mint(clovers, _tokenId);
         }
         IClovers(clovers).moveEth(commiter, stake);
@@ -235,7 +287,9 @@ contract CloversController is ICloversController, HasNoEther {
         if (IClubToken(clubToken).balanceOf(msg.sender) < toPay) {
             ClubTokenController(clubTokenController).buy(msg.sender); // msg.value needs to be enough to buy "toPay" amount of Club Token
         }
-        IClubToken(clubToken).burn(msg.sender, toPay);
+        if (toPay > 0) {
+            IClubToken(clubToken).burn(msg.sender, toPay);
+        }
         IClovers(clovers).transferFrom(clovers, msg.sender, _tokenId);
         return true;
     }
@@ -251,6 +305,7 @@ contract CloversController is ICloversController, HasNoEther {
         bytes28[2] memory moves = IClovers(clovers).getCloverMoves(_tokenId);
         require(moves[0] != 0);
         Reversi.Game memory game = Reversi.playGame(moves);
+        require(game.board == bytes16(_tokenId));
         if(isValidGame(game)) {
             uint256 _symmetries = IClovers(clovers).getSymmetries(_tokenId);
 

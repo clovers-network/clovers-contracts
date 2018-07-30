@@ -5,11 +5,11 @@ pragma solidity ^0.4.18;
 */
 
 
-import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import './ClubToken.sol';
 import "bancor-contracts/solidity/contracts/converter/BancorFormula.sol";
+import "zeppelin-solidity/contracts/ownership/HasNoTokens.sol";
 
-contract ClubTokenController is BancorFormula, Ownable {
+contract ClubTokenController is BancorFormula, HasNoTokens {
 
 
     address clubToken;

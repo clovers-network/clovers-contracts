@@ -51,6 +51,7 @@ contract ClubToken is IClubToken, StandardToken, DetailedERC20, MintableToken, B
      * NOTE: Disabled as tokens should not be burned under circumstances beside selling tokens.
      */
     function burn(uint256 _value) public {
+        _value;
         revert();
     }
 
