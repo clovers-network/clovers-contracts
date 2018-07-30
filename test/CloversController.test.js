@@ -11,7 +11,8 @@ const oneGwei = new web3.BigNumber("1000000000"); // 1 GWEI
 let gasPrice = oneGwei.toString(10);
 
 let stakeAmount = utils.toWei("0.1");
-let stakePeriod = "6000"; // at 15 sec block times this is ~25 hours
+// let stakePeriod = "6000"; // at 15 sec block times this is ~25 hours
+let stakePeriod = "10"; // make 10 for speed of tests
 let payMultiplier = "10";
 let priceMultiplier = "10";
 let basePrice = utils.toWei("0.001");
@@ -118,121 +119,121 @@ contract("Clovers", async function(accounts) {
 
         totalGas = totalGas.plus(tx.gasUsed);
 
-        // // Update Clovers.sol
-        // // -w CloversController address
-        // var tx = await clovers.updateCloversControllerAddress(
-        //   cloversController.address
-        // );
-        //
-        // console.log(
-        //   _ + "clovers.updateCloversControllerAddress - " + tx.receipt.gasUsed
-        // );
-        // gasToCash(tx.receipt.gasUsed);
-        //
-        // totalGas = totalGas.plus(tx.receipt.gasUsed);
-        //
-        // // Update ClubToken.sol
-        // // -w CloversController address
-        // var tx = await clubToken.updateCloversControllerAddress(
-        //   cloversController.address
-        // );
-        // console.log(
-        //   _ + "clubToken.updateCloversControllerAddress - " + tx.receipt.gasUsed
-        // );
-        //
-        // gasToCash(tx.receipt.gasUsed);
-        //
-        // totalGas = totalGas.plus(tx.receipt.gasUsed);
-        //
-        // // Update ClubToken.sol
-        // // -w ClubTokenController address
-        // var tx = await clubToken.updateClubTokenControllerAddress(
-        //   clubTokenController.address
-        // );
-        //
-        // console.log(
-        //   _ +
-        //     "clubToken.updateClubTokenControllerAddress - " +
-        //     tx.receipt.gasUsed
-        // );
-        // gasToCash(tx.receipt.gasUsed);
-        //
-        // totalGas = totalGas.plus(tx.receipt.gasUsed);
-        //
-        // // Update CloversController.sol
-        // // -w stakeAmount
-        // // -w stakePeriod
-        // // -w payMultiplier
-        // var tx = await cloversController.updateStakeAmount(stakeAmount);
-        // console.log(
-        //   _ + "cloversController.updateStakeAmount - " + tx.receipt.gasUsed
-        // );
-        // gasToCash(tx.receipt.gasUsed);
-        //
-        // totalGas = totalGas.plus(tx.receipt.gasUsed);
-        //
-        // var tx = await cloversController.updateStakePeriod(stakePeriod);
-        // console.log(
-        //   _ + "cloversController.updateStakePeriod - " + tx.receipt.gasUsed
-        // );
-        // gasToCash(tx.receipt.gasUsed);
-        //
-        // totalGas = totalGas.plus(tx.receipt.gasUsed);
-        //
-        // var tx = await cloversController.updatePayMultipier(payMultiplier);
-        // console.log(
-        //   _ + "cloversController.updatePayMultipier - " + tx.receipt.gasUsed
-        // );
-        // gasToCash(tx.receipt.gasUsed);
-        //
-        // totalGas = totalGas.plus(tx.receipt.gasUsed);
-        //
-        // var tx = await cloversController.updatePriceMultipier(priceMultiplier);
-        // console.log(
-        //   _ + "cloversController.updatePriceMultipier - " + tx.receipt.gasUsed
-        // );
-        // gasToCash(tx.receipt.gasUsed);
-        //
-        // totalGas = totalGas.plus(tx.receipt.gasUsed);
-        //
-        // var tx = await cloversController.updateBasePrice(basePrice);
-        // console.log(
-        //   _ + "cloversController.updateBasePrice - " + tx.receipt.gasUsed
-        // );
-        // gasToCash(tx.receipt.gasUsed);
-        //
-        // totalGas = totalGas.plus(tx.receipt.gasUsed);
-        //
-        // // Update ClubTokenController.sol
-        // // -w reserveRatio
-        // // -w virtualSupply
-        // // -w virtualBalance
-        // var tx = await clubTokenController.updateReserveRatio(reserveRatio);
-        // console.log(
-        //   _ + "clubTokenController.updateReserveRatio - " + tx.receipt.gasUsed
-        // );
-        // gasToCash(tx.receipt.gasUsed);
-        //
-        // totalGas = totalGas.plus(tx.receipt.gasUsed);
-        //
-        // var tx = await clubTokenController.updateVirtualSupply(virtualSupply);
-        // console.log(
-        //   _ + "clubTokenController.updateVirtualSupply - " + tx.receipt.gasUsed
-        // );
-        // gasToCash(tx.receipt.gasUsed);
-        //
-        // totalGas = totalGas.plus(tx.receipt.gasUsed);
-        //
-        // var tx = await clubTokenController.updateVirtualBalance(virtualBalance);
-        // console.log(
-        //   _ + "clubTokenController.updateVirtualBalance - " + tx.receipt.gasUsed
-        // );
-        // gasToCash(tx.receipt.gasUsed);
-        //
-        // totalGas = totalGas.plus(tx.receipt.gasUsed);
-        //
-        // console.log(_ + totalGas.toFormat(0) + " - Total Gas");
-        // gasToCash(totalGas);
+        // Update Clovers.sol
+        // -w CloversController address
+        var tx = await clovers.updateCloversControllerAddress(
+          cloversController.address
+        );
+
+        console.log(
+          _ + "clovers.updateCloversControllerAddress - " + tx.receipt.gasUsed
+        );
+        gasToCash(tx.receipt.gasUsed);
+
+        totalGas = totalGas.plus(tx.receipt.gasUsed);
+
+        // Update ClubToken.sol
+        // -w CloversController address
+        var tx = await clubToken.updateCloversControllerAddress(
+          cloversController.address
+        );
+        console.log(
+          _ + "clubToken.updateCloversControllerAddress - " + tx.receipt.gasUsed
+        );
+
+        gasToCash(tx.receipt.gasUsed);
+
+        totalGas = totalGas.plus(tx.receipt.gasUsed);
+
+        // Update ClubToken.sol
+        // -w ClubTokenController address
+        var tx = await clubToken.updateClubTokenControllerAddress(
+          clubTokenController.address
+        );
+
+        console.log(
+          _ +
+            "clubToken.updateClubTokenControllerAddress - " +
+            tx.receipt.gasUsed
+        );
+        gasToCash(tx.receipt.gasUsed);
+
+        totalGas = totalGas.plus(tx.receipt.gasUsed);
+
+        // Update CloversController.sol
+        // -w stakeAmount
+        // -w stakePeriod
+        // -w payMultiplier
+        var tx = await cloversController.updateStakeAmount(stakeAmount);
+        console.log(
+          _ + "cloversController.updateStakeAmount - " + tx.receipt.gasUsed
+        );
+        gasToCash(tx.receipt.gasUsed);
+
+        totalGas = totalGas.plus(tx.receipt.gasUsed);
+
+        var tx = await cloversController.updateStakePeriod(stakePeriod);
+        console.log(
+          _ + "cloversController.updateStakePeriod - " + tx.receipt.gasUsed
+        );
+        gasToCash(tx.receipt.gasUsed);
+
+        totalGas = totalGas.plus(tx.receipt.gasUsed);
+
+        var tx = await cloversController.updatePayMultipier(payMultiplier);
+        console.log(
+          _ + "cloversController.updatePayMultipier - " + tx.receipt.gasUsed
+        );
+        gasToCash(tx.receipt.gasUsed);
+
+        totalGas = totalGas.plus(tx.receipt.gasUsed);
+
+        var tx = await cloversController.updatePriceMultipier(priceMultiplier);
+        console.log(
+          _ + "cloversController.updatePriceMultipier - " + tx.receipt.gasUsed
+        );
+        gasToCash(tx.receipt.gasUsed);
+
+        totalGas = totalGas.plus(tx.receipt.gasUsed);
+
+        var tx = await cloversController.updateBasePrice(basePrice);
+        console.log(
+          _ + "cloversController.updateBasePrice - " + tx.receipt.gasUsed
+        );
+        gasToCash(tx.receipt.gasUsed);
+
+        totalGas = totalGas.plus(tx.receipt.gasUsed);
+
+        // Update ClubTokenController.sol
+        // -w reserveRatio
+        // -w virtualSupply
+        // -w virtualBalance
+        var tx = await clubTokenController.updateReserveRatio(reserveRatio);
+        console.log(
+          _ + "clubTokenController.updateReserveRatio - " + tx.receipt.gasUsed
+        );
+        gasToCash(tx.receipt.gasUsed);
+
+        totalGas = totalGas.plus(tx.receipt.gasUsed);
+
+        var tx = await clubTokenController.updateVirtualSupply(virtualSupply);
+        console.log(
+          _ + "clubTokenController.updateVirtualSupply - " + tx.receipt.gasUsed
+        );
+        gasToCash(tx.receipt.gasUsed);
+
+        totalGas = totalGas.plus(tx.receipt.gasUsed);
+
+        var tx = await clubTokenController.updateVirtualBalance(virtualBalance);
+        console.log(
+          _ + "clubTokenController.updateVirtualBalance - " + tx.receipt.gasUsed
+        );
+        gasToCash(tx.receipt.gasUsed);
+
+        totalGas = totalGas.plus(tx.receipt.gasUsed);
+
+        console.log(_ + totalGas.toFormat(0) + " - Total Gas");
+        gasToCash(totalGas);
 
         done();
       } catch (error) {
@@ -244,7 +245,7 @@ contract("Clovers", async function(accounts) {
   });
 
   describe("Clovers.sol", function() {
-    it.skip("should be able to read metadata", async function() {
+    it("should be able to read metadata", async function() {
       let metadata = await clovers.tokenURI(666);
       let _metadata = await cloversMetadata.tokenURI(666);
       assert(_metadata === metadata, "_metadata != metadata");
@@ -252,7 +253,7 @@ contract("Clovers", async function(accounts) {
   });
 
   describe("ClubTokenController.sol", function() {
-    it.skip("should read parameters that were set", async function() {
+    it("should read parameters that were set", async function() {
       let _reserveRatio = await clubTokenController.reserveRatio();
       assert(
         _reserveRatio.toString(10) === reserveRatio,
@@ -281,7 +282,7 @@ contract("Clovers", async function(accounts) {
       );
     });
 
-    it.skip("should mint new tokens", async function() {
+    it("should mint new tokens", async function() {
       let _depositAmount = utils.toWei("1");
       let buyer = accounts[5];
 
@@ -300,9 +301,6 @@ contract("Clovers", async function(accounts) {
         _connectorBalance,
         _connectorWeight,
         _depositAmount
-      );
-      console.log(
-        _ + "Expected return is " + utils.fromWei(expectedReturn.toString(10))
       );
 
       let balanceBefore = await clubToken.balanceOf(buyer);
@@ -332,7 +330,7 @@ contract("Clovers", async function(accounts) {
           ")"
       );
     });
-    it.skip("should sell the new tokens", async function() {
+    it("should sell the new tokens", async function() {
       let buyer = accounts[5];
       let _depositAmount = utils.toWei("1");
 
@@ -354,9 +352,7 @@ contract("Clovers", async function(accounts) {
         _connectorWeight,
         _sellAmount
       );
-      console.log(
-        _ + "Expected return is " + utils.fromWei(expectedReturn.toString(10))
-      );
+
       let difference = new web3.BigNumber(_depositAmount).sub(expectedReturn);
       assert(
         difference.lte(1),
@@ -429,32 +425,29 @@ contract("Clovers", async function(accounts) {
       )
     ];
 
-    let _tokenId = "0x5555555565556955695566955aa55555";
+    let _tokenId = "0x55555aa5569955695569555955555555";
+
     let _moves = [
       new web3.BigNumber(
-        "0xcb76aedd77baf6cfcfbeeb5362d6affb54f9d53971d37f37de9bf87c",
+        "0xb58b552a986549b132451cbcbd69d106af0e3ae6cead82cc297427c3",
         16
       ),
       new web3.BigNumber(
-        "0xc5670faa513068f1effd8f32a14ba11b64ca7461c193223c",
+        "0xbb9af45dbeefd78f120678dd7ef4dfe69f3d9bbe7eeddfc7f0000000",
         16
       )
     ];
 
     it("should convert correctly", async function() {
-      let isValid = await cloversController.v(_moves);
-      console.log(isValid);
-      let board = await cloversController.getBoard(_moves);
-      console.log(board.toString(16));
-      let boardUint = await cloversController.convertBytes16ToUint(board);
-      console.log(boardUint.toString(16));
-      let doItAll = await cloversController.doItAll(_moves);
-      console.log(doItAll.toString(16));
-      let compareItAll = await cloversController.compareItAll(_moves, board);
-      console.log(compareItAll);
+      let game = await reversi.getGame(_moves);
+      let boardUint = await cloversController.convertBytes16ToUint(game[3]);
+      assert(
+        "0x" + boardUint.toString(16) === _tokenId,
+        "_tokenId !== boardUint"
+      );
     });
 
-    it.skip("should read parameters that were set", async function() {
+    it("should read parameters that were set", async function() {
       let _stakeAmount = await cloversController.stakeAmount();
 
       assert(_stakeAmount.toString() === stakeAmount, "stake amount not equal");
@@ -478,7 +471,7 @@ contract("Clovers", async function(accounts) {
       assert(_basePrice.toString() === basePrice, "basePrice not equal");
     });
 
-    it.skip("should make sure token doesn't exist", async function() {
+    it("should make sure token doesn't exist", async function() {
       balance = web3.eth.getBalance(accounts[0]);
       try {
         await clovers.ownerOf(_tokenId);
@@ -487,7 +480,7 @@ contract("Clovers", async function(accounts) {
       }
     });
 
-    it.skip("should make sure claimClover (_keep = false) is successful using valid game w/ invalid symmetries", async function() {
+    it("should make sure claimClover (_keep = false) is successful using valid game w/ invalid symmetries", async function() {
       try {
         let options = [
           _moves,
@@ -518,7 +511,7 @@ contract("Clovers", async function(accounts) {
       }
     });
 
-    it.skip("should make sure stake amount was removed from your account", async function() {
+    it("should make sure stake amount was removed from your account", async function() {
       let gasCost = gasSpent * parseInt(gasPrice);
       _balance = web3.eth.getBalance(accounts[0]);
       assert(
@@ -537,19 +530,20 @@ contract("Clovers", async function(accounts) {
       );
     });
 
-    it.skip("should make sure it's not verified yet", async function() {
+    it("should make sure it's not verified yet", async function() {
       let isVerified = await cloversController.isVerified(_tokenId, {
         from: accounts[1]
       });
       assert(!isVerified, "clover is already verified somehow");
     });
 
-    it.skip("should check the cost of challenging this fake clover", async function() {
+    it("should check the cost of challenging this clover w invalid symmetries", async function() {
       try {
         gasEstimate = await cloversController.challengeClover.estimateGas(
           _tokenId
         );
         console.log(_ + "challengeClover gasEstimate", gasEstimate.toString());
+        gasToCash(gasEstimate.toString());
       } catch (error) {
         console.log("error:", error);
 
@@ -560,10 +554,8 @@ contract("Clovers", async function(accounts) {
       }
     });
 
-    it.skip("should update the stake amount with the gas Estimate from challengeClover", async function() {
+    it("should update the stake amount with the gas Estimate from challengeClover", async function() {
       try {
-        console.log("gasEstimate", gasEstimate);
-        console.log("gasPrice", gasPrice);
         newStakeAmount = new web3.BigNumber(gasEstimate).mul(gasPrice).mul(40);
         tx = await cloversController.updateStakeAmount(newStakeAmount, {
           gasPrice
@@ -577,7 +569,6 @@ contract("Clovers", async function(accounts) {
         gasToCash(tx.receipt.cumulativeGasUsed);
 
         gasSpent += tx.receipt.cumulativeGasUsed;
-        console.log("tx.receipt.status", tx.receipt.status);
         assert(
           new web3.BigNumber(tx.receipt.status).eq(1),
           "updateStakeAmount tx receipt should have been 0x01 (successful) but was instead " +
@@ -590,7 +581,7 @@ contract("Clovers", async function(accounts) {
       }
     });
 
-    it.skip("should check the stake amount for the token in question", async function() {
+    it("should check the stake amount for the token in question", async function() {
       let _movesHashSol = await cloversController.getMovesHash(_tokenId);
       let currentStake = await cloversController.getStake(_movesHashSol);
       assert(
@@ -602,7 +593,7 @@ contract("Clovers", async function(accounts) {
       );
     });
 
-    it.skip("should make sure it is verified after blocks increase", async function() {
+    it("should make sure it is verified after blocks increase", async function() {
       await increaseBlocks(stakePeriod);
       isVerified = await cloversController.isVerified(_tokenId, {
         from: accounts[1]
@@ -614,7 +605,7 @@ contract("Clovers", async function(accounts) {
       clubBalance = await clubToken.balanceOf(accounts[0]);
     });
 
-    it.skip("should make sure retrieveStake tx was successful", async function() {
+    it("should make sure retrieveStake tx was successful", async function() {
       try {
         tx = await cloversController.retrieveStake(_tokenId, { gasPrice });
 
@@ -638,7 +629,7 @@ contract("Clovers", async function(accounts) {
       }
     });
 
-    it.skip("should make sure token exists & is owned by this clovers contract", async function() {
+    it("should make sure token exists & is owned by this clovers contract", async function() {
       try {
         let owner = await clovers.ownerOf(_tokenId);
         assert(
@@ -655,9 +646,8 @@ contract("Clovers", async function(accounts) {
       }
     });
 
-    it.skip("should make sure reward was received", async function() {
+    it("should make sure reward was received", async function() {
       let _clubBalance = await clubToken.balanceOf(accounts[0]);
-      console.log(_ + "reward was " + _clubBalance.toString());
       assert(
         _clubBalance.gt(clubBalance),
         "new balance of " +
@@ -667,7 +657,7 @@ contract("Clovers", async function(accounts) {
       );
     });
 
-    it.skip("should make sure stake amount was retured to your account", async function() {
+    it("should make sure stake amount was retured to your account", async function() {
       gasCost = gasSpent * gasPrice;
       _balance = web3.eth.getBalance(accounts[0]);
       let result = balance.minus(gasCost);
@@ -782,7 +772,7 @@ function decodeEventString(hexVal) {
     .map(a =>
       a
         .toLowerCase()
-        .split.skip("")
+        .split("")
         .reduce(
           (result, ch) => result * 16 + "0123456789abcdefgh".indexOf(ch),
           0

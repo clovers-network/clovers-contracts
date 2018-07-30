@@ -326,26 +326,16 @@ contract CloversController is HasNoEther, HasNoTokens {
         return true;
     }
 
-    function v (bytes28[2] moves) public view returns(bool){
-        Reversi.Game memory game = Reversi.playGame(moves);
-        return isValidGame(game);
-    }
-    function getBoard (bytes28[2] moves) public view returns(bytes16){
-        Reversi.Game memory game = Reversi.playGame(moves);
-        return game.board;
-    }
-    function convertBytes16ToUint(bytes16 board) public view returns(uint256 number) {
-        for(uint i=0;i<board.length;i++){
-            number = number + uint(board[i])*(2**(8*(board.length-(i+1))));
+    /**
+    * @dev Convert a bytes16 board into a uint256.
+    * @param _board The board being converted.
+    * @return number the uint256 being converted.
+    */
+    function convertBytes16ToUint(bytes16 _board) public view returns(uint256 number) {
+        for(uint i=0;i<_board.length;i++){
+            number = number + uint(_board[i])*(2**(8*(_board.length-(i+1))));
         }
     }
-    function doItAll(bytes28[2] moves) public view returns(uint256) {
-        return convertBytes16ToUint(getBoard(moves));
-    }
-    function compareItAll(bytes28[2] moves, uint256 tokenId) public view returns(bool) {
-        return doItAll(moves) == tokenId;
-    }
-
     /**
     * @dev Challenge a staked Clover for being invalid.
     * @param _tokenId The board being challenged.
@@ -356,13 +346,11 @@ contract CloversController is HasNoEther, HasNoTokens {
         bytes28[2] memory moves = IClovers(clovers).getCloverMoves(_tokenId);
         require(moves[0] != 0);
         Reversi.Game memory game = Reversi.playGame(moves);
-        /* bytes memory b = new bytes(32); */
-        /* assembly { mstore(add(b, 16), _tokenId) } */
 
         if(convertBytes16ToUint(game.board) != _tokenId) {
             valid = false;
         }
-        if(isValidGame(game)) {
+        if(valid && isValidGame(game)) {
             uint256 _symmetries = IClovers(clovers).getSymmetries(_tokenId);
 
             valid = (_symmetries >> 4 & 1) > 0 == game.RotSym ? valid : false;
