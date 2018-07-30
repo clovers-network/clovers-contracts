@@ -5,6 +5,7 @@ var CloversMetadata = artifacts.require("./CloversMetadata.sol");
 var CloversController = artifacts.require("./CloversController.sol");
 var ClubTokenController = artifacts.require("./ClubTokenController.sol");
 var ClubToken = artifacts.require("./ClubToken.sol");
+const gasToCash = require("./helpers/utils").gasToCash;
 
 const ethPrice = new web3.BigNumber("440");
 const oneGwei = new web3.BigNumber("1000000000"); // 1 GWEI
@@ -22,8 +23,7 @@ let decimals = "18";
 let reserveRatio = "500000"; // parts per million 500000 / 1000000 = 1/2
 let virtualBalance = utils.toWei("1000");
 let virtualSupply = utils.toWei("1000");
-
-let _ = "        ";
+const _ = require("./helpers/utils")._;
 
 contract("Clovers", async function(accounts) {
   let clovers,
@@ -675,38 +675,37 @@ contract("Clovers", async function(accounts) {
     });
   });
 });
-
-function gasToCash(totalGas) {
-  web3.BigNumber.config({ DECIMAL_PLACES: 2, ROUNDING_MODE: 4 });
-
-  if (typeof totalGas !== "object") totalGas = new web3.BigNumber(totalGas);
-  let lowGwei = oneGwei.mul(new web3.BigNumber("8"));
-  let highGwei = oneGwei.mul(new web3.BigNumber("20"));
-  let ethPrice = new web3.BigNumber("450");
-
-  console.log(
-    _ +
-      _ +
-      "$" +
-      new web3.BigNumber(utils.fromWei(totalGas.mul(lowGwei).toString()))
-        .mul(ethPrice)
-        .toFixed(2) +
-      " @ 8 GWE & " +
-      ethPrice +
-      "/USD"
-  );
-  console.log(
-    _ +
-      _ +
-      "$" +
-      new web3.BigNumber(utils.fromWei(totalGas.mul(highGwei).toString()))
-        .mul(ethPrice)
-        .toFixed(2) +
-      " @ 20 GWE & " +
-      ethPrice +
-      "/USD"
-  );
-}
+// function gasToCash(totalGas) {
+//   web3.BigNumber.config({ DECIMAL_PLACES: 2, ROUNDING_MODE: 4 });
+//
+//   if (typeof totalGas !== "object") totalGas = new web3.BigNumber(totalGas);
+//   let lowGwei = oneGwei.mul(new web3.BigNumber("8"));
+//   let highGwei = oneGwei.mul(new web3.BigNumber("20"));
+//   let ethPrice = new web3.BigNumber("450");
+//
+//   console.log(
+//     _ +
+//       _ +
+//       "$" +
+//       new web3.BigNumber(utils.fromWei(totalGas.mul(lowGwei).toString()))
+//         .mul(ethPrice)
+//         .toFixed(2) +
+//       " @ 8 GWE & " +
+//       ethPrice +
+//       "/USD"
+//   );
+//   console.log(
+//     _ +
+//       _ +
+//       "$" +
+//       new web3.BigNumber(utils.fromWei(totalGas.mul(highGwei).toString()))
+//         .mul(ethPrice)
+//         .toFixed(2) +
+//       " @ 20 GWE & " +
+//       ethPrice +
+//       "/USD"
+//   );
+// }
 
 function getBlockNumber() {
   return new Promise((resolve, reject) => {
