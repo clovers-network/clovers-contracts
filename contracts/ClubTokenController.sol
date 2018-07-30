@@ -5,11 +5,12 @@ pragma solidity ^0.4.18;
 */
 
 
-import './ClubToken.sol';
+import './IClubToken.sol';
+import './IClubTokenController.sol';
 import "bancor-contracts/solidity/contracts/converter/BancorFormula.sol";
 import "zeppelin-solidity/contracts/ownership/HasNoTokens.sol";
 
-contract ClubTokenController is BancorFormula, HasNoTokens {
+contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens {
 
 
     address clubToken;
@@ -34,7 +35,7 @@ contract ClubTokenController is BancorFormula, HasNoTokens {
     */
     function getBuy(uint256 buyValue) public constant returns(uint256) {
         return calculatePurchaseReturn(
-            safeAdd(ClubToken(clubToken).totalSupply(), virtualSupply),
+            safeAdd(IClubToken(clubToken).totalSupply(), virtualSupply),
             safeAdd(poolBalance, virtualBalance),
             reserveRatio,
             buyValue);
@@ -49,7 +50,7 @@ contract ClubTokenController is BancorFormula, HasNoTokens {
 
     function getSell(uint256 sellAmount) public constant returns(uint256) {
         return calculateSaleReturn(
-            safeAdd(ClubToken(clubToken).totalSupply(), virtualSupply),
+            safeAdd(IClubToken(clubToken).totalSupply(), virtualSupply),
             safeAdd(poolBalance, virtualBalance),
             reserveRatio,
             sellAmount);
@@ -102,7 +103,7 @@ contract ClubTokenController is BancorFormula, HasNoTokens {
         require(msg.value > 0);
         uint256 tokens = getBuy(msg.value);
         require(tokens > 0);
-        require(ClubToken(clubToken).mint(buyer, tokens));
+        require(IClubToken(clubToken).mint(buyer, tokens));
         poolBalance = safeAdd(poolBalance, msg.value);
         clubToken.transfer(msg.value);
     }
@@ -114,14 +115,14 @@ contract ClubTokenController is BancorFormula, HasNoTokens {
     */
     function sell(uint256 sellAmount) public returns(bool) {
         require(sellAmount > 0);
-        require(ClubToken(clubToken).balanceOf(msg.sender) >= sellAmount);
+        require(IClubToken(clubToken).balanceOf(msg.sender) >= sellAmount);
         uint256 saleReturn = getSell(sellAmount);
         require(saleReturn > 0);
         require(saleReturn <= poolBalance);
         require(saleReturn <= clubToken.balance);
-        ClubToken(clubToken).burn(msg.sender, sellAmount);
+        IClubToken(clubToken).burn(msg.sender, sellAmount);
         poolBalance = safeSub(poolBalance, saleReturn);
-        ClubToken(clubToken).moveEth(msg.sender, saleReturn);
+        IClubToken(clubToken).moveEth(msg.sender, saleReturn);
     }
 
 

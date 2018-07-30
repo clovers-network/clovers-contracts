@@ -9,13 +9,13 @@ import "./Reversi.sol";
 import "./IClovers.sol";
 import "./IClubToken.sol";
 import "./ICloversController.sol";
-import "./ClubTokenController.sol";
+import "./IClubTokenController.sol";
 import "zeppelin-solidity/contracts/ownership/HasNoTokens.sol";
 import "zeppelin-solidity/contracts/ownership/HasNoEther.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 
 
-contract CloversController is ICloversController, HasNoEther, HasNoTokens {
+contract CloversController is HasNoEther, HasNoTokens {
     event cloverCommitted(bytes32 movesHash, address owner);
     event cloverClaimed(bytes28[2] moves, uint256 tokenId, address owner, uint stake, uint reward, uint256 symmetries);
     event stakeRetrieved(uint256 tokenId, address owner, uint stake);
@@ -124,7 +124,7 @@ contract CloversController is ICloversController, HasNoEther, HasNoTokens {
 
 
     function synchronousClaim(bytes28[2] moves, bool _keep) public payable returns (bool) {
-        Reversi.Game memory game = Reversi.playGame(moves);
+        /* Reversi.Game memory game = Reversi.playGame(moves);
         require(isValidGame(game));
         uint256 tokenId = uint256(game.board);
         require(IClovers(clovers).getBlockMinted(tokenId) == 0);
@@ -146,24 +146,24 @@ contract CloversController is ICloversController, HasNoEther, HasNoTokens {
             IClovers(clovers).setReward(tokenId, reward);
         }
         if (_keep) {
-            /* If the user decides to keep the Clover, they must
-            pay for it in club tokens according to the reward price. */
+            // If the user decides to keep the Clover, they must
+            // pay for it in club tokens according to the reward price.
             if (IClubToken(clubToken).balanceOf(msg.sender) < reward) {
-                ClubTokenController(clubTokenController).buy(msg.sender); // msg.value needs to be enough to buy "reward" amount of Club Token
+                IClubTokenController(clubTokenController).buy(msg.sender); // msg.value needs to be enough to buy "reward" amount of Club Token
             }
             if (reward > 0) {
                 IClubToken(clubToken).burn(msg.sender, reward);
             }
             IClovers(clovers).mint(msg.sender, tokenId);
         } else {
-            /* If the user decides not to keep the Clover, they will
-            receive the reward price in club tokens, and the clover will
-            go for sale at 10x the reward price. */
+            // If the user decides not to keep the Clover, they will
+            // receive the reward price in club tokens, and the clover will
+            // go for sale at 10x the reward price.
             if (reward > 0) {
                 require(IClubToken(clubToken).mint(msg.sender, reward));
             }
             IClovers(clovers).mint(clovers, tokenId);
-        }
+        } */
 
     }
 
@@ -256,7 +256,7 @@ contract CloversController is ICloversController, HasNoEther, HasNoTokens {
             /* If the user decides to keep the Clover, they must
             pay for it in club tokens according to the reward price. */
             if (IClubToken(clubToken).balanceOf(commiter) < reward) {
-                ClubTokenController(clubTokenController).buy(commiter); // msg.value needs to be enough to buy "reward" amount of Club Token
+                IClubTokenController(clubTokenController).buy(commiter); // msg.value needs to be enough to buy "reward" amount of Club Token
             }
             if (reward > 0) {
                 IClubToken(clubToken).burn(commiter, reward);
@@ -285,7 +285,7 @@ contract CloversController is ICloversController, HasNoEther, HasNoTokens {
         uint256 reward = IClovers(clovers).getReward(_tokenId);
         uint256 toPay = reward.mul(priceMultiplier);
         if (IClubToken(clubToken).balanceOf(msg.sender) < toPay) {
-            ClubTokenController(clubTokenController).buy(msg.sender); // msg.value needs to be enough to buy "toPay" amount of Club Token
+            IClubTokenController(clubTokenController).buy(msg.sender); // msg.value needs to be enough to buy "toPay" amount of Club Token
         }
         if (toPay > 0) {
             IClubToken(clubToken).burn(msg.sender, toPay);

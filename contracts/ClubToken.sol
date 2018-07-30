@@ -35,6 +35,8 @@ contract ClubToken is IClubToken, StandardToken, DetailedERC20, MintableToken, B
         DetailedERC20(_name, _symbol, _decimals)
     {}
 
+    function () public payable {}
+
     function updateClubTokenControllerAddress(address _clubTokenController) public onlyOwner {
         require(_clubTokenController != 0);
         clubTokenController = _clubTokenController;

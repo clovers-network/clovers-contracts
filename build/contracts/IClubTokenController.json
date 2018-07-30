@@ -1,23 +1,23 @@
 {
-  "contractName": "ERC165",
+  "contractName": "IClubTokenController",
   "abi": [
     {
-      "constant": true,
+      "constant": false,
       "inputs": [
         {
-          "name": "_interfaceId",
-          "type": "bytes4"
+          "name": "buyer",
+          "type": "address"
         }
       ],
-      "name": "supportsInterface",
+      "name": "buy",
       "outputs": [
         {
           "name": "",
           "type": "bool"
         }
       ],
-      "payable": false,
-      "stateMutability": "view",
+      "payable": true,
+      "stateMutability": "payable",
       "type": "function"
     }
   ],
@@ -25,97 +25,97 @@
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "pragma solidity ^0.4.24;\n\n\n/**\n * @title ERC165\n * @dev https://github.com/ethereum/EIPs/blob/master/EIPS/eip-165.md\n */\ninterface ERC165 {\n\n  /**\n   * @notice Query if a contract implements an interface\n   * @param _interfaceId The interface identifier, as specified in ERC-165\n   * @dev Interface identification is specified in ERC-165. This function\n   * uses less than 30,000 gas.\n   */\n  function supportsInterface(bytes4 _interfaceId)\n    external\n    view\n    returns (bool);\n}\n",
-  "sourcePath": "zeppelin-solidity/contracts/introspection/ERC165.sol",
+  "source": "pragma solidity ^0.4.18;\n\n/**\n * The Clovers contract is the interface for the CloversController Contract\n */\n\n\ncontract IClubTokenController {\n    function buy(address buyer) public payable returns(bool);\n}\n",
+  "sourcePath": "/Users/billy/clovers/clovers-contracts/contracts/IClubTokenController.sol",
   "ast": {
-    "absolutePath": "zeppelin-solidity/contracts/introspection/ERC165.sol",
+    "absolutePath": "/Users/billy/clovers/clovers-contracts/contracts/IClubTokenController.sol",
     "exportedSymbols": {
-      "ERC165": [
-        13122
+      "IClubTokenController": [
+        3219
       ]
     },
-    "id": 13123,
+    "id": 3220,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 13114,
+        "id": 3211,
         "literals": [
           "solidity",
           "^",
           "0.4",
-          ".24"
+          ".18"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:20"
+        "src": "0:24:8"
       },
       {
         "baseContracts": [],
         "contractDependencies": [],
-        "contractKind": "interface",
-        "documentation": "@title ERC165\n@dev https://github.com/ethereum/EIPs/blob/master/EIPS/eip-165.md",
+        "contractKind": "contract",
+        "documentation": "The Clovers contract is the interface for the CloversController Contract",
         "fullyImplemented": false,
-        "id": 13122,
+        "id": 3219,
         "linearizedBaseContracts": [
-          13122
+          3219
         ],
-        "name": "ERC165",
+        "name": "IClubTokenController",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "body": null,
-            "documentation": "@notice Query if a contract implements an interface\n@param _interfaceId The interface identifier, as specified in ERC-165\n@dev Interface identification is specified in ERC-165. This function\nuses less than 30,000 gas.",
-            "id": 13121,
+            "documentation": null,
+            "id": 3218,
             "implemented": false,
             "isConstructor": false,
-            "isDeclaredConst": true,
+            "isDeclaredConst": false,
             "modifiers": [],
-            "name": "supportsInterface",
+            "name": "buy",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 13117,
+              "id": 3214,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 13116,
-                  "name": "_interfaceId",
+                  "id": 3213,
+                  "name": "buyer",
                   "nodeType": "VariableDeclaration",
-                  "scope": 13121,
-                  "src": "420:19:20",
+                  "scope": 3218,
+                  "src": "161:13:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_bytes4",
-                    "typeString": "bytes4"
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
                   },
                   "typeName": {
-                    "id": 13115,
-                    "name": "bytes4",
+                    "id": 3212,
+                    "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "420:6:20",
+                    "src": "161:7:8",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_bytes4",
-                      "typeString": "bytes4"
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
                     }
                   },
                   "value": null,
                   "visibility": "internal"
                 }
               ],
-              "src": "419:21:20"
+              "src": "160:15:8"
             },
-            "payable": false,
+            "payable": true,
             "returnParameters": {
-              "id": 13120,
+              "id": 3217,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 13119,
+                  "id": 3216,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 13121,
-                  "src": "476:4:20",
+                  "scope": 3218,
+                  "src": "199:4:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -123,10 +123,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 13118,
+                    "id": 3215,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "476:4:20",
+                    "src": "199:4:8",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -136,110 +136,110 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "475:6:20"
+              "src": "198:6:8"
             },
-            "scope": 13122,
-            "src": "393:89:20",
-            "stateMutability": "view",
+            "scope": 3219,
+            "src": "148:57:8",
+            "stateMutability": "payable",
             "superFunction": null,
-            "visibility": "external"
+            "visibility": "public"
           }
         ],
-        "scope": 13123,
-        "src": "121:363:20"
+        "scope": 3220,
+        "src": "112:95:8"
       }
     ],
-    "src": "0:485:20"
+    "src": "0:208:8"
   },
   "legacyAST": {
-    "absolutePath": "zeppelin-solidity/contracts/introspection/ERC165.sol",
+    "absolutePath": "/Users/billy/clovers/clovers-contracts/contracts/IClubTokenController.sol",
     "exportedSymbols": {
-      "ERC165": [
-        13122
+      "IClubTokenController": [
+        3219
       ]
     },
-    "id": 13123,
+    "id": 3220,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 13114,
+        "id": 3211,
         "literals": [
           "solidity",
           "^",
           "0.4",
-          ".24"
+          ".18"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:20"
+        "src": "0:24:8"
       },
       {
         "baseContracts": [],
         "contractDependencies": [],
-        "contractKind": "interface",
-        "documentation": "@title ERC165\n@dev https://github.com/ethereum/EIPs/blob/master/EIPS/eip-165.md",
+        "contractKind": "contract",
+        "documentation": "The Clovers contract is the interface for the CloversController Contract",
         "fullyImplemented": false,
-        "id": 13122,
+        "id": 3219,
         "linearizedBaseContracts": [
-          13122
+          3219
         ],
-        "name": "ERC165",
+        "name": "IClubTokenController",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "body": null,
-            "documentation": "@notice Query if a contract implements an interface\n@param _interfaceId The interface identifier, as specified in ERC-165\n@dev Interface identification is specified in ERC-165. This function\nuses less than 30,000 gas.",
-            "id": 13121,
+            "documentation": null,
+            "id": 3218,
             "implemented": false,
             "isConstructor": false,
-            "isDeclaredConst": true,
+            "isDeclaredConst": false,
             "modifiers": [],
-            "name": "supportsInterface",
+            "name": "buy",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 13117,
+              "id": 3214,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 13116,
-                  "name": "_interfaceId",
+                  "id": 3213,
+                  "name": "buyer",
                   "nodeType": "VariableDeclaration",
-                  "scope": 13121,
-                  "src": "420:19:20",
+                  "scope": 3218,
+                  "src": "161:13:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_bytes4",
-                    "typeString": "bytes4"
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
                   },
                   "typeName": {
-                    "id": 13115,
-                    "name": "bytes4",
+                    "id": 3212,
+                    "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "420:6:20",
+                    "src": "161:7:8",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_bytes4",
-                      "typeString": "bytes4"
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
                     }
                   },
                   "value": null,
                   "visibility": "internal"
                 }
               ],
-              "src": "419:21:20"
+              "src": "160:15:8"
             },
-            "payable": false,
+            "payable": true,
             "returnParameters": {
-              "id": 13120,
+              "id": 3217,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 13119,
+                  "id": 3216,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 13121,
-                  "src": "476:4:20",
+                  "scope": 3218,
+                  "src": "199:4:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -247,10 +247,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 13118,
+                    "id": 3215,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "476:4:20",
+                    "src": "199:4:8",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -260,20 +260,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "475:6:20"
+              "src": "198:6:8"
             },
-            "scope": 13122,
-            "src": "393:89:20",
-            "stateMutability": "view",
+            "scope": 3219,
+            "src": "148:57:8",
+            "stateMutability": "payable",
             "superFunction": null,
-            "visibility": "external"
+            "visibility": "public"
           }
         ],
-        "scope": 13123,
-        "src": "121:363:20"
+        "scope": 3220,
+        "src": "112:95:8"
       }
     ],
-    "src": "0:485:20"
+    "src": "0:208:8"
   },
   "compiler": {
     "name": "solc",
@@ -281,5 +281,5 @@
   },
   "networks": {},
   "schemaVersion": "2.0.1",
-  "updatedAt": "2018-07-30T11:33:38.058Z"
+  "updatedAt": "2018-07-30T11:33:37.919Z"
 }
