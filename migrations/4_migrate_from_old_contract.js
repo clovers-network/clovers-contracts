@@ -59,7 +59,7 @@ module.exports = async function(deployer, helper, accounts) {
 
       var getCloversCount = await oldToken.getCloversCount();
       console.log(getCloversCount.toString());
-      await doFors(getCloversCount.toNumber(), 0, i => {
+      await doFors(getCloversCount.toNumber(), 8, i => {
         console.log(i + "/" + getCloversCount.toNumber());
         return new Promise(async (resolve, reject) => {
           try {

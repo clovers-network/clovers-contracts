@@ -9,7 +9,6 @@ pragma experimental ABIEncoderV2;
 import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "zeppelin-solidity/contracts/token/ERC721/ERC721Token.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
-import "./Reversi.sol";
 import "./IClovers.sol";
 import "./CloversMetadata.sol";
 
