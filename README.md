@@ -5,8 +5,7 @@
 ## test
 
 ```
-truffle develop
-> truffle test
+$ yarn test
 
 // hopefully you get:
 
