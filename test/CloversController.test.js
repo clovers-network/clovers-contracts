@@ -5,7 +5,8 @@ var CloversMetadata = artifacts.require("./CloversMetadata.sol");
 var CloversController = artifacts.require("./CloversController.sol");
 var ClubTokenController = artifacts.require("./ClubTokenController.sol");
 var ClubToken = artifacts.require("./ClubToken.sol");
-const gasToCash = require("./helpers/utils").gasToCash;
+const gasToCash = require("../helpers/utils").gasToCash;
+const _ = require("../helpers/utils")._;
 
 const ethPrice = new web3.BigNumber("440");
 const oneGwei = new web3.BigNumber("1000000000"); // 1 GWEI
@@ -23,7 +24,6 @@ let decimals = "18";
 let reserveRatio = "500000"; // parts per million 500000 / 1000000 = 1/2
 let virtualBalance = utils.toWei("1000");
 let virtualSupply = utils.toWei("1000");
-const _ = require("./helpers/utils")._;
 
 contract("Clovers", async function(accounts) {
   let clovers,

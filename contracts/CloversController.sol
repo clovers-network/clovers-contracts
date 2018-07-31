@@ -450,6 +450,10 @@ contract CloversController is HasNoEther, HasNoTokens {
         commits[movesHash] = committer;
     }
 
+    function _setCommit(bytes32 movesHash, address committer) onlyOwner {
+        setCommit(movesHash, committer);
+    }
+
     /**
     * @dev Adds new tallys of the totals numbers of clover symmetries.
     * @param _tokenId The token which needs to be examined.

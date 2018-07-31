@@ -3,8 +3,7 @@ var Reversi_ = artifacts.require("./Reversi.sol");
 var ReversiMock = artifacts.require("./mocks/ReversiMock.sol");
 var Reversi = require("clovers-reversi").default;
 const gasToCash = require("./helpers/utils").gasToCash;
-
-let _ = "        ";
+const _ = require("../helpers/utils")._;
 
 contract("Reversi", async function(accounts) {
   let reversi, reversiMock;

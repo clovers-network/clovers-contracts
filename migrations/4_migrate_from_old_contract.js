@@ -1,4 +1,5 @@
 var Clovers = artifacts.require("./Clovers.sol");
+var CloversController = artifacts.require("./CloversController.sol");
 var ClubToken = artifacts.require("./ClubToken.sol");
 var OldToken = artifacts.require("../contracts/OldToken.sol");
 var ethers = require("ethers");
@@ -7,7 +8,6 @@ var ethers = require("ethers");
 var Reversi = require("clovers-reversi").default;
 var Web3 = require("web3");
 module.exports = async function(deployer, helper, accounts) {
-  return
   var doFors = (n, i = 0, func) => {
     // console.log(n, i, func)
     return new Promise((resolve, reject) => {
@@ -46,8 +46,9 @@ module.exports = async function(deployer, helper, accounts) {
         etherscanProvider
       ]);
       var provider = providers.getDefaultProvider(network);
-
       var clovers = await Clovers.deployed();
+
+      var cloversController = await CloversController.deployed();
       // var web3Provider = ZeroClientProvider({
       //   getAccounts: function(){},
       //   rpcUrl: 'https://rinkeby.infura.io/Q5I7AA6unRLULsLTYd6d',
@@ -89,7 +90,7 @@ module.exports = async function(deployer, helper, accounts) {
             var blockNumber = await getBlockNumber();
 
             // setCommit
-            var tx = await clovers.setCommit(movesHash, _to);
+            var tx = await cloversController._setCommit(movesHash, _to);
             // console.log(tx.receipt.status)
             // setBlockMinted
             tx = await clovers.setBlockMinted(_tokenId, blockNumber);
@@ -120,7 +121,7 @@ module.exports = async function(deployer, helper, accounts) {
               allSymmetries[2] = allSymmetries[2].add(reversi.X0Sym ? 1 : 0);
               allSymmetries[3] = allSymmetries[3].add(reversi.XYSym ? 1 : 0);
               allSymmetries[4] = allSymmetries[4].add(reversi.XnYSym ? 1 : 0);
-              tx = await clover s.setAllSymmetries(...allSymmetries);
+              tx = await clovers.setAllSymmetries(...allSymmetries);
               console.log(tx.receipt.status);
             }
             if (!(await clovers.exists(_tokenId))) {
