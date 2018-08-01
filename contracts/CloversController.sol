@@ -19,7 +19,6 @@ contract CloversController is HasNoEther, HasNoTokens {
     event cloverCommitted(bytes32 movesHash, address owner);
     event cloverClaimed(bytes28[2] moves, uint256 tokenId, address owner, uint stake, uint reward, uint256 symmetries, bool keep);
     event stakeRetrieved(uint256 tokenId, address owner, uint stake);
-
     event cloverChallenged(bytes28[2] moves, uint256 tokenId, address owner, address challenger, uint stake);
 
     using SafeMath for uint256;
@@ -28,6 +27,7 @@ contract CloversController is HasNoEther, HasNoTokens {
     address public clovers;
     address public clubToken;
     address public clubTokenController;
+    address public simpleCloversMarket;
 
     uint256 public basePrice;
     uint256 public priceMultiplier;
@@ -76,6 +76,7 @@ contract CloversController is HasNoEther, HasNoTokens {
         Reversi.Game memory game = Reversi.playGame(moves);
         return isValidGame(game);
     }
+
     /**
     * @dev Checks whether the game is valid.
     * @param game The pre-played game.
@@ -151,6 +152,7 @@ contract CloversController is HasNoEther, HasNoTokens {
                 IClubTokenController(clubTokenController).buy(msg.sender); // msg.value needs to be enough to buy "reward" amount of Club Token
             }
             if (reward > 0) {
+                // IClubToken(clubToken).transferFrom(msg.sender, clubToken, reward); // if we'd rather keep the money
                 IClubToken(clubToken).burn(msg.sender, reward);
             }
             IClovers(clovers).mint(msg.sender, tokenId);
@@ -292,6 +294,7 @@ contract CloversController is HasNoEther, HasNoTokens {
                 IClubTokenController(clubTokenController).buy(committer); // msg.value needs to be enough to buy "reward" amount of Club Token
             }
             if (basePrice.add(reward) > 0) {
+                // IClubToken(clubToken).transferFrom(committer, clubToken, basePrice.add(reward)); // if we'd rather keep the money
                 IClubToken(clubToken).burn(committer, basePrice.add(reward));
             }
             IClovers(clovers).transferFrom(clovers, committer, _tokenId);
@@ -313,18 +316,20 @@ contract CloversController is HasNoEther, HasNoTokens {
     * @param _tokenId The board being bought.
     * @return A boolean representing whether or not the purchase was successful.
     */
-    function buyCloverFromContract(uint256 _tokenId) public payable returns(bool) {
+    /* function buyCloverFromContract(uint256 _tokenId) public payable returns(bool) {
+        require(IClovers(clovers).ownerOf(_tokenId) == clovers);
         uint256 reward = IClovers(clovers).getReward(_tokenId);
         uint256 toPay = basePrice.add(reward.mul(priceMultiplier));
         if (IClubToken(clubToken).balanceOf(msg.sender) < toPay) {
             IClubTokenController(clubTokenController).buy(msg.sender); // msg.value needs to be enough to buy "toPay" amount of Club Token
         }
         if (toPay > 0) {
+            // IClubToken(clubToken).transferFrom(msg.sender, clubToken, toPay); // if we'd rather keep the money
             IClubToken(clubToken).burn(msg.sender, toPay);
         }
         IClovers(clovers).transferFrom(clovers, msg.sender, _tokenId);
         return true;
-    }
+    } */
 
     /**
     * @dev Convert a bytes16 board into a uint256.
@@ -380,6 +385,11 @@ contract CloversController is HasNoEther, HasNoTokens {
         return true;
     }
 
+    function transferFrom(address _from, address _to, uint256 _tokenId) public {
+        require(msg.sender == simpleCloversMarket);
+        IClovers(clovers).transferFrom(_from, _to, _tokenId);
+    }
+
 
     /**
     * @dev Updates oracle Address.
@@ -387,6 +397,14 @@ contract CloversController is HasNoEther, HasNoTokens {
     */
     function updateOracle(address _oracle) public onlyOwner {
         oracle = _oracle;
+    }
+
+    /**
+    * @dev Updates simpleCloversMarket Address.
+    * @param _simpleCloversMarket The new simpleCloversMarket address.
+    */
+    function updateSimpleCloversMarket(address _simpleCloversMarket) public onlyOwner {
+        simpleCloversMarket = _simpleCloversMarket;
     }
 
     /**

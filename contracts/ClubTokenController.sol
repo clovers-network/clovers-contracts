@@ -13,7 +13,8 @@ import "zeppelin-solidity/contracts/ownership/HasNoTokens.sol";
 contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens {
 
 
-    address clubToken;
+    address public clubToken;
+    address public simpleCloversMarket;
 
     uint256 public poolBalance;
     uint256 public virtualSupply;
@@ -87,12 +88,27 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
     }
 
     /**
+    * @dev updates the SimpleCloversMarket address
+    * @param _simpleCloversMarket The address of the simpleCloversMarket
+    * @return A boolean representing whether or not the update was successful.
+    */
+    function updateSimpleCloversMarket(address _simpleCloversMarket) public onlyOwner returns(bool){
+        simpleCloversMarket = _simpleCloversMarket;
+        return true;
+    }
+
+    /**
     * @dev donate Donate Eth to the poolBalance without increasing the totalSupply
     */
     function donate() public payable {
         require(msg.value > 0);
         poolBalance = safeAdd(poolBalance, msg.value);
         clubToken.transfer(msg.value);
+    }
+
+    function transferFrom(address from, address to, uint256 amount) public {
+        require(msg.sender == simpleCloversMarket);
+        IClubToken(clubToken).transferFrom(from, to, amount);
     }
 
     /**

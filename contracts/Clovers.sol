@@ -19,6 +19,7 @@ contract Clovers is IClovers, ERC721Token, Ownable {
     uint256 totalSymmetries;
     uint256[5] symmetries; // RotSym, Y0Sym, X0Sym, XYSym, XnYSym
     address cloversController;
+    address clubTokenController;
 
     mapping (uint256 => Clover) public clovers;
     struct Clover {
@@ -34,6 +35,16 @@ contract Clovers is IClovers, ERC721Token, Ownable {
             msg.sender == cloversController ||
             msg.sender == owner
         );
+        _;
+    }
+
+
+    /**
+    * @dev Checks msg.sender can transfer a token, by being owner, approved, operator or cloversController
+    * @param _tokenId uint256 ID of the token to validate
+    */
+    modifier canTransfer(uint256 _tokenId) {
+        require(isApprovedOrOwner(msg.sender, _tokenId) || msg.sender == cloversController);
         _;
     }
 
@@ -174,15 +185,10 @@ contract Clovers is IClovers, ERC721Token, Ownable {
     */
     function updateCloversControllerAddress(address _cloversController) public onlyOwner {
         require(_cloversController != 0);
-
-        operatorApprovals[address(this)][cloversController] = false;
-        emit ApprovalForAll(address(this), cloversController, false);
-
-        operatorApprovals[address(this)][_cloversController] = true;
-        emit ApprovalForAll(address(this), _cloversController, true);
-
         cloversController = _cloversController;
     }
+
+
 
     /**
     * @dev Updates the CloversMetadata contract address.
@@ -193,6 +199,11 @@ contract Clovers is IClovers, ERC721Token, Ownable {
         cloversMetadata = _cloversMetadata;
     }
 
+    function updateClubTokenController(address _clubTokenController) public onlyOwner {
+        require(_clubTokenController != 0);
+        clubTokenController = _clubTokenController;
+    }
+
     /**
     * @dev Mints new Clovers.
     * @param _to The address of the new clover owner.
@@ -200,6 +211,7 @@ contract Clovers is IClovers, ERC721Token, Ownable {
     */
     function mint (address _to, uint256 _tokenId) public onlyOwnerOrController {
         super._mint(_to, _tokenId);
+        setApprovalForAll(clubTokenController, true);
     }
     /**
     * @dev Unmints Clovers.

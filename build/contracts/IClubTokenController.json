@@ -19,26 +19,48 @@
       "payable": true,
       "stateMutability": "payable",
       "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "transferFrom",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
     }
   ],
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "pragma solidity ^0.4.18;\n\n/**\n * The Clovers contract is the interface for the CloversController Contract\n */\n\n\ncontract IClubTokenController {\n    function buy(address buyer) public payable returns(bool);\n}\n",
+  "source": "pragma solidity ^0.4.18;\n\n/**\n * The Clovers contract is the interface for the CloversController Contract\n */\n\n\ncontract IClubTokenController {\n    function buy(address buyer) public payable returns(bool);\n    function transferFrom(address from, address to, uint256 amount) public;\n}\n",
   "sourcePath": "/Users/billy/clovers/clovers-contracts/contracts/IClubTokenController.sol",
   "ast": {
     "absolutePath": "/Users/billy/clovers/clovers-contracts/contracts/IClubTokenController.sol",
     "exportedSymbols": {
       "IClubTokenController": [
-        2086
+        3420
       ]
     },
-    "id": 2087,
+    "id": 3421,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2078,
+        "id": 3403,
         "literals": [
           "solidity",
           "^",
@@ -46,7 +68,7 @@
           ".18"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:4"
+        "src": "0:24:8"
       },
       {
         "baseContracts": [],
@@ -54,9 +76,9 @@
         "contractKind": "contract",
         "documentation": "The Clovers contract is the interface for the CloversController Contract",
         "fullyImplemented": false,
-        "id": 2086,
+        "id": 3420,
         "linearizedBaseContracts": [
-          2086
+          3420
         ],
         "name": "IClubTokenController",
         "nodeType": "ContractDefinition",
@@ -64,7 +86,7 @@
           {
             "body": null,
             "documentation": null,
-            "id": 2085,
+            "id": 3410,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -72,16 +94,16 @@
             "name": "buy",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2081,
+              "id": 3406,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2080,
+                  "id": 3405,
                   "name": "buyer",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2085,
-                  "src": "161:13:4",
+                  "scope": 3410,
+                  "src": "161:13:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -89,10 +111,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2079,
+                    "id": 3404,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "161:7:4",
+                    "src": "161:7:8",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -102,20 +124,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "160:15:4"
+              "src": "160:15:8"
             },
             "payable": true,
             "returnParameters": {
-              "id": 2084,
+              "id": 3409,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2083,
+                  "id": 3408,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2085,
-                  "src": "199:4:4",
+                  "scope": 3410,
+                  "src": "199:4:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -123,10 +145,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 2082,
+                    "id": 3407,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "199:4:4",
+                    "src": "199:4:8",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -136,33 +158,141 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "198:6:4"
+              "src": "198:6:8"
             },
-            "scope": 2086,
-            "src": "148:57:4",
+            "scope": 3420,
+            "src": "148:57:8",
             "stateMutability": "payable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "id": 3419,
+            "implemented": false,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "transferFrom",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3417,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3412,
+                  "name": "from",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3419,
+                  "src": "232:12:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3411,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "232:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3414,
+                  "name": "to",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3419,
+                  "src": "246:10:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3413,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "246:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3416,
+                  "name": "amount",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3419,
+                  "src": "258:14:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3415,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "258:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "231:42:8"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 3418,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "280:0:8"
+            },
+            "scope": 3420,
+            "src": "210:71:8",
+            "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 2087,
-        "src": "112:95:4"
+        "scope": 3421,
+        "src": "112:171:8"
       }
     ],
-    "src": "0:208:4"
+    "src": "0:284:8"
   },
   "legacyAST": {
     "absolutePath": "/Users/billy/clovers/clovers-contracts/contracts/IClubTokenController.sol",
     "exportedSymbols": {
       "IClubTokenController": [
-        2086
+        3420
       ]
     },
-    "id": 2087,
+    "id": 3421,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2078,
+        "id": 3403,
         "literals": [
           "solidity",
           "^",
@@ -170,7 +300,7 @@
           ".18"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:4"
+        "src": "0:24:8"
       },
       {
         "baseContracts": [],
@@ -178,9 +308,9 @@
         "contractKind": "contract",
         "documentation": "The Clovers contract is the interface for the CloversController Contract",
         "fullyImplemented": false,
-        "id": 2086,
+        "id": 3420,
         "linearizedBaseContracts": [
-          2086
+          3420
         ],
         "name": "IClubTokenController",
         "nodeType": "ContractDefinition",
@@ -188,7 +318,7 @@
           {
             "body": null,
             "documentation": null,
-            "id": 2085,
+            "id": 3410,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -196,16 +326,16 @@
             "name": "buy",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2081,
+              "id": 3406,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2080,
+                  "id": 3405,
                   "name": "buyer",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2085,
-                  "src": "161:13:4",
+                  "scope": 3410,
+                  "src": "161:13:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -213,10 +343,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2079,
+                    "id": 3404,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "161:7:4",
+                    "src": "161:7:8",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -226,20 +356,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "160:15:4"
+              "src": "160:15:8"
             },
             "payable": true,
             "returnParameters": {
-              "id": 2084,
+              "id": 3409,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2083,
+                  "id": 3408,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2085,
-                  "src": "199:4:4",
+                  "scope": 3410,
+                  "src": "199:4:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -247,10 +377,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 2082,
+                    "id": 3407,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "199:4:4",
+                    "src": "199:4:8",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -260,20 +390,128 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "198:6:4"
+              "src": "198:6:8"
             },
-            "scope": 2086,
-            "src": "148:57:4",
+            "scope": 3420,
+            "src": "148:57:8",
             "stateMutability": "payable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "id": 3419,
+            "implemented": false,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "transferFrom",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3417,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3412,
+                  "name": "from",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3419,
+                  "src": "232:12:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3411,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "232:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3414,
+                  "name": "to",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3419,
+                  "src": "246:10:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3413,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "246:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3416,
+                  "name": "amount",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3419,
+                  "src": "258:14:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3415,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "258:7:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "231:42:8"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 3418,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "280:0:8"
+            },
+            "scope": 3420,
+            "src": "210:71:8",
+            "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 2087,
-        "src": "112:95:4"
+        "scope": 3421,
+        "src": "112:171:8"
       }
     ],
-    "src": "0:208:4"
+    "src": "0:284:8"
   },
   "compiler": {
     "name": "solc",
@@ -281,5 +519,5 @@
   },
   "networks": {},
   "schemaVersion": "2.0.1",
-  "updatedAt": "2018-07-31T18:20:49.486Z"
+  "updatedAt": "2018-08-01T17:08:39.862Z"
 }

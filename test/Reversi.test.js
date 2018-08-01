@@ -2,10 +2,10 @@ var utils = require("web3-utils");
 var Reversi_ = artifacts.require("./Reversi.sol");
 var ReversiMock = artifacts.require("./mocks/ReversiMock.sol");
 var Reversi = require("clovers-reversi").default;
-const gasToCash = require("./helpers/utils").gasToCash;
+const gasToCash = require("../helpers/utils").gasToCash;
 const _ = require("../helpers/utils")._;
 
-contract("Reversi", async function(accounts) {
+contract.skip("Reversi", async function(accounts) {
   let reversi, reversiMock;
   before(done => {
     (async () => {

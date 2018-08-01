@@ -5,6 +5,7 @@ var CloversMetadata = artifacts.require("./CloversMetadata.sol");
 var CloversController = artifacts.require("./CloversController.sol");
 var ClubTokenController = artifacts.require("./ClubTokenController.sol");
 var ClubToken = artifacts.require("./ClubToken.sol");
+var SimpleCloversMarket = artifacts.require("./SimpleCloversMarket.sol");
 const gasToCash = require("../helpers/utils").gasToCash;
 const _ = require("../helpers/utils")._;
 
@@ -96,6 +97,8 @@ module.exports = (deployer, helper, accounts) => {
       // -w ClubTokenController address
 
       cloversController = await CloversController.deployed();
+
+      simpleCloversMarket = await SimpleCloversMarket.deployed();
       //
       // var tx = web3.eth.getTransactionReceipt(
       //   cloversController.transactionHash
@@ -111,9 +114,17 @@ module.exports = (deployer, helper, accounts) => {
       var tx = await clovers.updateCloversControllerAddress(
         cloversController.address
       );
+
+      var tx = await clovers.updateClubTokenController(
+        clubTokenController.address
+      );
+
+      var tx = await clubTokenController.updateSimpleCloversMarket(
+        simpleCloversMarket.address
+      );
       //
       // console.log(
-      //   _ + "clovers.updateCloversControllerAddress - " + tx.receipt.gasUsed
+      //   _ + "clovers.updatettrollerAddress - " + tx.receipt.gasUsed
       // );
       // gasToCash(tx.receipt.gasUsed);
       //
@@ -146,9 +157,14 @@ module.exports = (deployer, helper, accounts) => {
       // totalGas = totalGas.plus(tx.receipt.gasUsed);
 
       // Update CloversController.sol
+      // -w simpleCloversMarket
       // -w stakeAmount
       // -w stakePeriod
       // -w payMultiplier
+      var tx = await cloversController.updateSimpleCloversMarket(
+        simpleCloversMarket.address
+      );
+
       var tx = await cloversController.updateStakeAmount(stakeAmount);
       // console.log(
       //   _ + "cloversController.updateStakeAmount - " + tx.receipt.gasUsed

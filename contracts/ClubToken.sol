@@ -13,8 +13,8 @@ import "./IClubToken.sol";
 
 contract ClubToken is IClubToken, StandardToken, DetailedERC20, MintableToken, BurnableToken {
 
-    address cloversController;
-    address clubTokenController;
+    address public cloversController;
+    address public clubTokenController;
 
     modifier hasMintPermission() {
       require(
@@ -46,6 +46,33 @@ contract ClubToken is IClubToken, StandardToken, DetailedERC20, MintableToken, B
         require(_cloversController != 0);
         cloversController = _cloversController;
     }
+
+
+      /**
+       * @dev Transfer tokens from one address to another
+       * @param _from address The address which you want to send tokens from
+       * @param _to address The address which you want to transfer to
+       * @param _value uint256 the amount of tokens to be transferred
+       */
+      function transferFrom(
+        address _from,
+        address _to,
+        uint256 _value
+      )
+        public
+        returns (bool)
+      {
+        require(_to != address(0));
+        require(_value <= balances[_from]);
+        if (msg.sender != cloversController && msg.sender != clubTokenController) {
+            require(_value <= allowed[_from][msg.sender]);
+            allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
+        }
+        balances[_from] = balances[_from].sub(_value);
+        balances[_to] = balances[_to].add(_value);
+        emit Transfer(_from, _to, _value);
+        return true;
+      }
 
     /**
      * @dev Burns a specific amount of tokens.

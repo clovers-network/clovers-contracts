@@ -4,7 +4,9 @@ var Clovers = artifacts.require("./Clovers.sol");
 var CloversMetadata = artifacts.require("./CloversMetadata.sol");
 var CloversController = artifacts.require("./CloversController.sol");
 var ClubTokenController = artifacts.require("./ClubTokenController.sol");
+var SimpleCloversMarket = artifacts.require("./SimpleCloversMarket.sol");
 var ClubToken = artifacts.require("./ClubToken.sol");
+
 const gasToCash = require("../helpers/utils").gasToCash;
 const _ = require("../helpers/utils")._;
 
@@ -115,6 +117,15 @@ module.exports = (deployer, helper, accounts) => {
         clubTokenController.address
       );
       cloversController = await CloversController.deployed();
+
+      await deployer.deploy(
+        SimpleCloversMarket,
+        clovers.address,
+        clubToken.address,
+        clubTokenController.address,
+        cloversController.address
+      );
+      simpleCloversMarket = await SimpleCloversMarket.deployed();
     } catch (error) {
       console.log(error);
     }

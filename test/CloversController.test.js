@@ -4,12 +4,14 @@ var Clovers = artifacts.require("./Clovers.sol");
 var CloversMetadata = artifacts.require("./CloversMetadata.sol");
 var CloversController = artifacts.require("./CloversController.sol");
 var ClubTokenController = artifacts.require("./ClubTokenController.sol");
+var SimpleCloversMarket = artifacts.require("./SimpleCloversMarket.sol");
 var ClubToken = artifacts.require("./ClubToken.sol");
 const gasToCash = require("../helpers/utils").gasToCash;
 const _ = require("../helpers/utils")._;
+var BigNumber = require("bignumber.js");
 
-const ethPrice = new web3.BigNumber("440");
-const oneGwei = new web3.BigNumber("1000000000"); // 1 GWEI
+const ethPrice = new BigNumber("440");
+const oneGwei = new BigNumber("1000000000"); // 1 GWEI
 let gasPrice = oneGwei.toString(10);
 
 let stakeAmount = utils.toWei("0.1");
@@ -31,11 +33,12 @@ contract("Clovers", async function(accounts) {
     clubToken,
     reversi,
     cloversController,
-    clubTokenController;
+    clubTokenController,
+    simpleCloversMarket;
   before(done => {
     (async () => {
       try {
-        var totalGas = new web3.BigNumber("0");
+        var totalGas = new BigNumber("0");
 
         // Deploy Clovers.sol (NFT)
         clovers = await Clovers.new("Clovers", "CLVR");
@@ -119,6 +122,38 @@ contract("Clovers", async function(accounts) {
 
         totalGas = totalGas.plus(tx.gasUsed);
 
+        // Deploy SimpleCloversMarket.sol
+        // -w Clovers address
+        // -w ClubToken address
+        // -w ClubTokenController address
+        simpleCloversMarket = await SimpleCloversMarket.new(
+          clovers.address,
+          clubToken.address,
+          clubTokenController.address,
+          cloversController.address
+        );
+        var tx = web3.eth.getTransactionReceipt(
+          simpleCloversMarket.transactionHash
+        );
+
+        console.log(_ + "Deploy simpleCloversMarket - " + tx.gasUsed);
+        gasToCash(tx.gasUsed);
+
+        totalGas = totalGas.plus(tx.gasUsed);
+
+        // Update Clovers.sol
+        // -w ClubTokenController address
+        var tx = await clovers.updateClubTokenController(
+          clubTokenController.address
+        );
+
+        console.log(
+          _ + "clovers.updateClubTokenController - " + tx.receipt.gasUsed
+        );
+        gasToCash(tx.receipt.gasUsed);
+
+        totalGas = totalGas.plus(tx.receipt.gasUsed);
+
         // Update Clovers.sol
         // -w CloversController address
         var tx = await clovers.updateCloversControllerAddress(
@@ -161,9 +196,22 @@ contract("Clovers", async function(accounts) {
         totalGas = totalGas.plus(tx.receipt.gasUsed);
 
         // Update CloversController.sol
+        // -w simpleCloversMarket
         // -w stakeAmount
         // -w stakePeriod
         // -w payMultiplier
+        var tx = await cloversController.updateSimpleCloversMarket(
+          simpleCloversMarket.address
+        );
+        console.log(
+          _ +
+            "cloversController.updateSimpleCloversMarket - " +
+            tx.receipt.gasUsed
+        );
+        gasToCash(tx.receipt.gasUsed);
+
+        totalGas = totalGas.plus(tx.receipt.gasUsed);
+
         var tx = await cloversController.updateStakeAmount(stakeAmount);
         console.log(
           _ + "cloversController.updateStakeAmount - " + tx.receipt.gasUsed
@@ -205,9 +253,22 @@ contract("Clovers", async function(accounts) {
         totalGas = totalGas.plus(tx.receipt.gasUsed);
 
         // Update ClubTokenController.sol
+        // -w simpleCloversMarket
         // -w reserveRatio
         // -w virtualSupply
         // -w virtualBalance
+        var tx = await clubTokenController.updateSimpleCloversMarket(
+          simpleCloversMarket.address
+        );
+        console.log(
+          _ +
+            "clubTokenController.updateSimpleCloversMarket - " +
+            tx.receipt.gasUsed
+        );
+        gasToCash(tx.receipt.gasUsed);
+
+        totalGas = totalGas.plus(tx.receipt.gasUsed);
+
         var tx = await clubTokenController.updateReserveRatio(reserveRatio);
         console.log(
           _ + "clubTokenController.updateReserveRatio - " + tx.receipt.gasUsed
@@ -244,15 +305,158 @@ contract("Clovers", async function(accounts) {
     })();
   });
 
-  describe("Clovers.sol", function() {
+  describe.skip("Clovers.sol", function() {
     it("should be able to read metadata", async function() {
       let metadata = await clovers.tokenURI(666);
       let _metadata = await cloversMetadata.tokenURI(666);
       assert(_metadata === metadata, "_metadata != metadata");
     });
   });
+  describe("SimpleCloversMarket.sol", function() {
+    let _tokenId = "666";
+    let _seller = accounts[9];
+    let _buyer = accounts[8];
+    let _price = new BigNumber(utils.toWei("0.5"));
+    it("should have correct contract addresses", async function() {
+      let _clovers = await simpleCloversMarket.clovers();
+      assert(
+        _clovers === clovers.address,
+        "clovers contract address is incorrect " +
+          _clovers +
+          "!=" +
+          clovers.address
+      );
 
-  describe("ClubTokenController.sol", function() {
+      let _clubToken = await simpleCloversMarket.clubToken();
+      assert(
+        _clubToken === clubToken.address,
+        "clubToken contract address is incorrect " +
+          _clubToken +
+          "!=" +
+          clubToken.address
+      );
+
+      let _clubTokenController = await simpleCloversMarket.clubTokenController();
+      assert(
+        _clubTokenController === clubTokenController.address,
+        "clubTokenController contract address is incorrect " +
+          _clubTokenController +
+          "!=" +
+          clubTokenController.address
+      );
+    });
+
+    it("should list a clover for sale", async function() {
+      try {
+        tx = await clovers.mint(_seller, _tokenId);
+        console.log(_ + "clovers.mint - " + tx.receipt.cumulativeGasUsed);
+        gasToCash(tx.receipt.cumulativeGasUsed);
+        let owner = await clovers.ownerOf(_tokenId);
+        assert(
+          owner.toString() === _seller.toString(),
+          "owner is not seller " + owner.toString() + "!=" + _seller.toString()
+        );
+      } catch (error) {
+        assert(false, error.message);
+      }
+      try {
+        tx = await simpleCloversMarket.sell(_tokenId, _price, {
+          from: _seller
+        });
+        console.log(
+          _ + "simpleCloversMarket.sell - " + tx.receipt.cumulativeGasUsed
+        );
+        gasToCash(tx.receipt.cumulativeGasUsed);
+
+        let _price_ = await simpleCloversMarket.sellPrice(_tokenId);
+        assert(
+          _price_.toString() === _price.toString(),
+          "prices do not match " +
+            _price_.toString() +
+            "!==" +
+            _price.toString()
+        );
+      } catch (error) {
+        assert(false, error.message);
+      }
+    });
+
+    var getLowestPrice = async function(
+      targetAmount,
+      currentPrice = new BigNumber("0"),
+      useLittle = false
+    ) {
+      if (typeof targetAmount !== "object")
+        targetAmount = new BigNumber(targetAmount);
+      let littleIncrement = new BigNumber(utils.toWei("0.001"));
+      let bigIncrement = new BigNumber(utils.toWei("0.1"));
+      currentPrice = currentPrice.add(
+        useLittle ? littleIncrement : bigIncrement
+      );
+      let resultOfSpend = await clubTokenController.getBuy(currentPrice);
+      if (resultOfSpend.gt(targetAmount)) {
+        return useLittle
+          ? currentPrice
+          : getLowestPrice(targetAmount, currentPrice.sub(bigIncrement), true);
+      }
+      return getLowestPrice(targetAmount, currentPrice, useLittle);
+    };
+
+    it("should buy the clover", async () => {
+      let buyerBalance = await clubToken.balanceOf(_buyer);
+      try {
+        let amountToSpend;
+        if (buyerBalance.lt(_price)) {
+          amountToSpend = await getLowestPrice(_price);
+          tx = await clubTokenController.buy(_buyer, {
+            value: amountToSpend
+          });
+          console.log(
+            _ + "clubTokenController.buy - " + tx.receipt.cumulativeGasUsed
+          );
+          gasToCash(tx.receipt.cumulativeGasUsed);
+          buyerBalance = await clubToken.balanceOf(_buyer);
+          assert(
+            buyerBalance.gte(_price),
+            "buyer balance still isn't enough (" +
+              buyerBalance.toString() +
+              "<" +
+              _price.toString()
+          );
+        } else {
+          amountToSpend = "0";
+        }
+      } catch (error) {
+        assert(false, error.message);
+      }
+      try {
+        let from = await simpleCloversMarket.sellFrom(_tokenId);
+        let owner = await clovers.ownerOf(_tokenId);
+        assert(
+          from.toString() === owner.toString(),
+          "for sale from wrong person"
+        );
+
+        tx = await simpleCloversMarket.buy(_tokenId, {
+          from: _buyer
+          // value: amountToSpend
+        });
+        console.log(
+          _ + "simpleCloversMarket.buy - " + tx.receipt.cumulativeGasUsed
+        );
+        gasToCash(tx.receipt.cumulativeGasUsed);
+        let newOwner = await clovers.ownerOf(_tokenId);
+        assert(
+          newOwner.toString() === _buyer.toString(),
+          "buyer was unable to buy"
+        );
+      } catch (error) {
+        assert(false, error.message);
+      }
+    });
+  });
+
+  describe.skip("ClubTokenController.sol", function() {
     it("should read parameters that were set", async function() {
       let _reserveRatio = await clubTokenController.reserveRatio();
       assert(
@@ -353,7 +557,7 @@ contract("Clovers", async function(accounts) {
         _sellAmount
       );
 
-      let difference = new web3.BigNumber(_depositAmount).sub(expectedReturn);
+      let difference = new BigNumber(_depositAmount).sub(expectedReturn);
       assert(
         difference.lte(1),
         "difference of expectedReturn (" +
@@ -404,7 +608,7 @@ contract("Clovers", async function(accounts) {
     });
   });
 
-  describe("CloversController.sol", function() {
+  describe.skip("CloversController.sol", function() {
     let balance,
       _balance,
       tx,
@@ -415,11 +619,11 @@ contract("Clovers", async function(accounts) {
 
     let _invalidTokenId = "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
     let _invalidMoves = [
-      new web3.BigNumber(
+      new BigNumber(
         "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
         16
       ),
-      new web3.BigNumber(
+      new BigNumber(
         "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
         16
       )
@@ -428,11 +632,11 @@ contract("Clovers", async function(accounts) {
     let _tokenId = "0x55555aa5569955695569555955555555";
 
     let _moves = [
-      new web3.BigNumber(
+      new BigNumber(
         "0xb58b552a986549b132451cbcbd69d106af0e3ae6cead82cc297427c3",
         16
       ),
-      new web3.BigNumber(
+      new BigNumber(
         "0xbb9af45dbeefd78f120678dd7ef4dfe69f3d9bbe7eeddfc7f0000000",
         16
       )
@@ -484,11 +688,11 @@ contract("Clovers", async function(accounts) {
       try {
         let options = [
           _moves,
-          new web3.BigNumber(_tokenId, 16),
-          new web3.BigNumber("0x1F", 16), // invalid symmetries
+          new BigNumber(_tokenId, 16),
+          new BigNumber("0x1F", 16), // invalid symmetries
           false,
           {
-            value: new web3.BigNumber(stakeAmount),
+            value: new BigNumber(stakeAmount),
             gasPrice
           }
         ];
@@ -501,7 +705,7 @@ contract("Clovers", async function(accounts) {
 
         gasSpent = tx.receipt.cumulativeGasUsed;
         assert(
-          new web3.BigNumber(tx.receipt.status).eq(1),
+          new BigNumber(tx.receipt.status).eq(1),
           "claimClover tx receipt should have been 0x01 (successful) but was instead " +
             tx.receipt.status
         );
@@ -556,7 +760,7 @@ contract("Clovers", async function(accounts) {
 
     it("should update the stake amount with the gas Estimate from challengeClover", async function() {
       try {
-        newStakeAmount = new web3.BigNumber(gasEstimate).mul(gasPrice).mul(40);
+        newStakeAmount = new BigNumber(gasEstimate).mul(gasPrice).mul(40);
         tx = await cloversController.updateStakeAmount(newStakeAmount, {
           gasPrice
         });
@@ -570,7 +774,7 @@ contract("Clovers", async function(accounts) {
 
         gasSpent += tx.receipt.cumulativeGasUsed;
         assert(
-          new web3.BigNumber(tx.receipt.status).eq(1),
+          new BigNumber(tx.receipt.status).eq(1),
           "updateStakeAmount tx receipt should have been 0x01 (successful) but was instead " +
             tx.receipt.status
         );
@@ -618,7 +822,7 @@ contract("Clovers", async function(accounts) {
 
         gasSpent += tx.receipt.cumulativeGasUsed;
         assert(
-          new web3.BigNumber(tx.receipt.status).eq(1),
+          new BigNumber(tx.receipt.status).eq(1),
           "retrieveStake tx receipt should have been 0x01 (successful) but was instead " +
             tx.receipt.status
         );
@@ -676,18 +880,18 @@ contract("Clovers", async function(accounts) {
   });
 });
 // function gasToCash(totalGas) {
-//   web3.BigNumber.config({ DECIMAL_PLACES: 2, ROUNDING_MODE: 4 });
+//   BigNumber.config({ DECIMAL_PLACES: 2, ROUNDING_MODE: 4 });
 //
-//   if (typeof totalGas !== "object") totalGas = new web3.BigNumber(totalGas);
-//   let lowGwei = oneGwei.mul(new web3.BigNumber("8"));
-//   let highGwei = oneGwei.mul(new web3.BigNumber("20"));
-//   let ethPrice = new web3.BigNumber("450");
+//   if (typeof totalGas !== "object") totalGas = new BigNumber(totalGas);
+//   let lowGwei = oneGwei.mul(new BigNumber("8"));
+//   let highGwei = oneGwei.mul(new BigNumber("20"));
+//   let ethPrice = new BigNumber("450");
 //
 //   console.log(
 //     _ +
 //       _ +
 //       "$" +
-//       new web3.BigNumber(utils.fromWei(totalGas.mul(lowGwei).toString()))
+//       new BigNumber(utils.fromWei(totalGas.mul(lowGwei).toString()))
 //         .mul(ethPrice)
 //         .toFixed(2) +
 //       " @ 8 GWE & " +
@@ -698,7 +902,7 @@ contract("Clovers", async function(accounts) {
 //     _ +
 //       _ +
 //       "$" +
-//       new web3.BigNumber(utils.fromWei(totalGas.mul(highGwei).toString()))
+//       new BigNumber(utils.fromWei(totalGas.mul(highGwei).toString()))
 //         .mul(ethPrice)
 //         .toFixed(2) +
 //       " @ 20 GWE & " +
