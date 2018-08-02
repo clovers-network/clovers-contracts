@@ -1,4 +1,5 @@
 pragma solidity ^0.4.18;
+pragma experimental ABIEncoderV2;
 
 /**
  * The Clovers contract is the interface for the CloversController Contract

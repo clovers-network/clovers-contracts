@@ -31,6 +31,7 @@ let virtualBalance = utils.toWei("1000");
 let virtualSupply = utils.toWei("1000");
 
 module.exports = (deployer, helper, accounts) => {
+
   deployer.then(async () => {
     try {
       var totalGas = new web3.BigNumber("0");

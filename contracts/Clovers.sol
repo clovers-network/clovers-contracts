@@ -178,6 +178,7 @@ contract Clovers is IClovers, ERC721Token, Ownable {
     */
     function deleteClover(uint256 _tokenId) public onlyOwnerOrController {
         delete(clovers[_tokenId]);
+        unmint(_tokenId);
     }
     /**
     * @dev Updates the CloversController contract address and approves that contract to manage the Clovers owned by the Clovers contract.

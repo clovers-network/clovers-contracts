@@ -35,6 +35,18 @@ contract IClubToken {
 
 contract IClubTokenController {
     function buy(address buyer) public payable returns(bool);
+    function transferFrom(address from, address to, uint256 amount) public;
+}
+
+// File: bancor-contracts/solidity/contracts/converter/interfaces/IBancorFormula.sol
+
+/*
+    Bancor Formula interface
+*/
+contract IBancorFormula {
+    function calculatePurchaseReturn(uint256 _supply, uint256 _connectorBalance, uint32 _connectorWeight, uint256 _depositAmount) public view returns (uint256);
+    function calculateSaleReturn(uint256 _supply, uint256 _connectorBalance, uint32 _connectorWeight, uint256 _sellAmount) public view returns (uint256);
+    function calculateCrossConnectorReturn(uint256 _fromConnectorBalance, uint32 _fromConnectorWeight, uint256 _toConnectorBalance, uint32 _toConnectorWeight, uint256 _amount) public view returns (uint256);
 }
 
 // File: bancor-contracts/solidity/contracts/utility/Utils.sol
@@ -109,17 +121,6 @@ contract Utils {
         assert(_x == 0 || z / _x == _y);
         return z;
     }
-}
-
-// File: bancor-contracts/solidity/contracts/converter/interfaces/IBancorFormula.sol
-
-/*
-    Bancor Formula interface
-*/
-contract IBancorFormula {
-    function calculatePurchaseReturn(uint256 _supply, uint256 _connectorBalance, uint32 _connectorWeight, uint256 _depositAmount) public view returns (uint256);
-    function calculateSaleReturn(uint256 _supply, uint256 _connectorBalance, uint32 _connectorWeight, uint256 _sellAmount) public view returns (uint256);
-    function calculateCrossConnectorReturn(uint256 _fromConnectorBalance, uint32 _fromConnectorWeight, uint256 _toConnectorBalance, uint32 _toConnectorWeight, uint256 _amount) public view returns (uint256);
 }
 
 // File: bancor-contracts/solidity/contracts/converter/BancorFormula.sol
@@ -637,70 +638,6 @@ contract BancorFormula is IBancorFormula, Utils {
     }
 }
 
-// File: zeppelin-solidity/contracts/token/ERC20/ERC20Basic.sol
-
-/**
- * @title ERC20Basic
- * @dev Simpler version of ERC20 interface
- * See https://github.com/ethereum/EIPs/issues/179
- */
-contract ERC20Basic {
-  function totalSupply() public view returns (uint256);
-  function balanceOf(address who) public view returns (uint256);
-  function transfer(address to, uint256 value) public returns (bool);
-  event Transfer(address indexed from, address indexed to, uint256 value);
-}
-
-// File: zeppelin-solidity/contracts/token/ERC20/ERC20.sol
-
-/**
- * @title ERC20 interface
- * @dev see https://github.com/ethereum/EIPs/issues/20
- */
-contract ERC20 is ERC20Basic {
-  function allowance(address owner, address spender)
-    public view returns (uint256);
-
-  function transferFrom(address from, address to, uint256 value)
-    public returns (bool);
-
-  function approve(address spender, uint256 value) public returns (bool);
-  event Approval(
-    address indexed owner,
-    address indexed spender,
-    uint256 value
-  );
-}
-
-// File: zeppelin-solidity/contracts/token/ERC20/SafeERC20.sol
-
-/**
- * @title SafeERC20
- * @dev Wrappers around ERC20 operations that throw on failure.
- * To use this library you can add a `using SafeERC20 for ERC20;` statement to your contract,
- * which allows you to call the safe operations as `token.safeTransfer(...)`, etc.
- */
-library SafeERC20 {
-  function safeTransfer(ERC20Basic token, address to, uint256 value) internal {
-    require(token.transfer(to, value));
-  }
-
-  function safeTransferFrom(
-    ERC20 token,
-    address from,
-    address to,
-    uint256 value
-  )
-    internal
-  {
-    require(token.transferFrom(from, to, value));
-  }
-
-  function safeApprove(ERC20 token, address spender, uint256 value) internal {
-    require(token.approve(spender, value));
-  }
-}
-
 // File: zeppelin-solidity/contracts/ownership/Ownable.sol
 
 /**
@@ -765,6 +702,70 @@ contract Ownable {
   }
 }
 
+// File: zeppelin-solidity/contracts/token/ERC20/ERC20Basic.sol
+
+/**
+ * @title ERC20Basic
+ * @dev Simpler version of ERC20 interface
+ * See https://github.com/ethereum/EIPs/issues/179
+ */
+contract ERC20Basic {
+  function totalSupply() public view returns (uint256);
+  function balanceOf(address who) public view returns (uint256);
+  function transfer(address to, uint256 value) public returns (bool);
+  event Transfer(address indexed from, address indexed to, uint256 value);
+}
+
+// File: zeppelin-solidity/contracts/token/ERC20/ERC20.sol
+
+/**
+ * @title ERC20 interface
+ * @dev see https://github.com/ethereum/EIPs/issues/20
+ */
+contract ERC20 is ERC20Basic {
+  function allowance(address owner, address spender)
+    public view returns (uint256);
+
+  function transferFrom(address from, address to, uint256 value)
+    public returns (bool);
+
+  function approve(address spender, uint256 value) public returns (bool);
+  event Approval(
+    address indexed owner,
+    address indexed spender,
+    uint256 value
+  );
+}
+
+// File: zeppelin-solidity/contracts/token/ERC20/SafeERC20.sol
+
+/**
+ * @title SafeERC20
+ * @dev Wrappers around ERC20 operations that throw on failure.
+ * To use this library you can add a `using SafeERC20 for ERC20;` statement to your contract,
+ * which allows you to call the safe operations as `token.safeTransfer(...)`, etc.
+ */
+library SafeERC20 {
+  function safeTransfer(ERC20Basic token, address to, uint256 value) internal {
+    require(token.transfer(to, value));
+  }
+
+  function safeTransferFrom(
+    ERC20 token,
+    address from,
+    address to,
+    uint256 value
+  )
+    internal
+  {
+    require(token.transferFrom(from, to, value));
+  }
+
+  function safeApprove(ERC20 token, address spender, uint256 value) internal {
+    require(token.approve(spender, value));
+  }
+}
+
 // File: zeppelin-solidity/contracts/ownership/CanReclaimToken.sol
 
 /**
@@ -826,7 +827,8 @@ contract HasNoTokens is CanReclaimToken {
 contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens {
 
 
-    address clubToken;
+    address public clubToken;
+    address public simpleCloversMarket;
 
     uint256 public poolBalance;
     uint256 public virtualSupply;
@@ -900,12 +902,27 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
     }
 
     /**
+    * @dev updates the SimpleCloversMarket address
+    * @param _simpleCloversMarket The address of the simpleCloversMarket
+    * @return A boolean representing whether or not the update was successful.
+    */
+    function updateSimpleCloversMarket(address _simpleCloversMarket) public onlyOwner returns(bool){
+        simpleCloversMarket = _simpleCloversMarket;
+        return true;
+    }
+
+    /**
     * @dev donate Donate Eth to the poolBalance without increasing the totalSupply
     */
     function donate() public payable {
         require(msg.value > 0);
         poolBalance = safeAdd(poolBalance, msg.value);
         clubToken.transfer(msg.value);
+    }
+
+    function transferFrom(address from, address to, uint256 amount) public {
+        require(msg.sender == simpleCloversMarket);
+        IClubToken(clubToken).transferFrom(from, to, amount);
     }
 
     /**

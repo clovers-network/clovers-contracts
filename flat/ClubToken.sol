@@ -1,29 +1,17 @@
 pragma solidity ^0.4.24;
 
-// File: contracts/IClubToken.sol
+// File: zeppelin-solidity/contracts/token/ERC20/ERC20Basic.sol
 
 /**
- * Interface for ERC20 Club Token
+ * @title ERC20Basic
+ * @dev Simpler version of ERC20 interface
+ * See https://github.com/ethereum/EIPs/issues/179
  */
-
-
-contract IClubToken {
-    event Approval(address indexed owner, address indexed spender, uint256 value);
-    event Transfer(address indexed from, address indexed to, uint256 value);
-
-    function mint(address _to, uint256 _amount) public returns (bool);
-    function burn(address _burner, uint256 _value) public;
-    function moveEth(address _to, uint256 _amount) public;
-    function moveToken(address _to, uint256 _amount, address _token) public returns (bool);
-    function approveToken(address _to, uint256 _amount, address _token) public returns (bool);
-
-    function allowance(address owner, address spender) public view returns (uint256);
-    function transferFrom(address from, address to, uint256 value) public returns (bool);
-    function approve(address spender, uint256 value) public returns (bool);
-    function increaseApproval(address _spender, uint256 _addedValue) public returns (bool);
-    function totalSupply() public view returns (uint256);
-    function balanceOf(address who) public view returns (uint256);
-    function transfer(address to, uint256 value) public returns (bool);
+contract ERC20Basic {
+  function totalSupply() public view returns (uint256);
+  function balanceOf(address who) public view returns (uint256);
+  function transfer(address to, uint256 value) public returns (bool);
+  event Transfer(address indexed from, address indexed to, uint256 value);
 }
 
 // File: zeppelin-solidity/contracts/math/SafeMath.sol
@@ -78,20 +66,6 @@ library SafeMath {
   }
 }
 
-// File: zeppelin-solidity/contracts/token/ERC20/ERC20Basic.sol
-
-/**
- * @title ERC20Basic
- * @dev Simpler version of ERC20 interface
- * See https://github.com/ethereum/EIPs/issues/179
- */
-contract ERC20Basic {
-  function totalSupply() public view returns (uint256);
-  function balanceOf(address who) public view returns (uint256);
-  function transfer(address to, uint256 value) public returns (bool);
-  event Transfer(address indexed from, address indexed to, uint256 value);
-}
-
 // File: zeppelin-solidity/contracts/token/ERC20/BasicToken.sol
 
 /**
@@ -138,36 +112,6 @@ contract BasicToken is ERC20Basic {
 
 }
 
-// File: zeppelin-solidity/contracts/token/ERC20/BurnableToken.sol
-
-/**
- * @title Burnable Token
- * @dev Token that can be irreversibly burned (destroyed).
- */
-contract BurnableToken is BasicToken {
-
-  event Burn(address indexed burner, uint256 value);
-
-  /**
-   * @dev Burns a specific amount of tokens.
-   * @param _value The amount of token to be burned.
-   */
-  function burn(uint256 _value) public {
-    _burn(msg.sender, _value);
-  }
-
-  function _burn(address _who, uint256 _value) internal {
-    require(_value <= balances[_who]);
-    // no need to require value <= totalSupply, since that would imply the
-    // sender's balance is greater than the totalSupply, which *should* be an assertion failure
-
-    balances[_who] = balances[_who].sub(_value);
-    totalSupply_ = totalSupply_.sub(_value);
-    emit Burn(_who, _value);
-    emit Transfer(_who, address(0), _value);
-  }
-}
-
 // File: zeppelin-solidity/contracts/token/ERC20/ERC20.sol
 
 /**
@@ -187,90 +131,6 @@ contract ERC20 is ERC20Basic {
     address indexed spender,
     uint256 value
   );
-}
-
-// File: zeppelin-solidity/contracts/token/ERC20/DetailedERC20.sol
-
-/**
- * @title DetailedERC20 token
- * @dev The decimals are only for visualization purposes.
- * All the operations are done using the smallest and indivisible token unit,
- * just as on Ethereum all the operations are done in wei.
- */
-contract DetailedERC20 is ERC20 {
-  string public name;
-  string public symbol;
-  uint8 public decimals;
-
-  constructor(string _name, string _symbol, uint8 _decimals) public {
-    name = _name;
-    symbol = _symbol;
-    decimals = _decimals;
-  }
-}
-
-// File: zeppelin-solidity/contracts/ownership/Ownable.sol
-
-/**
- * @title Ownable
- * @dev The Ownable contract has an owner address, and provides basic authorization control
- * functions, this simplifies the implementation of "user permissions".
- */
-contract Ownable {
-  address public owner;
-
-
-  event OwnershipRenounced(address indexed previousOwner);
-  event OwnershipTransferred(
-    address indexed previousOwner,
-    address indexed newOwner
-  );
-
-
-  /**
-   * @dev The Ownable constructor sets the original `owner` of the contract to the sender
-   * account.
-   */
-  constructor() public {
-    owner = msg.sender;
-  }
-
-  /**
-   * @dev Throws if called by any account other than the owner.
-   */
-  modifier onlyOwner() {
-    require(msg.sender == owner);
-    _;
-  }
-
-  /**
-   * @dev Allows the current owner to relinquish control of the contract.
-   * @notice Renouncing to ownership will leave the contract without an owner.
-   * It will not be possible to call the functions with the `onlyOwner`
-   * modifier anymore.
-   */
-  function renounceOwnership() public onlyOwner {
-    emit OwnershipRenounced(owner);
-    owner = address(0);
-  }
-
-  /**
-   * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param _newOwner The address to transfer ownership to.
-   */
-  function transferOwnership(address _newOwner) public onlyOwner {
-    _transferOwnership(_newOwner);
-  }
-
-  /**
-   * @dev Transfers control of the contract to a newOwner.
-   * @param _newOwner The address to transfer ownership to.
-   */
-  function _transferOwnership(address _newOwner) internal {
-    require(_newOwner != address(0));
-    emit OwnershipTransferred(owner, _newOwner);
-    owner = _newOwner;
-  }
 }
 
 // File: zeppelin-solidity/contracts/token/ERC20/StandardToken.sol
@@ -394,6 +254,90 @@ contract StandardToken is ERC20, BasicToken {
 
 }
 
+// File: zeppelin-solidity/contracts/token/ERC20/DetailedERC20.sol
+
+/**
+ * @title DetailedERC20 token
+ * @dev The decimals are only for visualization purposes.
+ * All the operations are done using the smallest and indivisible token unit,
+ * just as on Ethereum all the operations are done in wei.
+ */
+contract DetailedERC20 is ERC20 {
+  string public name;
+  string public symbol;
+  uint8 public decimals;
+
+  constructor(string _name, string _symbol, uint8 _decimals) public {
+    name = _name;
+    symbol = _symbol;
+    decimals = _decimals;
+  }
+}
+
+// File: zeppelin-solidity/contracts/ownership/Ownable.sol
+
+/**
+ * @title Ownable
+ * @dev The Ownable contract has an owner address, and provides basic authorization control
+ * functions, this simplifies the implementation of "user permissions".
+ */
+contract Ownable {
+  address public owner;
+
+
+  event OwnershipRenounced(address indexed previousOwner);
+  event OwnershipTransferred(
+    address indexed previousOwner,
+    address indexed newOwner
+  );
+
+
+  /**
+   * @dev The Ownable constructor sets the original `owner` of the contract to the sender
+   * account.
+   */
+  constructor() public {
+    owner = msg.sender;
+  }
+
+  /**
+   * @dev Throws if called by any account other than the owner.
+   */
+  modifier onlyOwner() {
+    require(msg.sender == owner);
+    _;
+  }
+
+  /**
+   * @dev Allows the current owner to relinquish control of the contract.
+   * @notice Renouncing to ownership will leave the contract without an owner.
+   * It will not be possible to call the functions with the `onlyOwner`
+   * modifier anymore.
+   */
+  function renounceOwnership() public onlyOwner {
+    emit OwnershipRenounced(owner);
+    owner = address(0);
+  }
+
+  /**
+   * @dev Allows the current owner to transfer control of the contract to a newOwner.
+   * @param _newOwner The address to transfer ownership to.
+   */
+  function transferOwnership(address _newOwner) public onlyOwner {
+    _transferOwnership(_newOwner);
+  }
+
+  /**
+   * @dev Transfers control of the contract to a newOwner.
+   * @param _newOwner The address to transfer ownership to.
+   */
+  function _transferOwnership(address _newOwner) internal {
+    require(_newOwner != address(0));
+    emit OwnershipTransferred(owner, _newOwner);
+    owner = _newOwner;
+  }
+}
+
 // File: zeppelin-solidity/contracts/token/ERC20/MintableToken.sol
 
 /**
@@ -451,6 +395,62 @@ contract MintableToken is StandardToken, Ownable {
   }
 }
 
+// File: zeppelin-solidity/contracts/token/ERC20/BurnableToken.sol
+
+/**
+ * @title Burnable Token
+ * @dev Token that can be irreversibly burned (destroyed).
+ */
+contract BurnableToken is BasicToken {
+
+  event Burn(address indexed burner, uint256 value);
+
+  /**
+   * @dev Burns a specific amount of tokens.
+   * @param _value The amount of token to be burned.
+   */
+  function burn(uint256 _value) public {
+    _burn(msg.sender, _value);
+  }
+
+  function _burn(address _who, uint256 _value) internal {
+    require(_value <= balances[_who]);
+    // no need to require value <= totalSupply, since that would imply the
+    // sender's balance is greater than the totalSupply, which *should* be an assertion failure
+
+    balances[_who] = balances[_who].sub(_value);
+    totalSupply_ = totalSupply_.sub(_value);
+    emit Burn(_who, _value);
+    emit Transfer(_who, address(0), _value);
+  }
+}
+
+// File: contracts/IClubToken.sol
+
+/**
+ * Interface for ERC20 Club Token
+ */
+
+
+contract IClubToken {
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+    event Transfer(address indexed from, address indexed to, uint256 value);
+
+    function mint(address _to, uint256 _amount) public returns (bool);
+    function burn(address _burner, uint256 _value) public;
+    function moveEth(address _to, uint256 _amount) public;
+    function moveToken(address _to, uint256 _amount, address _token) public returns (bool);
+    function approveToken(address _to, uint256 _amount, address _token) public returns (bool);
+
+    function allowance(address owner, address spender) public view returns (uint256);
+    function transferFrom(address from, address to, uint256 value) public returns (bool);
+    function approve(address spender, uint256 value) public returns (bool);
+    function increaseApproval(address _spender, uint256 _addedValue) public returns (bool);
+    function totalSupply() public view returns (uint256);
+    function balanceOf(address who) public view returns (uint256);
+    function transfer(address to, uint256 value) public returns (bool);
+}
+
 // File: contracts/ClubToken.sol
 
 /**
@@ -465,8 +465,8 @@ contract MintableToken is StandardToken, Ownable {
 
 contract ClubToken is IClubToken, StandardToken, DetailedERC20, MintableToken, BurnableToken {
 
-    address cloversController;
-    address clubTokenController;
+    address public cloversController;
+    address public clubTokenController;
 
     modifier hasMintPermission() {
       require(
@@ -498,6 +498,33 @@ contract ClubToken is IClubToken, StandardToken, DetailedERC20, MintableToken, B
         require(_cloversController != 0);
         cloversController = _cloversController;
     }
+
+
+      /**
+       * @dev Transfer tokens from one address to another
+       * @param _from address The address which you want to send tokens from
+       * @param _to address The address which you want to transfer to
+       * @param _value uint256 the amount of tokens to be transferred
+       */
+      function transferFrom(
+        address _from,
+        address _to,
+        uint256 _value
+      )
+        public
+        returns (bool)
+      {
+        require(_to != address(0));
+        require(_value <= balances[_from]);
+        if (msg.sender != cloversController && msg.sender != clubTokenController) {
+            require(_value <= allowed[_from][msg.sender]);
+            allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
+        }
+        balances[_from] = balances[_from].sub(_value);
+        balances[_to] = balances[_to].add(_value);
+        emit Transfer(_from, _to, _value);
+        return true;
+      }
 
     /**
      * @dev Burns a specific amount of tokens.

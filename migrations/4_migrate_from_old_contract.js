@@ -3,12 +3,11 @@ var CloversController = artifacts.require("./CloversController.sol");
 var ClubToken = artifacts.require("./ClubToken.sol");
 var OldToken = artifacts.require("../contracts/OldToken.sol");
 var ethers = require("ethers");
-
+var start = 0
 // var Reversi = require('../app/src/assets/reversi.js')
 var Reversi = require("clovers-reversi").default;
 var Web3 = require("web3");
 module.exports = async function(deployer, helper, accounts) {
-  return;
 
   var doFors = (n, i = 0, func) => {
     // console.log(n, i, func)
@@ -61,7 +60,7 @@ module.exports = async function(deployer, helper, accounts) {
 
       var getCloversCount = await oldToken.getCloversCount();
       console.log(getCloversCount.toString());
-      await doFors(getCloversCount.toNumber(), 17, i => {
+      await doFors(getCloversCount.toNumber(), start, i => {
         console.log(i + "/" + getCloversCount.toNumber());
         return new Promise(async (resolve, reject) => {
           try {

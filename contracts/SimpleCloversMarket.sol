@@ -9,6 +9,9 @@ import "zeppelin-solidity/contracts/math/SafeMath.sol";
 
 contract SimpleCloversMarket is Ownable {
 
+    event updatePrice(uint256 _tokenId, uint256 price);
+
+
     using SafeMath for uint256;
 
     address public clovers;
@@ -53,9 +56,10 @@ contract SimpleCloversMarket is Ownable {
 
     function sell(uint256 _tokenId, uint256 price) public {
         require(price > 0);
-        require(IClovers(clovers).ownerOf(_tokenId) == msg.sender);
+        require(IClovers(clovers).ownerOf(_tokenId) == msg.sender || msg.sender == cloversController);
         sells[_tokenId].price = price;
-        sells[_tokenId].from = msg.sender;
+        sells[_tokenId].from = IClovers(clovers).ownerOf(_tokenId);
+        updatePrice(_tokenId, price);
     }
     function buy (uint256 _tokenId) public payable {
         uint256 sellPrice = sells[_tokenId].price;
@@ -68,6 +72,7 @@ contract SimpleCloversMarket is Ownable {
         IClubTokenController(clubTokenController).transferFrom(msg.sender, sellFrom, sellPrice);
         ICloversController(cloversController).transferFrom(sellFrom, msg.sender, _tokenId);
         delete(sells[_tokenId]);
+        updatePrice(_tokenId, 0);
     }
 
     /**
@@ -75,7 +80,7 @@ contract SimpleCloversMarket is Ownable {
     * @param _tokenId The board being bought.
     * @return A boolean representing whether or not the purchase was successful.
     */
-    function buyCloverFromContract(uint256 _tokenId) public payable returns(bool) {
+    /* function buyCloverFromContract(uint256 _tokenId) public payable returns(bool) {
         require(IClovers(clovers).ownerOf(_tokenId) == clovers);
         uint256 reward = IClovers(clovers).getReward(_tokenId);
         uint256 toPay = ICloversController(cloversController).basePrice().add(reward.mul(ICloversController(cloversController).priceMultiplier()));
@@ -87,6 +92,7 @@ contract SimpleCloversMarket is Ownable {
             IClubToken(clubToken).burn(msg.sender, toPay);
         }
         IClovers(clovers).transferFrom(clovers, msg.sender, _tokenId);
+        updatePrice(_tokenId, 0);
         return true;
-    }
+    } */
 }

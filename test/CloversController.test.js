@@ -28,6 +28,9 @@ let virtualBalance = utils.toWei("1000");
 let virtualSupply = utils.toWei("1000");
 
 contract("Clovers", async function(accounts) {
+
+  let oracle = accounts[8];
+
   let clovers,
     cloversMetadata,
     clubToken,
@@ -196,10 +199,23 @@ contract("Clovers", async function(accounts) {
         totalGas = totalGas.plus(tx.receipt.gasUsed);
 
         // Update CloversController.sol
+        // -w oracle
         // -w simpleCloversMarket
         // -w stakeAmount
         // -w stakePeriod
         // -w payMultiplier
+        var tx = await cloversController.updateOracle(
+          oracle
+        );
+        console.log(
+          _ +
+            "cloversController.updateOracle - " +
+            tx.receipt.gasUsed
+        );
+        gasToCash(tx.receipt.gasUsed);
+
+        totalGas = totalGas.plus(tx.receipt.gasUsed);
+
         var tx = await cloversController.updateSimpleCloversMarket(
           simpleCloversMarket.address
         );
@@ -305,7 +321,7 @@ contract("Clovers", async function(accounts) {
     })();
   });
 
-  describe.skip("Clovers.sol", function() {
+  describe("Clovers.sol", function() {
     it("should be able to read metadata", async function() {
       let metadata = await clovers.tokenURI(666);
       let _metadata = await cloversMetadata.tokenURI(666);
@@ -456,7 +472,7 @@ contract("Clovers", async function(accounts) {
     });
   });
 
-  describe.skip("ClubTokenController.sol", function() {
+  describe("ClubTokenController.sol", function() {
     it("should read parameters that were set", async function() {
       let _reserveRatio = await clubTokenController.reserveRatio();
       assert(
@@ -559,7 +575,7 @@ contract("Clovers", async function(accounts) {
 
       let difference = new BigNumber(_depositAmount).sub(expectedReturn);
       assert(
-        difference.lte(1),
+        difference.lte(2),
         "difference of expectedReturn (" +
           expectedReturn.toString(10) +
           ") and _depositAmount (" +
@@ -608,7 +624,7 @@ contract("Clovers", async function(accounts) {
     });
   });
 
-  describe.skip("CloversController.sol", function() {
+  describe("CloversController.sol", function() {
     let balance,
       _balance,
       tx,
@@ -744,7 +760,10 @@ contract("Clovers", async function(accounts) {
     it("should check the cost of challenging this clover w invalid symmetries", async function() {
       try {
         gasEstimate = await cloversController.challengeClover.estimateGas(
-          _tokenId
+          _tokenId,
+          {
+            from: oracle
+          }
         );
         console.log(_ + "challengeClover gasEstimate", gasEstimate.toString());
         gasToCash(gasEstimate.toString());
@@ -753,7 +772,7 @@ contract("Clovers", async function(accounts) {
 
         assert(
           false,
-          "cloversController.challengeClover should have succeeded"
+          "cloversController.challengeClover " + error.message
         );
       }
     });

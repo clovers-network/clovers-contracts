@@ -9,7 +9,8 @@ var SimpleCloversMarket = artifacts.require("./SimpleCloversMarket.sol");
 const gasToCash = require("../helpers/utils").gasToCash;
 const _ = require("../helpers/utils")._;
 
-let stakeAmount = 529271 * 1000000000 * 40; // gasPrice * 1GWEI * 40
+// let stakeAmount = 529271 * 1000000000 * 40; // gasPrice * 1GWEI * 40 (normal person price)
+let stakeAmount = 96842 * 1000000000 * 40; // gasPrice * 1GWEI * 40 (oracle price)
 
 let multiplier = 10;
 
@@ -30,10 +31,14 @@ let virtualBalance = utils.toWei("1000");
 let virtualSupply = utils.toWei("1000");
 
 module.exports = (deployer, helper, accounts) => {
+
+  let oracle = accounts[8];
+
   deployer.then(async () => {
     try {
       var totalGas = new web3.BigNumber("0");
-
+      let sofar = 0;
+      let total = 15
       // Deploy Clovers.sol (NFT)
       clovers = await Clovers.deployed();
       // var tx = web3.eth.getTransactionReceipt(clovers.transactionHash);
@@ -111,13 +116,17 @@ module.exports = (deployer, helper, accounts) => {
 
       // Update Clovers.sol
       // -w CloversController address
+      console.log((++sofar) + '/' + total)
+
       var tx = await clovers.updateCloversControllerAddress(
         cloversController.address
       );
+      console.log((++sofar) + '/' + total)
 
       var tx = await clovers.updateClubTokenController(
         clubTokenController.address
       );
+      console.log((++sofar) + '/' + total)
 
       var tx = await clubTokenController.updateSimpleCloversMarket(
         simpleCloversMarket.address
@@ -132,6 +141,7 @@ module.exports = (deployer, helper, accounts) => {
 
       // Update ClubToken.sol
       // -w CloversController address
+      console.log((++sofar) + '/' + total)
       var tx = await clubToken.updateCloversControllerAddress(
         cloversController.address
       );
@@ -145,6 +155,7 @@ module.exports = (deployer, helper, accounts) => {
 
       // Update ClubToken.sol
       // -w ClubTokenController address
+      console.log((++sofar) + '/' + total)
       var tx = await clubToken.updateClubTokenControllerAddress(
         clubTokenController.address
       );
@@ -158,13 +169,19 @@ module.exports = (deployer, helper, accounts) => {
 
       // Update CloversController.sol
       // -w simpleCloversMarket
+      // -w oracle
       // -w stakeAmount
       // -w stakePeriod
       // -w payMultiplier
+      console.log((++sofar) + '/' + total)
       var tx = await cloversController.updateSimpleCloversMarket(
         simpleCloversMarket.address
       );
-
+      console.log((++sofar) + '/' + total)
+      var tx = await cloversController.updateOracle(
+        oracle
+      );
+      console.log((++sofar) + '/' + total)
       var tx = await cloversController.updateStakeAmount(stakeAmount);
       // console.log(
       //   _ + "cloversController.updateStakeAmount - " + tx.receipt.gasUsed
@@ -172,7 +189,7 @@ module.exports = (deployer, helper, accounts) => {
       // gasToCash(tx.receipt.gasUsed);
       //
       // totalGas = totalGas.plus(tx.receipt.gasUsed);
-
+      console.log((++sofar) + '/' + total)
       var tx = await cloversController.updateStakePeriod(stakePeriod);
       // console.log(
       //   _ + "cloversController.updateStakePeriod - " + tx.receipt.gasUsed
@@ -180,7 +197,7 @@ module.exports = (deployer, helper, accounts) => {
       // gasToCash(tx.receipt.gasUsed);
       //
       // totalGas = totalGas.plus(tx.receipt.gasUsed);
-
+      console.log((++sofar) + '/' + total)
       var tx = await cloversController.updatePayMultipier(payMultiplier);
       // console.log(
       //   _ + "cloversController.updatePayMultipier - " + tx.receipt.gasUsed
@@ -188,7 +205,7 @@ module.exports = (deployer, helper, accounts) => {
       // gasToCash(tx.receipt.gasUsed);
       //
       // totalGas = totalGas.plus(tx.receipt.gasUsed);
-
+      console.log((++sofar) + '/' + total)
       var tx = await cloversController.updatePriceMultipier(priceMultiplier);
       // console.log(
       //   _ + "cloversController.updatePriceMultipier - " + tx.receipt.gasUsed
@@ -196,7 +213,7 @@ module.exports = (deployer, helper, accounts) => {
       // gasToCash(tx.receipt.gasUsed);
       //
       // totalGas = totalGas.plus(tx.receipt.gasUsed);
-
+      console.log((++sofar) + '/' + total)
       var tx = await cloversController.updateBasePrice(basePrice);
       // console.log(
       //   _ + "cloversController.updateBasePrice - " + tx.receipt.gasUsed
@@ -209,6 +226,7 @@ module.exports = (deployer, helper, accounts) => {
       // -w reserveRatio
       // -w virtualSupply
       // -w virtualBalance
+      console.log((++sofar) + '/' + total)
       var tx = await clubTokenController.updateReserveRatio(reserveRatio);
       // console.log(
       //   _ + "clubTokenController.updateReserveRatio - " + tx.receipt.gasUsed
@@ -216,7 +234,7 @@ module.exports = (deployer, helper, accounts) => {
       // gasToCash(tx.receipt.gasUsed);
       //
       // totalGas = totalGas.plus(tx.receipt.gasUsed);
-
+      console.log((++sofar) + '/' + total)
       var tx = await clubTokenController.updateVirtualSupply(virtualSupply);
       // console.log(
       //   _ + "clubTokenController.updateVirtualSupply - " + tx.receipt.gasUsed
@@ -224,7 +242,7 @@ module.exports = (deployer, helper, accounts) => {
       // gasToCash(tx.receipt.gasUsed);
       //
       // totalGas = totalGas.plus(tx.receipt.gasUsed);
-
+      console.log((++sofar) + '/' + total)
       var tx = await clubTokenController.updateVirtualBalance(virtualBalance);
       // console.log(
       //   _ + "clubTokenController.updateVirtualBalance - " + tx.receipt.gasUsed

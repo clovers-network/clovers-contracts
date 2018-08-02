@@ -5,7 +5,7 @@ var Reversi = require("clovers-reversi").default;
 const gasToCash = require("../helpers/utils").gasToCash;
 const _ = require("../helpers/utils")._;
 
-contract.skip("Reversi", async function(accounts) {
+contract("Reversi", async function(accounts) {
   let reversi, reversiMock;
   before(done => {
     (async () => {
