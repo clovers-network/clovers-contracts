@@ -67,7 +67,7 @@ contract SimpleCloversMarket is Ownable {
         require(sellPrice > 0);
         require(IClovers(clovers).ownerOf(_tokenId) == sellFrom);
         if(IClubToken(clubToken).balanceOf(msg.sender) < sellPrice) {
-            IClubTokenController(clubTokenController).buy(msg.sender);
+            IClubTokenController(clubTokenController).buy.value(msg.value)(msg.sender);
         }
         IClubTokenController(clubTokenController).transferFrom(msg.sender, sellFrom, sellPrice);
         ICloversController(cloversController).transferFrom(sellFrom, msg.sender, _tokenId);
@@ -75,24 +75,4 @@ contract SimpleCloversMarket is Ownable {
         updatePrice(_tokenId, 0);
     }
 
-    /**
-    * @dev Buy one of the Clovers which were given up when mining.
-    * @param _tokenId The board being bought.
-    * @return A boolean representing whether or not the purchase was successful.
-    */
-    /* function buyCloverFromContract(uint256 _tokenId) public payable returns(bool) {
-        require(IClovers(clovers).ownerOf(_tokenId) == clovers);
-        uint256 reward = IClovers(clovers).getReward(_tokenId);
-        uint256 toPay = ICloversController(cloversController).basePrice().add(reward.mul(ICloversController(cloversController).priceMultiplier()));
-        if (IClubToken(clubToken).balanceOf(msg.sender) < toPay) {
-            IClubTokenController(clubTokenController).buy(msg.sender); // msg.value needs to be enough to buy "toPay" amount of Club Token
-        }
-        if (toPay > 0) {
-            // IClubToken(clubToken).transferFrom(msg.sender, clubToken, toPay); // if we'd rather keep the money
-            IClubToken(clubToken).burn(msg.sender, toPay);
-        }
-        IClovers(clovers).transferFrom(clovers, msg.sender, _tokenId);
-        updatePrice(_tokenId, 0);
-        return true;
-    } */
 }

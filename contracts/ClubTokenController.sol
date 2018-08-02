@@ -15,6 +15,7 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
 
     address public clubToken;
     address public simpleCloversMarket;
+    address public curationMarket;
 
     uint256 public poolBalance;
     uint256 public virtualSupply;
@@ -98,6 +99,16 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
     }
 
     /**
+    * @dev updates the CurationMarket address
+    * @param _curationMarket The address of the curationMarket
+    * @return A boolean representing whether or not the update was successful.
+    */
+    function updateCurationMarket(address _curationMarket) public onlyOwner returns(bool){
+        curationMarket = _curationMarket;
+        return true;
+    }
+
+    /**
     * @dev donate Donate Eth to the poolBalance without increasing the totalSupply
     */
     function donate() public payable {
@@ -107,7 +118,7 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
     }
 
     function transferFrom(address from, address to, uint256 amount) public {
-        require(msg.sender == simpleCloversMarket);
+        require(msg.sender == simpleCloversMarket || msg.sender == curationMarket);
         IClubToken(clubToken).transferFrom(from, to, amount);
     }
 

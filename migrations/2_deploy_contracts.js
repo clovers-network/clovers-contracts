@@ -5,6 +5,7 @@ var CloversMetadata = artifacts.require("./CloversMetadata.sol");
 var CloversController = artifacts.require("./CloversController.sol");
 var ClubTokenController = artifacts.require("./ClubTokenController.sol");
 var SimpleCloversMarket = artifacts.require("./SimpleCloversMarket.sol");
+var CurationMarket = artifacts.require("./CurationMarket.sol");
 var ClubToken = artifacts.require("./ClubToken.sol");
 
 const gasToCash = require("../helpers/utils").gasToCash;
@@ -26,12 +27,11 @@ let basePrice = utils.toWei("0.001");
 
 let decimals = "18";
 
-let reserveRatio = "500000"; // parts per million 500000 / 1000000 = 1/2
-let virtualBalance = utils.toWei("1000");
-let virtualSupply = utils.toWei("1000");
+let reserveRatio = "333333"; // parts per million 500000 / 1000000 = 1/2
+let virtualBalance = utils.toWei("3333");
+let virtualSupply = utils.toWei("100000");
 
 module.exports = (deployer, helper, accounts) => {
-
   deployer.then(async () => {
     try {
       var totalGas = new web3.BigNumber("0");
@@ -127,6 +127,18 @@ module.exports = (deployer, helper, accounts) => {
         cloversController.address
       );
       simpleCloversMarket = await SimpleCloversMarket.deployed();
+
+      await deployer.deploy(
+        CurationMarket,
+        virtualSupply,
+        virtualBalance,
+        reserveRatio,
+        clovers.address,
+        cloversController.address,
+        clubToken.address,
+        clubTokenController.address
+      );
+      curationMarket = await CurationMarket.deployed();
     } catch (error) {
       console.log(error);
     }

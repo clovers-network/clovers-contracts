@@ -5,6 +5,8 @@ var ClubToken = require("./build/contracts/ClubToken.json");
 var IClovers = require("./build/contracts/IClovers.json");
 var ICloversController = require("./build/contracts/ICloversController.json");
 var Reversi = require("./build/contracts/Reversi.json");
+var SimpleCloversMarket = require("./build/contracts/SimpleCloversMarket.json");
+var CurationMarket = require("./build/contracts/CurationMarket.json");
 
 module.exports = {
   Clovers: Clovers,
@@ -13,5 +15,7 @@ module.exports = {
   ClubToken: ClubToken,
   IClovers: IClovers,
   ICloversController: ICloversController,
-  Reversi: Reversi
+  Reversi: Reversi,
+  SimpleCloversMarket: SimpleCloversMarket,
+  CurationMarket: CurationMarket
 };

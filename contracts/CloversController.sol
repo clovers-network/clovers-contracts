@@ -29,6 +29,7 @@ contract CloversController is HasNoEther, HasNoTokens {
     address public clubToken;
     address public clubTokenController;
     address public simpleCloversMarket;
+    address public curationMarket;
 
     uint256 public basePrice;
     uint256 public priceMultiplier;
@@ -382,10 +383,17 @@ contract CloversController is HasNoEther, HasNoTokens {
     * @param _tokenId The Clover
     */
     function transferFrom(address _from, address _to, uint256 _tokenId) public {
-        require(msg.sender == simpleCloversMarket);
+        require(msg.sender == simpleCloversMarket || msg.sender == curationMarket);
         IClovers(clovers).transferFrom(_from, _to, _tokenId);
     }
 
+    /**
+    * @dev Updates curationMarket Address.
+    * @param _curationMarket The new curationMarket Address.
+    */
+    function updateCurationMarket(address _curationMarket) public onlyOwner {
+        curationMarket = _curationMarket;
+    }
     /**
     * @dev Updates oracle Address.
     * @param _oracle The new oracle Address.

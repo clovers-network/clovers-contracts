@@ -6,6 +6,8 @@ var CloversController = artifacts.require("./CloversController.sol");
 var ClubTokenController = artifacts.require("./ClubTokenController.sol");
 var SimpleCloversMarket = artifacts.require("./SimpleCloversMarket.sol");
 var ClubToken = artifacts.require("./ClubToken.sol");
+var CurationMarket = artifacts.require("./CurationMarket.sol");
+
 const gasToCash = require("../helpers/utils").gasToCash;
 const _ = require("../helpers/utils")._;
 var BigNumber = require("bignumber.js");
@@ -23,12 +25,11 @@ let basePrice = utils.toWei("0.001");
 
 let decimals = "18";
 
-let reserveRatio = "500000"; // parts per million 500000 / 1000000 = 1/2
-let virtualBalance = utils.toWei("1000");
-let virtualSupply = utils.toWei("1000");
+let reserveRatio = "333333"; // parts per million 500000 / 1000000 = 1/2
+let virtualBalance = utils.toWei("3333");
+let virtualSupply = utils.toWei("100000");
 
 contract("Clovers", async function(accounts) {
-
   let oracle = accounts[8];
 
   let clovers,
@@ -37,6 +38,7 @@ contract("Clovers", async function(accounts) {
     reversi,
     cloversController,
     clubTokenController,
+    curationMarket,
     simpleCloversMarket;
   before(done => {
     (async () => {
@@ -144,6 +146,31 @@ contract("Clovers", async function(accounts) {
 
         totalGas = totalGas.plus(tx.gasUsed);
 
+        // Deploy CurationMarket.sol
+        // -w virtualSupply
+        // -w virtualBalance
+        // -w reserveRatio
+        // -w Clovers address
+        // -w CloversController address
+        // -w ClubToken address
+        // -w ClubTokenController address
+        curationMarket = await CurationMarket.new(
+          virtualSupply,
+          virtualBalance,
+          reserveRatio,
+          clovers.address,
+          cloversController.address,
+          clubToken.address,
+          clubTokenController.address
+        );
+        var tx = web3.eth.getTransactionReceipt(
+          simpleCloversMarket.transactionHash
+        );
+        console.log(_ + "Deploy curationMarket - " + tx.gasUsed);
+        gasToCash(tx.gasUsed);
+
+        totalGas = totalGas.plus(tx.gasUsed);
+
         // Update Clovers.sol
         // -w ClubTokenController address
         var tx = await clovers.updateClubTokenController(
@@ -200,17 +227,24 @@ contract("Clovers", async function(accounts) {
 
         // Update CloversController.sol
         // -w oracle
+        // -w curationMarket
         // -w simpleCloversMarket
         // -w stakeAmount
         // -w stakePeriod
         // -w payMultiplier
-        var tx = await cloversController.updateOracle(
-          oracle
+        var tx = await cloversController.updateOracle(oracle);
+        console.log(
+          _ + "cloversController.updateOracle - " + tx.receipt.gasUsed
+        );
+        gasToCash(tx.receipt.gasUsed);
+
+        totalGas = totalGas.plus(tx.receipt.gasUsed);
+
+        var tx = await cloversController.updateCurationMarket(
+          curationMarket.address
         );
         console.log(
-          _ +
-            "cloversController.updateOracle - " +
-            tx.receipt.gasUsed
+          _ + "cloversController.updateCurationMarket - " + tx.receipt.gasUsed
         );
         gasToCash(tx.receipt.gasUsed);
 
@@ -269,6 +303,7 @@ contract("Clovers", async function(accounts) {
         totalGas = totalGas.plus(tx.receipt.gasUsed);
 
         // Update ClubTokenController.sol
+        // -w curationMarket
         // -w simpleCloversMarket
         // -w reserveRatio
         // -w virtualSupply
@@ -280,6 +315,16 @@ contract("Clovers", async function(accounts) {
           _ +
             "clubTokenController.updateSimpleCloversMarket - " +
             tx.receipt.gasUsed
+        );
+        gasToCash(tx.receipt.gasUsed);
+
+        totalGas = totalGas.plus(tx.receipt.gasUsed);
+
+        var tx = await clubTokenController.updateCurationMarket(
+          curationMarket.address
+        );
+        console.log(
+          _ + "clubTokenController.updateCurationMarket - " + tx.receipt.gasUsed
         );
         gasToCash(tx.receipt.gasUsed);
 
@@ -328,6 +373,86 @@ contract("Clovers", async function(accounts) {
       assert(_metadata === metadata, "_metadata != metadata");
     });
   });
+
+  describe("CurationMarket.sol", function() {
+    let _curator = accounts[4];
+    let _curatorTokenId = "420";
+    it("should be able to read metadata", async () => {
+      let _clovers = await curationMarket.clovers();
+      assert(
+        _clovers.toString() === clovers.address.toString(),
+        "_clovers != clovers"
+      );
+      let _clubToken = await curationMarket.clubToken();
+      assert(
+        _clubToken.toString() === clubToken.address.toString(),
+        "_clubToken != clubToken"
+      );
+      let _cloversController = await curationMarket.cloversController();
+      assert(
+        _cloversController.toString() === cloversController.address.toString(),
+        "_cloversController != cloversController"
+      );
+      let _clubTokenController = await curationMarket.clubTokenController();
+      assert(
+        _clubTokenController.toString() ===
+          clubTokenController.address.toString(),
+        "_clubTokenController != clubTokenController"
+      );
+    });
+
+    it("should get a clover and start a market", async () => {
+      let _spendAmount = utils.toWei("1");
+
+      try {
+        tx = await clovers.mint(_curator, _curatorTokenId);
+        console.log(_ + "clovers.mint - " + tx.receipt.cumulativeGasUsed);
+        gasToCash(tx.receipt.cumulativeGasUsed);
+        let owner = await clovers.ownerOf(_curatorTokenId);
+        assert(
+          owner.toString() === _curator.toString(),
+          "owner is not curator " +
+            owner.toString() +
+            "!=" +
+            _curator.toString()
+        );
+      } catch (error) {
+        assert(false, error.message);
+      }
+
+      try {
+        let amountToSpend = await getLowestPrice(
+          clubTokenController,
+          _spendAmount
+        );
+        console.log(
+          _ + "amount to spend is " + utils.fromWei(amountToSpend.toString())
+        );
+        console.l;
+        tx = await curationMarket.addCloverToMarket(
+          _curatorTokenId,
+          _spendAmount,
+          {
+            from: _curator,
+            value: amountToSpend
+          }
+        );
+        console.log(
+          _ +
+            "curationMarket.addCloverToMarket - " +
+            tx.receipt.cumulativeGasUsed
+        );
+        gasToCash(tx.receipt.cumulativeGasUsed);
+
+        // let balance = await curationMarket.balanceOf(_curatorTokenId, _curator);
+        // assert(balance.gt(0), "doesn't own any shares");
+      } catch (error) {
+        assert(false, error.message);
+        assert(false, error.stack);
+      }
+    });
+  });
+
   describe("SimpleCloversMarket.sol", function() {
     let _tokenId = "666";
     let _seller = accounts[9];
@@ -397,48 +522,27 @@ contract("Clovers", async function(accounts) {
       }
     });
 
-    var getLowestPrice = async function(
-      targetAmount,
-      currentPrice = new BigNumber("0"),
-      useLittle = false
-    ) {
-      if (typeof targetAmount !== "object")
-        targetAmount = new BigNumber(targetAmount);
-      let littleIncrement = new BigNumber(utils.toWei("0.001"));
-      let bigIncrement = new BigNumber(utils.toWei("0.1"));
-      currentPrice = currentPrice.add(
-        useLittle ? littleIncrement : bigIncrement
-      );
-      let resultOfSpend = await clubTokenController.getBuy(currentPrice);
-      if (resultOfSpend.gt(targetAmount)) {
-        return useLittle
-          ? currentPrice
-          : getLowestPrice(targetAmount, currentPrice.sub(bigIncrement), true);
-      }
-      return getLowestPrice(targetAmount, currentPrice, useLittle);
-    };
-
-    it("should buy the clover", async () => {
+    it("should buy the clover by minting ClubToken before", async () => {
       let buyerBalance = await clubToken.balanceOf(_buyer);
+      let amountToSpend;
       try {
-        let amountToSpend;
         if (buyerBalance.lt(_price)) {
-          amountToSpend = await getLowestPrice(_price);
-          tx = await clubTokenController.buy(_buyer, {
-            value: amountToSpend
-          });
-          console.log(
-            _ + "clubTokenController.buy - " + tx.receipt.cumulativeGasUsed
-          );
-          gasToCash(tx.receipt.cumulativeGasUsed);
-          buyerBalance = await clubToken.balanceOf(_buyer);
-          assert(
-            buyerBalance.gte(_price),
-            "buyer balance still isn't enough (" +
-              buyerBalance.toString() +
-              "<" +
-              _price.toString()
-          );
+          amountToSpend = await getLowestPrice(clubTokenController, _price);
+          // tx = await clubTokenController.buy(_buyer, {
+          //   value: amountToSpend
+          // });
+          // console.log(
+          //   _ + "clubTokenController.buy - " + tx.receipt.cumulativeGasUsed
+          // );
+          // gasToCash(tx.receipt.cumulativeGasUsed);
+          // buyerBalance = await clubToken.balanceOf(_buyer);
+          // assert(
+          //   buyerBalance.gte(_price),
+          //   "buyer balance still isn't enough (" +
+          //     buyerBalance.toString() +
+          //     "<" +
+          //     _price.toString()
+          // );
         } else {
           amountToSpend = "0";
         }
@@ -454,8 +558,8 @@ contract("Clovers", async function(accounts) {
         );
 
         tx = await simpleCloversMarket.buy(_tokenId, {
-          from: _buyer
-          // value: amountToSpend
+          from: _buyer,
+          value: amountToSpend
         });
         console.log(
           _ + "simpleCloversMarket.buy - " + tx.receipt.cumulativeGasUsed
@@ -770,10 +874,7 @@ contract("Clovers", async function(accounts) {
       } catch (error) {
         console.log("error:", error);
 
-        assert(
-          false,
-          "cloversController.challengeClover " + error.message
-        );
+        assert(false, "cloversController.challengeClover " + error.message);
       }
     });
 
@@ -1002,4 +1103,29 @@ function decodeEventString(hexVal) {
     )
     .map(a => String.fromCharCode(a))
     .join("");
+}
+
+async function getLowestPrice(
+  contract,
+  targetAmount,
+  currentPrice = new BigNumber("0"),
+  useLittle = false
+) {
+  if (typeof targetAmount !== "object")
+    targetAmount = new BigNumber(targetAmount);
+  let littleIncrement = new BigNumber(utils.toWei("0.001"));
+  let bigIncrement = new BigNumber(utils.toWei("0.1"));
+  currentPrice = currentPrice.add(useLittle ? littleIncrement : bigIncrement);
+  let resultOfSpend = await contract.getBuy(currentPrice);
+  if (resultOfSpend.gt(targetAmount)) {
+    return useLittle
+      ? currentPrice
+      : getLowestPrice(
+          contract,
+          targetAmount,
+          currentPrice.sub(bigIncrement),
+          true
+        );
+  }
+  return getLowestPrice(contract, targetAmount, currentPrice, useLittle);
 }

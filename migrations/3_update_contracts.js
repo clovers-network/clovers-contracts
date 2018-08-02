@@ -6,6 +6,8 @@ var CloversController = artifacts.require("./CloversController.sol");
 var ClubTokenController = artifacts.require("./ClubTokenController.sol");
 var ClubToken = artifacts.require("./ClubToken.sol");
 var SimpleCloversMarket = artifacts.require("./SimpleCloversMarket.sol");
+var CurationMarket = artifacts.require("./CurationMarket.sol");
+
 const gasToCash = require("../helpers/utils").gasToCash;
 const _ = require("../helpers/utils")._;
 
@@ -26,19 +28,18 @@ let basePrice = utils.toWei("0.001");
 
 let decimals = "18";
 
-let reserveRatio = "500000"; // parts per million 500000 / 1000000 = 1/2
-let virtualBalance = utils.toWei("1000");
-let virtualSupply = utils.toWei("1000");
+let reserveRatio = "333333"; // parts per million 500000 / 1000000 = 1/2
+let virtualBalance = utils.toWei("3333");
+let virtualSupply = utils.toWei("100000");
 
 module.exports = (deployer, helper, accounts) => {
-
   let oracle = accounts[8];
 
   deployer.then(async () => {
     try {
       var totalGas = new web3.BigNumber("0");
       let sofar = 0;
-      let total = 15
+      let total = 17;
       // Deploy Clovers.sol (NFT)
       clovers = await Clovers.deployed();
       // var tx = web3.eth.getTransactionReceipt(clovers.transactionHash);
@@ -104,155 +105,95 @@ module.exports = (deployer, helper, accounts) => {
       cloversController = await CloversController.deployed();
 
       simpleCloversMarket = await SimpleCloversMarket.deployed();
-      //
-      // var tx = web3.eth.getTransactionReceipt(
-      //   cloversController.transactionHash
-      // );
-      //
-      // console.log(_ + "Deploy cloversController - " + tx.gasUsed);
-      // gasToCash(tx.gasUsed);
-      //
-      // totalGas = totalGas.plus(tx.gasUsed);
+
+      curationMarket = await CurationMarket.deployed();
 
       // Update Clovers.sol
       // -w CloversController address
-      console.log((++sofar) + '/' + total)
-
+      console.log(++sofar + "/" + total);
       var tx = await clovers.updateCloversControllerAddress(
         cloversController.address
       );
-      console.log((++sofar) + '/' + total)
 
+      console.log(++sofar + "/" + total);
       var tx = await clovers.updateClubTokenController(
         clubTokenController.address
       );
-      console.log((++sofar) + '/' + total)
-
-      var tx = await clubTokenController.updateSimpleCloversMarket(
-        simpleCloversMarket.address
-      );
-      //
-      // console.log(
-      //   _ + "clovers.updatettrollerAddress - " + tx.receipt.gasUsed
-      // );
-      // gasToCash(tx.receipt.gasUsed);
-      //
-      // totalGas = totalGas.plus(tx.receipt.gasUsed);
 
       // Update ClubToken.sol
       // -w CloversController address
-      console.log((++sofar) + '/' + total)
+      console.log(++sofar + "/" + total);
       var tx = await clubToken.updateCloversControllerAddress(
         cloversController.address
       );
-      // console.log(
-      //   _ + "clubToken.updateCloversControllerAddress - " + tx.receipt.gasUsed
-      // );
-      //
-      // gasToCash(tx.receipt.gasUsed);
-      //
-      // totalGas = totalGas.plus(tx.receipt.gasUsed);
 
       // Update ClubToken.sol
       // -w ClubTokenController address
-      console.log((++sofar) + '/' + total)
+      console.log(++sofar + "/" + total);
       var tx = await clubToken.updateClubTokenControllerAddress(
         clubTokenController.address
       );
 
-      // console.log(
-      //   _ + "clubToken.updateClubTokenControllerAddress - " + tx.receipt.gasUsed
-      // );
-      // gasToCash(tx.receipt.gasUsed);
-      //
-      // totalGas = totalGas.plus(tx.receipt.gasUsed);
-
       // Update CloversController.sol
+      // -w curationMarket
       // -w simpleCloversMarket
       // -w oracle
       // -w stakeAmount
       // -w stakePeriod
       // -w payMultiplier
-      console.log((++sofar) + '/' + total)
+      console.log(++sofar + "/" + total);
+      var tx = await cloversController.updateCurationMarket(
+        curationMarket.address
+      );
+
+      console.log(++sofar + "/" + total);
       var tx = await cloversController.updateSimpleCloversMarket(
         simpleCloversMarket.address
       );
-      console.log((++sofar) + '/' + total)
-      var tx = await cloversController.updateOracle(
-        oracle
-      );
-      console.log((++sofar) + '/' + total)
+
+      console.log(++sofar + "/" + total);
+      var tx = await cloversController.updateOracle(oracle);
+
+      console.log(++sofar + "/" + total);
       var tx = await cloversController.updateStakeAmount(stakeAmount);
-      // console.log(
-      //   _ + "cloversController.updateStakeAmount - " + tx.receipt.gasUsed
-      // );
-      // gasToCash(tx.receipt.gasUsed);
-      //
-      // totalGas = totalGas.plus(tx.receipt.gasUsed);
-      console.log((++sofar) + '/' + total)
+
+      console.log(++sofar + "/" + total);
       var tx = await cloversController.updateStakePeriod(stakePeriod);
-      // console.log(
-      //   _ + "cloversController.updateStakePeriod - " + tx.receipt.gasUsed
-      // );
-      // gasToCash(tx.receipt.gasUsed);
-      //
-      // totalGas = totalGas.plus(tx.receipt.gasUsed);
-      console.log((++sofar) + '/' + total)
+
+      console.log(++sofar + "/" + total);
       var tx = await cloversController.updatePayMultipier(payMultiplier);
-      // console.log(
-      //   _ + "cloversController.updatePayMultipier - " + tx.receipt.gasUsed
-      // );
-      // gasToCash(tx.receipt.gasUsed);
-      //
-      // totalGas = totalGas.plus(tx.receipt.gasUsed);
-      console.log((++sofar) + '/' + total)
+
+      console.log(++sofar + "/" + total);
       var tx = await cloversController.updatePriceMultipier(priceMultiplier);
-      // console.log(
-      //   _ + "cloversController.updatePriceMultipier - " + tx.receipt.gasUsed
-      // );
-      // gasToCash(tx.receipt.gasUsed);
-      //
-      // totalGas = totalGas.plus(tx.receipt.gasUsed);
-      console.log((++sofar) + '/' + total)
+
+      console.log(++sofar + "/" + total);
       var tx = await cloversController.updateBasePrice(basePrice);
-      // console.log(
-      //   _ + "cloversController.updateBasePrice - " + tx.receipt.gasUsed
-      // );
-      // gasToCash(tx.receipt.gasUsed);
-      //
-      // totalGas = totalGas.plus(tx.receipt.gasUsed);
 
       // Update ClubTokenController.sol
+      // -w simpleCloversMarket
+      // -w curationMarket
       // -w reserveRatio
       // -w virtualSupply
       // -w virtualBalance
-      console.log((++sofar) + '/' + total)
+
+      console.log(++sofar + "/" + total);
+      var tx = await clubTokenController.updateSimpleCloversMarket(
+        simpleCloversMarket.address
+      );
+
+      console.log(++sofar + "/" + total);
+      var tx = await clubTokenController.updateCurationMarket(
+        curationMarket.address
+      );
+
+      console.log(++sofar + "/" + total);
       var tx = await clubTokenController.updateReserveRatio(reserveRatio);
-      // console.log(
-      //   _ + "clubTokenController.updateReserveRatio - " + tx.receipt.gasUsed
-      // );
-      // gasToCash(tx.receipt.gasUsed);
-      //
-      // totalGas = totalGas.plus(tx.receipt.gasUsed);
-      console.log((++sofar) + '/' + total)
+
+      console.log(++sofar + "/" + total);
       var tx = await clubTokenController.updateVirtualSupply(virtualSupply);
-      // console.log(
-      //   _ + "clubTokenController.updateVirtualSupply - " + tx.receipt.gasUsed
-      // );
-      // gasToCash(tx.receipt.gasUsed);
-      //
-      // totalGas = totalGas.plus(tx.receipt.gasUsed);
-      console.log((++sofar) + '/' + total)
+
+      console.log(++sofar + "/" + total);
       var tx = await clubTokenController.updateVirtualBalance(virtualBalance);
-      // console.log(
-      //   _ + "clubTokenController.updateVirtualBalance - " + tx.receipt.gasUsed
-      // );
-      // gasToCash(tx.receipt.gasUsed);
-      //
-      // totalGas = totalGas.plus(tx.receipt.gasUsed);
-      //
-      // console.log(_ + totalGas.toFormat(0) + " - Total Gas");
-      // gasToCash(totalGas);
     } catch (error) {
       console.log(error);
     }
