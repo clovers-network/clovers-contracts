@@ -294,7 +294,7 @@ contract CloversController is HasNoEther, HasNoTokens {
         uint256 stake = getStake(movesHash);
         addSymmetries(_tokenId);
         address committer = getCommit(movesHash);
-        require(msg.sender == committer);
+        /* require(msg.sender == committer); */ // why did i do that?
 
         uint256 reward = IClovers(clovers).getReward(_tokenId);
         bool _keep = IClovers(clovers).getKeep(_tokenId);
