@@ -12,12 +12,12 @@ var CurationMarket = require("./build/contracts/CurationMarket.json");
 module.exports = {
   Clovers: Clovers,
   CloversController: CloversController,
-  CloversMetadata: CloversMetadata,
+  // CloversMetadata: CloversMetadata,
   ClubToken: ClubToken,
   ClubTokenController: ClubTokenController,
-  IClovers: IClovers,
-  ICloversController: ICloversController,
-  Reversi: Reversi,
+  // IClovers: IClovers,
+  // ICloversController: ICloversController,
+  // Reversi: Reversi,
   SimpleCloversMarket: SimpleCloversMarket,
   CurationMarket: CurationMarket
 };
