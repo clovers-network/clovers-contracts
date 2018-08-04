@@ -13,6 +13,7 @@ module.exports = {
   CloversController: CloversController,
   CloversMetadata: CloversMetadata,
   ClubToken: ClubToken,
+  ClubTokenController: ClubTokenController,
   IClovers: IClovers,
   ICloversController: ICloversController,
   Reversi: Reversi,
