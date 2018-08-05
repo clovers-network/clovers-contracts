@@ -30,6 +30,9 @@ contract CurationMarket is BancorFormula, Ownable {
     event Mint(uint256 _tokenId, address indexed to, uint256 amount);
     event Burn(uint256 _tokenId, address indexed burner, uint256 value);
 
+    event Buy(uint256 _tokenId, address buyer, uint256 tokens, uint256 value, uint256 poolBalance, uint256 tokenSupply);
+    event Sell(uint256 _tokenId, address seller, uint256 tokens, uint256 value, uint256 poolBalance, uint256 tokenSupply);
+
     constructor(
         uint256 _virtualSupply,
         uint256 _virtualBalance,
@@ -172,6 +175,7 @@ contract CurationMarket is BancorFormula, Ownable {
         require(_mint(_tokenId, _to, tokens));
         cloverMarkets[_tokenId].poolBalance = safeAdd(cloverMarkets[_tokenId].poolBalance, _spendAmount);
         IClubTokenController(clubTokenController).transferFrom(msg.sender, address(this), _spendAmount);
+        emit Buy(_tokenId, _to, tokens, msg.value, cloverMarkets[_tokenId].poolBalance, cloverMarkets[_tokenId].totalSupply);
         return true;
     }
 
@@ -201,6 +205,9 @@ contract CurationMarket is BancorFormula, Ownable {
         require(_burn(_tokenId, msg.sender, sellAmount));
         cloverMarkets[_tokenId].poolBalance = safeSub(cloverMarkets[_tokenId].poolBalance, saleReturn);
         IClubTokenController(clubTokenController).transferFrom(address(this), msg.sender, saleReturn);
+        emit Sell(_tokenId, msg.sender, sellAmount, saleReturn, cloverMarkets[_tokenId].poolBalance, cloverMarkets[_tokenId].totalSupply);
+
+        return true;
     }
 
 
