@@ -1,11 +1,11 @@
+var utils = require('web3-utils')
 var Reversi = artifacts.require('./Reversi.sol')
 var Clovers = artifacts.require('./Clovers.sol')
-var CloversMetadata = artifacts.require('./CloversMetadata.sol')
 var CloversController = artifacts.require('./CloversController.sol')
 var ClubTokenController = artifacts.require('./ClubTokenController.sol')
-var ClubToken = artifacts.require('./ClubToken.sol')
 var SimpleCloversMarket = artifacts.require('./SimpleCloversMarket.sol')
 var CurationMarket = artifacts.require('./CurationMarket.sol')
+var ClubToken = artifacts.require('./ClubToken.sol')
 
 const gasToCash = require('../helpers/utils').gasToCash
 const _ = require('../helpers/utils')._
@@ -23,55 +23,41 @@ var {
   reserveRatio,
   virtualBalance,
   virtualSupply,
-  oracle,
-  updateCloversController,
   updateClubTokenController
 } = require('../helpers/migVals')
 
 module.exports = (deployer, helper, accounts) => {
   deployer.then(async () => {
     try {
+      var totalGas = new web3.BigNumber('0')
+
+      // reversi = await Reversi.deployed()
       clovers = await Clovers.deployed()
-      cloversMetadata = await CloversMetadata.deployed()
-      clubToken = await ClubToken.deployed()
-      reversi = await Reversi.deployed()
-      clubTokenController = await ClubTokenController.deployed()
       cloversController = await CloversController.deployed()
-      simpleCloversMarket = await SimpleCloversMarket.deployed()
+      clubToken = await ClubToken.deployed()
+      // clubTokenController = await ClubTokenController.deployed()
       curationMarket = await CurationMarket.deployed()
+      simpleCloversMarket = await SimpleCloversMarket.deployed()
 
-      // Update Clovers.sol
-      // -w CloversController address
-      // -w ClubTokenController address
-
-      var tx = await clovers.updateCloversControllerAddress(
-        cloversController.address
-      )
-
-      var tx = await clovers.updateClubTokenController(
-        clubTokenController.address
-      )
-
-      // Update ClubToken.sol
-      // -w CloversController address
-      // -w ClubTokenController address
-
-      var tx = await clubToken.updateCloversControllerAddress(
-        cloversController.address
-      )
-
-      var tx = await clubToken.updateClubTokenControllerAddress(
-        clubTokenController.address
-      )
-
-      // Update CloversController
-      await updateCloversController({
-        cloversController,
-        curationMarket,
-        simpleCloversMarket
+      await deployer.deploy(ClubTokenController, clubToken.address, {
+        overwrite: true
       })
+      clubTokenController = await ClubTokenController.deployed()
 
-      // Update ClubTokenController
+      await cloversController.updateClubTokenController(
+        clubTokenController.address
+      )
+      await simpleCloversMarket.updateClubTokenController(
+        clubTokenController.address
+      )
+      await curationMarket.updateClubTokenController(
+        clubTokenController.address
+      )
+      await clovers.updateClubTokenController(clubTokenController.address)
+      await clubToken.updateClubTokenControllerAddress(
+        clubTokenController.address
+      )
+
       await updateClubTokenController({
         clubTokenController,
         curationMarket,

@@ -12,6 +12,8 @@ import "zeppelin-solidity/contracts/ownership/HasNoTokens.sol";
 
 contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens {
 
+    event Buy(address buyer, uint256 tokens, uint256 value, uint256 poolBalance, uint256 tokenSupply);
+    event Sell(address seller, uint256 tokens, uint256 value, uint256 poolBalance, uint256 tokenSupply);
 
     address public clubToken;
     address public simpleCloversMarket;
@@ -133,6 +135,7 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
         require(IClubToken(clubToken).mint(buyer, tokens));
         poolBalance = safeAdd(poolBalance, msg.value);
         clubToken.transfer(msg.value);
+        emit Buy(buyer, tokens, msg.value, poolBalance, IClubToken(clubToken).totalSupply());
     }
 
 
@@ -150,6 +153,7 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
         IClubToken(clubToken).burn(msg.sender, sellAmount);
         poolBalance = safeSub(poolBalance, saleReturn);
         IClubToken(clubToken).moveEth(msg.sender, saleReturn);
+        emit Sell(msg.sender, sellAmount, saleReturn, poolBalance, IClubToken(clubToken).totalSupply());
     }
 
 
