@@ -15,7 +15,7 @@ const overwrites = {
   ClubTokenController: false,
   SimpleCloversMarket: false,
   CurationMarket: false,
-  ClubToken: false
+  ClubToken: true
 }
 
 const gasToCash = require('../helpers/utils').gasToCash

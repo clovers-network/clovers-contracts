@@ -12,6 +12,7 @@ const gasToCash = require('../helpers/utils').gasToCash
 const _ = require('../helpers/utils')._
 var BigNumber = require('bignumber.js')
 
+var { getLowestPrice } = require('../helpers/utils')
 const ethPrice = new BigNumber('440')
 const oneGwei = new BigNumber('1000000000') // 1 GWEI
 let gasPrice = oneGwei.toString(10)
@@ -1101,29 +1102,4 @@ function decodeEventString(hexVal) {
     )
     .map(a => String.fromCharCode(a))
     .join('')
-}
-
-async function getLowestPrice(
-  contract,
-  targetAmount,
-  currentPrice = new BigNumber('0'),
-  useLittle = false
-) {
-  if (typeof targetAmount !== 'object')
-    targetAmount = new BigNumber(targetAmount)
-  let littleIncrement = new BigNumber(utils.toWei('0.001'))
-  let bigIncrement = new BigNumber(utils.toWei('0.1'))
-  currentPrice = currentPrice.add(useLittle ? littleIncrement : bigIncrement)
-  let resultOfSpend = await contract.getBuy(currentPrice)
-  if (resultOfSpend.gt(targetAmount)) {
-    return useLittle
-      ? currentPrice
-      : getLowestPrice(
-          contract,
-          targetAmount,
-          currentPrice.sub(bigIncrement),
-          true
-        )
-  }
-  return getLowestPrice(contract, targetAmount, currentPrice, useLittle)
 }
