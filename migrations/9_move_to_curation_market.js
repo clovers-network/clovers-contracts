@@ -60,8 +60,8 @@ module.exports = (deployer, helper, accounts) => {
         value
       })
 
-      let balanceOf = await curationMarket.balanceOf(tokenId, accounts[0])
-      await curationMarket.sell(tokenId, balanceOf)
+      // let balanceOf = await curationMarket.balanceOf(tokenId, accounts[0])
+      // await curationMarket.sell(tokenId, balanceOf)
       // function sell(uint256 _tokenId, uint256 sellAmount) public
     } catch (error) {
       console.log(error)
