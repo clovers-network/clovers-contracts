@@ -11,7 +11,7 @@ import "bancor-contracts/solidity/contracts/converter/BancorFormula.sol";
 import "zeppelin-solidity/contracts/ownership/HasNoTokens.sol";
 
 contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens {
-
+    event Transfer(address indexed from, address indexed to, uint256 value);
     event Buy(address buyer, uint256 tokens, uint256 value, uint256 poolBalance, uint256 tokenSupply);
     event Sell(address seller, uint256 tokens, uint256 value, uint256 poolBalance, uint256 tokenSupply);
 
