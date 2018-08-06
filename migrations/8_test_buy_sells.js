@@ -47,7 +47,7 @@ module.exports = (deployer, helper, accounts) => {
       })
       let balance = await clubToken.balanceOf(accounts[0])
       console.log('balance is ' + balance.toString(10))
-      // await clubTokenController.sell(balance)
+      await clubTokenController.sell(balance)
     } catch (error) {
       console.log(error)
     }

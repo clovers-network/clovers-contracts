@@ -41,9 +41,9 @@ module.exports = (deployer, helper, accounts) => {
       curationMarket = await CurationMarket.deployed()
       simpleCloversMarket = await SimpleCloversMarket.deployed()
 
-      let tokenId = '0xaaaaa55a99669aa6aaaaaaaaaaaaaaaa'
+      // let tokenId = '0xaaaaa55a99669aa6aaaaaaaaaaaaaaaa'
 
-      // let tokenId = await clovers.tokenOfOwnerByIndex(accounts[0], '0')
+      let tokenId = await clovers.tokenOfOwnerByIndex(accounts[0], '0')
       // console.log('token is ' + tokenId.toString(16))
       if ((await clovers.ownerOf(tokenId)) === accounts[0].toLowerCase()) {
         console.log('is owner')
@@ -60,8 +60,8 @@ module.exports = (deployer, helper, accounts) => {
         value
       })
 
-      // let balanceOf = await curationMarket.balanceOf(tokenId, accounts[0])
-      // await curationMarket.sell(tokenId, balanceOf)
+      let balanceOf = await curationMarket.balanceOf(tokenId, accounts[0])
+      await curationMarket.sell(tokenId, balanceOf)
       // function sell(uint256 _tokenId, uint256 sellAmount) public
     } catch (error) {
       console.log(error)
