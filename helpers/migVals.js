@@ -96,6 +96,8 @@ async function updateClubTokenController({
   // -w reserveRatio
   // -w virtualSupply
   // -w virtualBalance
+  // -w poolBalance
+  // -w tokenSupply
   console.log('clubTokenController.updateSimpleCloversMarket')
   var tx = await clubTokenController.updateSimpleCloversMarket(
     simpleCloversMarket.address
@@ -113,4 +115,9 @@ async function updateClubTokenController({
 
   console.log('clubTokenController.updateVirtualBalance')
   var tx = await clubTokenController.updateVirtualBalance(vals.virtualBalance)
+  //
+  // let poolBalance = await web3.eth.getBalance(clubToken.address)
+  // console.log('poolBalance is ' + poolBalance.toString())
+  // console.log('clubTokenController.updatePoolBalance')
+  // var tx = await clubTokenController.updatePoolBalance(poolBalance)
 }

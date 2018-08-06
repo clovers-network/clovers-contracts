@@ -154,7 +154,7 @@ contract CloversController is HasNoEther, HasNoTokens {
             // If the user decides to keep the Clover, they must
             // pay for it in club tokens according to the reward price.
             if (IClubToken(clubToken).balanceOf(msg.sender) < reward) {
-                IClubTokenController(clubTokenController).buy(msg.sender); // msg.value needs to be enough to buy "reward" amount of Club Token
+                IClubTokenController(clubTokenController).buy.value(msg.value)(msg.sender); // msg.value needs to be enough to buy "reward" amount of Club Token
             }
             if (reward > 0) {
                 // IClubToken(clubToken).transferFrom(msg.sender, clubToken, reward); // if we'd rather keep the money
@@ -173,6 +173,9 @@ contract CloversController is HasNoEther, HasNoTokens {
 
     } */
 
+    function getPrice(uint256 _symmetries) public constant returns(uint256) {
+        return basePrice.add(calculateReward(_symmetries));
+    }
 
     /**
     * @dev Claim the Clover without a commit or reveal. Payable so you can attach enough for the stake,
@@ -184,6 +187,8 @@ contract CloversController is HasNoEther, HasNoTokens {
     * @return A boolean representing whether or not the claim was successful.
     */
     function claimClover(bytes28[2] moves, uint256 _tokenId, uint256 _symmetries, bool _keep) public payable returns (bool) {
+        emit cloverClaimed(moves, _tokenId, msg.sender, _tokenId, _tokenId, _symmetries, _keep);
+
         bytes32 movesHash = keccak256(moves);
 
         require(msg.value >= stakeAmount);
@@ -215,14 +220,13 @@ contract CloversController is HasNoEther, HasNoTokens {
             // If the user decides to keep the Clover, they must
             // pay for it in club tokens according to the reward price.
             if (IClubToken(clubToken).balanceOf(msg.sender) < price) {
-                IClubTokenController(clubTokenController).buy(msg.sender);
+                IClubTokenController(clubTokenController).buy.value(msg.value.sub(stakeAmount))(msg.sender);
             }
             IClubToken(clubToken).transferFrom(msg.sender, clovers, price);
-            /* IClubToken(clubToken).burn(committer, price); */
+            // IClubToken(clubToken).burn(committer, price);
         }
         IClovers(clovers).mint(clovers, _tokenId);
         emit cloverClaimed(moves, _tokenId, msg.sender, stakeAmount, reward, _symmetries, _keep);
-
         return true;
     }
     /**

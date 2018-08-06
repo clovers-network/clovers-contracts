@@ -28,6 +28,7 @@ var {
 // const Rev = require('clovers-reversi')
 module.exports = (deployer, helper, accounts) => {
   deployer.then(async () => {
+    return
     try {
       var totalGas = new web3.BigNumber('0')
 
@@ -42,11 +43,23 @@ module.exports = (deployer, helper, accounts) => {
 
       // let rev = new Rev()
       // rev.mine()
+      let poolBalance = await clubTokenController.poolBalance()
+      console.log('poolBalance is ' + poolBalance.toString(10) + ' ETH')
+
+      console.log(accounts[0] + ' to spend ' + oneGwei.toString(10) + ' ETH')
+      let shouldBuy = await clubTokenController.getBuy(oneGwei)
+      console.log('should buy ' + shouldBuy.toString(10) + ' Tokens')
       await clubTokenController.buy(accounts[0], {
         value: oneGwei
       })
       let balance = await clubToken.balanceOf(accounts[0])
-      console.log('balance is ' + balance.toString(10))
+      console.log('balance is ' + balance.toString(10) + ' Tokens')
+      let shouldSell = await clubTokenController.getSell(balance)
+      console.log(
+        'should receive from sale: ' + shouldSell.toString(10) + ' ETH'
+      )
+      poolBalance = await clubTokenController.poolBalance()
+      console.log('poolBalance is ' + poolBalance.toString(10) + ' ETH')
       await clubTokenController.sell(balance)
     } catch (error) {
       console.log(error)

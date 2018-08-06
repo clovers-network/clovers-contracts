@@ -28,6 +28,7 @@ var {
 
 module.exports = (deployer, helper, accounts) => {
   deployer.then(async () => {
+    return
     try {
       var totalGas = new web3.BigNumber('0')
 

@@ -11,10 +11,10 @@ const overwrites = {
   Reversi: false,
   Clovers: false,
   CloversMetadata: false,
-  CloversController: false,
-  ClubTokenController: false,
-  SimpleCloversMarket: false,
-  CurationMarket: false,
+  CloversController: true,
+  ClubTokenController: true,
+  SimpleCloversMarket: true,
+  CurationMarket: true,
   ClubToken: true
 }
 

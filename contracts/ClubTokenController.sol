@@ -18,7 +18,7 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
     address public simpleCloversMarket;
     address public curationMarket;
 
-    uint256 public poolBalance;
+    /* uint256 public poolBalance; */
     uint256 public virtualSupply;
     uint256 public virtualBalance;
     uint32 public reserveRatio; // represented in ppm, 1-1000000
@@ -31,6 +31,10 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
         buy(msg.sender);
     }
 
+    function poolBalance() public constant returns(uint256) {
+        return clubToken.balance;
+    }
+
     /**
     * @dev gets the amount of tokens returned from spending Eth
     * @param buyValue The amount of Eth to be spent
@@ -39,7 +43,7 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
     function getBuy(uint256 buyValue) public constant returns(uint256) {
         return calculatePurchaseReturn(
             safeAdd(IClubToken(clubToken).totalSupply(), virtualSupply),
-            safeAdd(poolBalance, virtualBalance),
+            safeAdd(poolBalance(), virtualBalance),
             reserveRatio,
             buyValue);
     }
@@ -54,7 +58,7 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
     function getSell(uint256 sellAmount) public constant returns(uint256) {
         return calculateSaleReturn(
             safeAdd(IClubToken(clubToken).totalSupply(), virtualSupply),
-            safeAdd(poolBalance, virtualBalance),
+            safeAdd(poolBalance(), virtualBalance),
             reserveRatio,
             sellAmount);
     }
@@ -88,6 +92,15 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
         virtualBalance = _virtualBalance;
         return true;
     }
+    /**
+    * @dev updates the poolBalance
+    * @param _poolBalance The eth balance of ClubToken.sol
+    * @return A boolean representing whether or not the update was successful.
+    */
+    /* function updatePoolBalance(uint256 _poolBalance) public onlyOwner returns(bool){
+        poolBalance = _poolBalance;
+        return true;
+    } */
 
     /**
     * @dev updates the SimpleCloversMarket address
@@ -114,7 +127,7 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
     */
     function donate() public payable {
         require(msg.value > 0);
-        poolBalance = safeAdd(poolBalance, msg.value);
+        /* poolBalance = safeAdd(poolBalance, msg.value); */
         clubToken.transfer(msg.value);
     }
 
@@ -132,9 +145,9 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
         uint256 tokens = getBuy(msg.value);
         require(tokens > 0);
         require(IClubToken(clubToken).mint(buyer, tokens));
-        poolBalance = safeAdd(poolBalance, msg.value);
+        /* poolBalance = safeAdd(poolBalance, msg.value); */
         clubToken.transfer(msg.value);
-        emit Buy(buyer, tokens, msg.value, poolBalance, IClubToken(clubToken).totalSupply());
+        emit Buy(buyer, tokens, msg.value, poolBalance(), IClubToken(clubToken).totalSupply());
     }
 
 
@@ -147,12 +160,12 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
         require(IClubToken(clubToken).balanceOf(msg.sender) >= sellAmount);
         uint256 saleReturn = getSell(sellAmount);
         require(saleReturn > 0);
-        require(saleReturn <= poolBalance);
+        require(saleReturn <= poolBalance());
         require(saleReturn <= clubToken.balance);
         IClubToken(clubToken).burn(msg.sender, sellAmount);
-        poolBalance = safeSub(poolBalance, saleReturn);
+        /* poolBalance = safeSub(poolBalance, saleReturn); */
         IClubToken(clubToken).moveEth(msg.sender, saleReturn);
-        emit Sell(msg.sender, sellAmount, saleReturn, poolBalance, IClubToken(clubToken).totalSupply());
+        emit Sell(msg.sender, sellAmount, saleReturn, poolBalance(), IClubToken(clubToken).totalSupply());
     }
 
 
