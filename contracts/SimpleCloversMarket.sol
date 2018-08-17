@@ -52,6 +52,7 @@ contract SimpleCloversMarket is Ownable {
         address seller = sells[_tokenId].from;
         require(owner == msg.sender || owner != seller);
         delete(sells[_tokenId]);
+        updatePrice(_tokenId, 0);
     }
 
     function sell(uint256 _tokenId, uint256 price) public {
