@@ -10,14 +10,14 @@ var vals = (module.exports = {
   gasPrice: new BigNumber('1000000000'),
   // stakePeriod: '6000', // at 15 sec block times this is ~25 hours
   stakePeriod: '60000', // at 15 sec block times this is ~250 hours
-  payMultiplier: '10',
+  payMultiplier: utils.toWei('0.1'),
   priceMultiplier: '10',
-  basePrice: utils.toWei('0.001'),
+  basePrice: utils.toWei('1'),
 
   decimals: '18',
   oracle: '0xb20fbdc70c19d0ebcee204d32e1828fca9c2fb09',
   reserveRatio: '333333', // parts per million 500000 / 1000000 = 1/2
-  virtualBalance: utils.toWei('3333'),
+  virtualBalance: utils.toWei('33'),
   virtualSupply: utils.toWei('100000'),
   updateCloversController,
   updateClubTokenController,

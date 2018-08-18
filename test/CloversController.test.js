@@ -367,7 +367,7 @@ contract('Clovers', async function(accounts) {
   })
 
   describe('Clovers.sol', function() {
-    it.skip('should be able to read metadata', async function() {
+    it('should be able to read metadata', async function() {
       let metadata = await clovers.tokenURI(666)
       let _metadata = await cloversMetadata.tokenURI(666)
       assert(_metadata === metadata, '_metadata != metadata')
@@ -377,7 +377,7 @@ contract('Clovers', async function(accounts) {
   describe('CurationMarket.sol', function() {
     let _curator = accounts[4]
     let _curatorTokenId = '420'
-    it.skip('should be able to read metadata', async () => {
+    it('should be able to read metadata', async () => {
       let _clovers = await curationMarket.clovers()
       assert(
         _clovers.toString() === clovers.address.toString(),
@@ -401,7 +401,7 @@ contract('Clovers', async function(accounts) {
       )
     })
 
-    it.skip('should get a clover and start a market', async () => {
+    it('should get a clover and start a market', async () => {
       let _spendAmount = utils.toWei('1')
 
       try {
@@ -458,7 +458,7 @@ contract('Clovers', async function(accounts) {
     let _seller = accounts[9]
     let _buyer = accounts[8]
     let _price = new web3.BigNumber(utils.toWei('0.5'))
-    it.skip('should have correct contract addresses', async function() {
+    it('should have correct contract addresses', async function() {
       let _clovers = await simpleCloversMarket.clovers()
       assert(
         _clovers === clovers.address,
@@ -487,7 +487,7 @@ contract('Clovers', async function(accounts) {
       )
     })
 
-    it.skip('should list a clover for sale', async function() {
+    it('should list a clover for sale', async function() {
       try {
         tx = await clovers.mint(_seller, _tokenId)
         console.log(_ + 'clovers.mint - ' + tx.receipt.cumulativeGasUsed)
@@ -522,7 +522,7 @@ contract('Clovers', async function(accounts) {
       }
     })
 
-    it.skip('should buy the clover by minting ClubToken before', async () => {
+    it('should buy the clover by minting ClubToken before', async () => {
       let buyerBalance = await clubToken.balanceOf(_buyer)
       let amountToSpend
       try {
@@ -577,7 +577,7 @@ contract('Clovers', async function(accounts) {
   })
 
   describe('ClubTokenController.sol', function() {
-    it.skip('should read parameters that were set', async function() {
+    it('should read parameters that were set', async function() {
       let _reserveRatio = await clubTokenController.reserveRatio()
       assert(
         _reserveRatio.toString(10) === reserveRatio,
@@ -606,7 +606,7 @@ contract('Clovers', async function(accounts) {
       )
     })
 
-    it.skip('should mint new tokens', async function() {
+    it('should mint new tokens', async function() {
       let _depositAmount = utils.toWei('1')
       let buyer = accounts[5]
 
@@ -654,7 +654,7 @@ contract('Clovers', async function(accounts) {
           ')'
       )
     })
-    it.skip('should sell the new tokens', async function() {
+    it('should sell the new tokens', async function() {
       let buyer = accounts[5]
       let _depositAmount = utils.toWei('1')
 
@@ -762,7 +762,7 @@ contract('Clovers', async function(accounts) {
       )
     ]
 
-    it.skip('should convert correctly', async function() {
+    it('should convert correctly', async function() {
       let game = await reversi.getGame(_moves)
       let boardUint = await cloversController.convertBytes16ToUint(game[3])
       assert(
@@ -771,7 +771,7 @@ contract('Clovers', async function(accounts) {
       )
     })
 
-    it.skip('should read parameters that were set', async function() {
+    it('should read parameters that were set', async function() {
       let _stakeAmount = await cloversController.stakeAmount()
 
       assert(_stakeAmount.toString() === stakeAmount, 'stake amount not equal')
@@ -795,7 +795,7 @@ contract('Clovers', async function(accounts) {
       assert(_basePrice.toString() === basePrice, 'basePrice not equal')
     })
 
-    it.skip("should make sure token doesn't exist", async function() {
+    it("should make sure token doesn't exist", async function() {
       balance = web3.eth.getBalance(accounts[0])
       try {
         await clovers.ownerOf(_tokenId)
@@ -804,121 +804,11 @@ contract('Clovers', async function(accounts) {
       }
     })
 
-    it('should make sure can claimClover (keep = true) w valid game and approve from oracle', async function() {
-      let rev = new Rev()
-      let user = accounts[6]
-
-      rev.mine()
-      rev.thisMovesToByteMoves()
-
-      let moves = [rev.byteFirst32Moves, rev.byteLastMoves]
-      tokenId = new web3.BigNumber(rev.byteBoard, 16)
-
-      let symmetries = rev.returnSymmetriesAsBN()
-      let stakeAmount = await cloversController.stakeAmount()
-      console.log('stakeAmount', stakeAmount.toString(10))
-
-      let reward
-      try {
-        reward = await cloversController.calculateReward(
-          symmetries.toString(10)
-        )
-        console.log('reward', reward.toString(10))
-      } catch (error) {
-        assert(false, 'calculate reward failed')
-        return
-      }
-
-      let costInTokens
-      try {
-        costInTokens = await cloversController.getPrice(symmetries.toString())
-        console.log('costInTokens', costInTokens.toString())
-      } catch (error) {
-        console.log(error)
-        assert(false, 'costInTokens2 reward failed')
-        return
-      }
-      let costOfTokens
-      try {
-        costOfTokens = await getLowestPrice(clubTokenController, costInTokens)
-        console.log('cost of tokens', costOfTokens.toString())
-      } catch (error) {
-        assert(false, 'get lowest price failed')
-        console.log(error)
-        return
-      }
-
-      let value = costOfTokens.add(stakeAmount)
-      console.log('value', value.toString())
-      let keep = true
-
-      try {
-        if (tokenId.constructor.isBN) {
-          tokenId = web3.toBigNumber('0x' + tokenId.toString(16))
-          console.log(' was BN!')
-          console.log(tokenId)
-        }
-        // TODO why does ruffle change the value of my token ID????
-        var tx = await cloversController.claimClover(
-          moves,
-          '0x' + tokenId.toString(16),
-          '0x' + symmetries.toString(16),
-          keep,
-          {
-            value: value,
-            from: user
-          }
-        )
-        // console.log(tx.receipt.logs.map(l => l))
-      } catch (error) {
-        assert(false, 'claimClover failed ' + error.message)
-        return
-      }
-      let totalSupply = await clovers.totalSupply()
-      console.log('totalSupply is ' + totalSupply.toString())
-      if (totalSupply.gt(0)) {
-        let tokenByIndex = await clovers.tokenByIndex('0')
-        console.log('tokenByIndex', tokenByIndex)
-        console.log('tokenByIndex', tokenByIndex.toString(10))
-        console.log('tokenByIndex', tokenByIndex.toString(16))
-      } else {
-        assert(false, 'no tokens in clover contract')
-        return
-      }
-
-      try {
-        let exists = await clovers.exists(tokenId)
-        assert(
-          exists,
-          'clover ' + tokenId + (exists ? ' does ' : ' does not ') + ' exist'
-        )
-        let newOwner = await clovers.ownerOf(tokenId)
-        assert(
-          newOwner.toLowerCase() === clovers.address,
-          'clover ' +
-            tokenId +
-            ' should be owned by ' +
-            clovers.address +
-            ' but is owned by ' +
-            newOwner
-        )
-      } catch (error) {
-        console.log(error)
-        assert(false, 'check owner failed ' + error.message)
-        return
-      }
-
-      try {
-        console.log(tokenId.toString(16), oracle)
-        await cloversController.retrieveStake(tokenId, { from: oracle })
-      } catch (error) {
-        assert(false, 'retrieveStake failed ' + error.message)
-        assert(false, error.message)
-        console.log(error)
-      }
+    it('should make sure can claimClover (keep = true) w valid game, owning no clubToken and approve from oracle', async function() {
+      await makeFullClaim({ user: accounts[6], buyClubToken: false })
     })
 
-    it.skip('should make sure claimClover (_keep = false) is successful using valid game w/ invalid symmetries', async function() {
+    it('should make sure claimClover (_keep = false) is successful using valid game w/ invalid symmetries', async function() {
       try {
         let options = [
           _moves,
@@ -949,7 +839,7 @@ contract('Clovers', async function(accounts) {
       }
     })
 
-    it.skip('should make sure stake amount was removed from your account', async function() {
+    it('should make sure stake amount was removed from your account', async function() {
       let gasCost = gasSpent * parseInt(gasPrice)
       _balance = web3.eth.getBalance(accounts[0])
       assert(
@@ -968,14 +858,14 @@ contract('Clovers', async function(accounts) {
       )
     })
 
-    it.skip("should make sure it's not verified yet", async function() {
+    it("should make sure it's not verified yet", async function() {
       let isVerified = await cloversController.isVerified(_tokenId, {
         from: accounts[1]
       })
       assert(!isVerified, 'clover is already verified somehow')
     })
 
-    it.skip('should check the cost of challenging this clover w invalid symmetries', async function() {
+    it('should check the cost of challenging this clover w invalid symmetries', async function() {
       try {
         gasEstimate = await cloversController.challengeClover.estimateGas(
           _tokenId,
@@ -992,7 +882,7 @@ contract('Clovers', async function(accounts) {
       }
     })
 
-    it.skip('should update the stake amount with the gas Estimate from challengeClover', async function() {
+    it('should update the stake amount with the gas Estimate from challengeClover', async function() {
       try {
         newStakeAmount = new web3.BigNumber(gasEstimate).mul(gasPrice).mul(40)
         tx = await cloversController.updateStakeAmount(newStakeAmount, {
@@ -1019,7 +909,7 @@ contract('Clovers', async function(accounts) {
       }
     })
 
-    it.skip('should check the stake amount for the token in question', async function() {
+    it('should check the stake amount for the token in question', async function() {
       let _movesHashSol = await cloversController.getMovesHash(_tokenId)
       let currentStake = await cloversController.getStake(_movesHashSol)
       assert(
@@ -1031,7 +921,7 @@ contract('Clovers', async function(accounts) {
       )
     })
 
-    it.skip('should make sure it is verified after blocks increase', async function() {
+    it('should make sure it is verified after blocks increase', async function() {
       await increaseBlocks(stakePeriod)
       isVerified = await cloversController.isVerified(_tokenId, {
         from: accounts[1]
@@ -1043,7 +933,7 @@ contract('Clovers', async function(accounts) {
       clubBalance = await clubToken.balanceOf(accounts[0])
     })
 
-    it.skip('should make sure retrieveStake tx was successful', async function() {
+    it('should make sure retrieveStake tx was successful', async function() {
       try {
         tx = await cloversController.retrieveStake(_tokenId, { gasPrice })
 
@@ -1067,7 +957,7 @@ contract('Clovers', async function(accounts) {
       }
     })
 
-    it.skip('should make sure token exists & is owned by this clovers contract', async function() {
+    it('should make sure token exists & is owned by this clovers contract', async function() {
       try {
         let owner = await clovers.ownerOf(_tokenId)
         assert(
@@ -1084,7 +974,7 @@ contract('Clovers', async function(accounts) {
       }
     })
 
-    it.skip('should make sure reward was received', async function() {
+    it('should make sure reward was received', async function() {
       let _clubBalance = await clubToken.balanceOf(accounts[0])
       assert(
         _clubBalance.gt(clubBalance),
@@ -1095,7 +985,7 @@ contract('Clovers', async function(accounts) {
       )
     })
 
-    it.skip('should make sure stake amount was retured to your account', async function() {
+    it('should make sure stake amount was retured to your account', async function() {
       gasCost = gasSpent * gasPrice
       _balance = web3.eth.getBalance(accounts[0])
       let result = balance.minus(gasCost)
@@ -1111,8 +1001,114 @@ contract('Clovers', async function(accounts) {
           result.toString()
       )
     })
+
+    it('should make sure can claimClover (keep = true) w valid game, while owning enough clubToken and approve from oracle', async function() {
+      await makeFullClaim({ user: accounts[4], buyClubToken: true })
+    })
   })
+
+  async function makeFullClaim({ user, buyClubToken }) {
+    let rev = new Rev()
+
+    rev.mine()
+    rev.thisMovesToByteMoves()
+
+    let moves = [
+      '0x' + rev.byteFirst32Moves.padStart(56, '0'),
+      '0x' + rev.byteLastMoves.padStart(56, '0')
+    ]
+    tokenId = new web3.BigNumber(rev.byteBoard, 16)
+
+    let symmetries = rev.returnSymmetriesAsBN()
+    let stakeAmount = await cloversController.stakeAmount()
+
+    let reward
+    try {
+      reward = await cloversController.calculateReward(symmetries.toString(10))
+    } catch (error) {
+      assert(false, 'calculate reward failed')
+      return
+    }
+
+    let costInTokens
+    try {
+      costInTokens = await cloversController.getPrice(symmetries.toString())
+    } catch (error) {
+      console.log(error)
+      assert(false, 'costInTokens2 reward failed')
+      return
+    }
+
+    let costOfTokens
+    try {
+      costOfTokens = await getLowestPrice(clubTokenController, costInTokens)
+    } catch (error) {
+      assert(false, 'get lowest price failed')
+      console.log(error)
+      return
+    }
+
+    if (buyClubToken) {
+      await clubTokenController.buy(user, { value: costOfTokens.div(2) })
+      costOfTokens = costOfTokens.div(2)
+    }
+    let value = costOfTokens.add(stakeAmount)
+
+    let keep = true
+    try {
+      if (tokenId.constructor.isBN) {
+        tokenId = web3.toBigNumber('0x' + tokenId.toString(16))
+      }
+      var tx = await cloversController.claimClover(
+        moves,
+        tokenId.toString(10),
+        '0x' + symmetries.toString(16),
+        keep,
+        {
+          value: value,
+          from: user
+        }
+      )
+    } catch (error) {
+      assert(false, 'claimClover failed ' + error.message)
+      return
+    }
+
+    try {
+      let exists = await clovers.exists(tokenId)
+      assert(
+        exists,
+        'clover ' +
+          tokenId.toString(16) +
+          (exists ? ' does ' : ' does not ') +
+          ' exist'
+      )
+      let newOwner = await clovers.ownerOf(tokenId)
+      assert(
+        newOwner.toLowerCase() === clovers.address,
+        'clover ' +
+          tokenId +
+          ' should be owned by ' +
+          clovers.address +
+          ' but is owned by ' +
+          newOwner
+      )
+    } catch (error) {
+      console.log(error)
+      assert(false, 'check owner failed ' + error.message)
+      return
+    }
+
+    try {
+      await cloversController.retrieveStake(tokenId, { from: oracle })
+    } catch (error) {
+      assert(false, 'retrieveStake failed ' + error.message)
+      assert(false, error.message)
+      console.log(error)
+    }
+  }
 })
+
 // function gasToCash(totalGas) {
 //   BigNumber.config({ DECIMAL_PLACES: 2, ROUNDING_MODE: 4 });
 //
@@ -1209,7 +1205,7 @@ function decodeEventString(hexVal) {
     .map(a =>
       a
         .toLowerCase()
-        .split.skip('')
+        .split('')
         .reduce(
           (result, ch) => result * 16 + '0123456789abcdefgh'.indexOf(ch),
           0

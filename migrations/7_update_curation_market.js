@@ -26,7 +26,9 @@ var {
   updateClubTokenController
 } = require('../helpers/migVals')
 
-module.exports = (deployer, helper, accounts) => {
+module.exports = (deployer, network, accounts) => {
+  if (network === 'test') return
+
   deployer.then(async () => {
     return
     try {

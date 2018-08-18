@@ -27,9 +27,9 @@ var {
   deployCloversController
 } = require('../helpers/migVals')
 
-module.exports = (deployer, helper, accounts) => {
+module.exports = (deployer, network, accounts) => {
   deployer.then(async () => {
-    return
+    if (network === 'test') return
     try {
       var totalGas = new web3.BigNumber('0')
 
