@@ -161,6 +161,7 @@ contract CurationMarket is BancorFormula, Ownable {
     * @dev buy Buy shares with Eth
     * @param _to The address that should receive the new tokens
     * @param _tokenId The tokenId that should be bought into
+    * @param _spendAmount The amount of Club Token to spend
     */
     function buy(address _to, uint256 _tokenId, uint256 _spendAmount) public payable
     marketExists(_tokenId)
@@ -175,7 +176,7 @@ contract CurationMarket is BancorFormula, Ownable {
         require(_mint(_tokenId, _to, tokens));
         cloverMarkets[_tokenId].poolBalance = safeAdd(cloverMarkets[_tokenId].poolBalance, _spendAmount);
         IClubTokenController(clubTokenController).transferFrom(msg.sender, address(this), _spendAmount);
-        emit Buy(_tokenId, _to, tokens, msg.value, cloverMarkets[_tokenId].poolBalance, cloverMarkets[_tokenId].totalSupply);
+        emit Buy(_tokenId, _to, tokens, _spendAmount, cloverMarkets[_tokenId].poolBalance, cloverMarkets[_tokenId].totalSupply);
         return true;
     }
 
