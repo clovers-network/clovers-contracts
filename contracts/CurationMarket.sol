@@ -1,6 +1,6 @@
 pragma solidity ^0.4.18;
 
-import "zeppelin-solidity/contracts/ownership/ownable.sol";
+import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "bancor-contracts/solidity/contracts/converter/BancorFormula.sol";
 import "./ICloversController.sol";
 import "./IClovers.sol";
