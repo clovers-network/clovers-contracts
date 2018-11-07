@@ -34,6 +34,8 @@ var {
   reserveRatio,
   virtualBalance,
   virtualSupply,
+  virtualBalanceCM,
+  virtualSupplyCM,
   deployCloversController
 } = require('../helpers/migVals')
 
@@ -121,8 +123,8 @@ module.exports = (deployer, network, accounts) => {
       // -w ClubTokenController address
       await deployer.deploy(
         CurationMarket,
-        virtualSupply,
-        virtualBalance,
+        virtualSupplyCM,
+        virtualBalanceCM,
         reserveRatio,
         clovers.address,
         cloversController.address,

@@ -23,9 +23,11 @@ var {
   reserveRatio,
   virtualBalance,
   virtualSupply,
+  virtualBalanceCM,
+  virtualSupplyCM,
   updateClubTokenController
 } = require('../helpers/migVals')
-
+const overwrite = false
 module.exports = (deployer, network, accounts) => {
   if (network === 'test') return
   deployer.then(async () => {
@@ -51,25 +53,32 @@ module.exports = (deployer, network, accounts) => {
       // -w ClubTokenController address
       await deployer.deploy(
         CurationMarket,
-        virtualSupply,
-        virtualBalance,
+        virtualSupplyCM,
+        virtualBalanceCM,
         reserveRatio,
         clovers.address,
         cloversController.address,
         clubToken.address,
         clubTokenController.address,
-        { overwrite: true }
+        { overwrite }
       )
       curationMarket = await CurationMarket.deployed()
+      if (!overwrite) {
+        console.log('curationMarket.updateVirtualSupply')
+        var tx = await curationMarket.updateVirtualSupply(virtualSupplyCM)
 
-      console.log('clubTokenController.updateCurationMarket')
-      var tx = await clubTokenController.updateCurationMarket(
-        curationMarket.address
-      )
-      console.log('cloversController.updateCurationMarket')
-      var tx = await cloversController.updateCurationMarket(
-        curationMarket.address
-      )
+        console.log('curationMarket.updateVirtualBalanceCM')
+        var tx = await curationMarket.updateVirtualBalance(virtualBalanceCM)
+      } else {
+        console.log('clubTokenController.updateCurationMarket')
+        var tx = await clubTokenController.updateCurationMarket(
+          curationMarket.address
+        )
+        console.log('cloversController.updateCurationMarket')
+        var tx = await cloversController.updateCurationMarket(
+          curationMarket.address
+        )
+      }
     } catch (error) {
       console.log(error)
     }

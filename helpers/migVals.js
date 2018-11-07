@@ -19,6 +19,8 @@ var vals = (module.exports = {
   reserveRatio: '333333', // parts per million 500000 / 1000000 = 1/2
   virtualBalance: utils.toWei('33'),
   virtualSupply: utils.toWei('100000'),
+  virtualBalanceCM: utils.toWei('33333'),
+  virtualSupplyCM: utils.toWei('100000'),
   updateCloversController,
   updateClubTokenController,
   deployCloversController
