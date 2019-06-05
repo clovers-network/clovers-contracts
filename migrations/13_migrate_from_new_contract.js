@@ -112,7 +112,6 @@ module.exports = async function(deployer, network, accounts) {
               // console.log(receipt.receipt.status)
               
               if (reversi.symmetrical) {
-                console.log('is symmetrical')
                 // console.log(reversi)
                 
                 var symmetries = new web3.BigNumber(0)
