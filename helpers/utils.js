@@ -50,7 +50,7 @@ var vals = (module.exports = {
     if (typeof totalGas !== 'object') totalGas = new BigNumber(totalGas)
     let lowGwei = oneGwei.mul(new BigNumber('8'))
     let highGwei = oneGwei.mul(new BigNumber('20'))
-    let ethPrice = new BigNumber('450')
+    let ethPrice = new BigNumber('250')
 
     console.log(
       _ +

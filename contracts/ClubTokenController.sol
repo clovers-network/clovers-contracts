@@ -14,6 +14,7 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
     event Buy(address buyer, uint256 tokens, uint256 value, uint256 poolBalance, uint256 tokenSupply);
     event Sell(address seller, uint256 tokens, uint256 value, uint256 poolBalance, uint256 tokenSupply);
 
+    bool public paused;
     address public clubToken;
     address public simpleCloversMarket;
     address public curationMarket;
@@ -25,10 +26,16 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
 
     constructor(address _clubToken) public {
         clubToken = _clubToken;
+        paused = true;
     }
 
     function () public payable {
         buy(msg.sender);
+    }
+
+    modifier isPaused() {
+        if (paused && msg.sender != owner) revert("contract paused");
+        _;
     }
 
     function poolBalance() public constant returns(uint256) {
@@ -61,6 +68,10 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
             safeAdd(poolBalance(), virtualBalance),
             reserveRatio,
             sellAmount);
+    }
+
+    function setPaused(bool _paused) public onlyOwner {
+        paused = _paused;
     }
 
     /**
@@ -125,7 +136,7 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
     /**
     * @dev donate Donate Eth to the poolBalance without increasing the totalSupply
     */
-    function donate() public payable {
+    function donate() public payable isPaused {
         require(msg.value > 0);
         /* poolBalance = safeAdd(poolBalance, msg.value); */
         clubToken.transfer(msg.value);
@@ -140,7 +151,7 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
     * @dev buy Buy ClubTokens with Eth
     * @param buyer The address that should receive the new tokens
     */
-    function buy(address buyer) public payable returns(bool) {
+    function buy(address buyer) public payable isPaused returns(bool) {
         require(msg.value > 0);
         uint256 tokens = getBuy(msg.value);
         require(tokens > 0);
@@ -155,7 +166,7 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
     * @dev sell Sell ClubTokens for Eth
     * @param sellAmount The amount of tokens to sell
     */
-    function sell(uint256 sellAmount) public returns(bool) {
+    function sell(uint256 sellAmount) public isPaused returns(bool) {
         require(sellAmount > 0);
         require(IClubToken(clubToken).balanceOf(msg.sender) >= sellAmount);
         uint256 saleReturn = getSell(sellAmount);

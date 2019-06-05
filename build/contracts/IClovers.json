@@ -696,9 +696,9 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.4.18;\n\n/**\n * Interface for Digital Asset Registry for the Non Fungible Token Clover\n * with upgradeable contract reference for returning metadata.\n */\n\n\ncontract IClovers {\n\n    function tokenURI(uint _tokenId) public view returns (string _infoUrl);\n\n    function getKeep(uint256 _tokenId) public view returns (bool);\n    function getBlockMinted(uint256 _tokenId) public view returns (uint256);\n    function getCloverMoves(uint256 _tokenId) public view returns (bytes28[2]);\n    function getReward(uint256 _tokenId) public view returns (uint256);\n    function getSymmetries(uint256 _tokenId) public view returns (uint256);\n    function getAllSymmetries() public view returns (uint256, uint256, uint256, uint256, uint256, uint256);\n\n    function moveEth(address _to, uint256 _amount) public;\n    function moveToken(address _to, uint256 _amount, address _token) public returns (bool);\n    function approveToken(address _to, uint256 _amount, address _token) public returns (bool);\n\n    function setKeep(uint256 _tokenId, bool value) public;\n    function setBlockMinted(uint256 _tokenId, uint256 value) public;\n    function setCloverMoves(uint256 _tokenId, bytes28[2] moves) public;\n    function setReward(uint256 _tokenId, uint256 _amount) public;\n    function setSymmetries(uint256 _tokenId, uint256 _symmetries) public;\n    function setAllSymmetries(uint256 _totalSymmetries, uint256 RotSym, uint256 Y0Sym, uint256 X0Sym, uint256 XYSym, uint256 XnYSym) public;\n    function deleteClover(uint256 _tokenId) public;\n\n    function updateCloversControllerAddress(address _cloversController) public;\n    function updateCloversMetadataAddress(address _cloversMetadata) public;\n\n    function mint (address _to, uint256 _tokenId) public;\n    function unmint (uint256 _tokenId) public;\n\n    event Transfer(\n      address indexed _from,\n      address indexed _to,\n      uint256 indexed _tokenId\n    );\n    event Approval(\n      address indexed _owner,\n      address indexed _approved,\n      uint256 indexed _tokenId\n    );\n    event ApprovalForAll(\n      address indexed _owner,\n      address indexed _operator,\n      bool _approved\n    );\n\n    function balanceOf(address _owner) public view returns (uint256 _balance);\n    function ownerOf(uint256 _tokenId) public view returns (address _owner);\n    function exists(uint256 _tokenId) public view returns (bool _exists);\n\n    function approve(address _to, uint256 _tokenId) public;\n    function getApproved(uint256 _tokenId)\n      public view returns (address _operator);\n\n    function setApprovalForAll(address _operator, bool _approved) public;\n    function isApprovedForAll(address _owner, address _operator)\n      public view returns (bool);\n\n    function transferFrom(address _from, address _to, uint256 _tokenId) public;\n    function safeTransferFrom(address _from, address _to, uint256 _tokenId)\n      public;\n\n    function safeTransferFrom(\n      address _from,\n      address _to,\n      uint256 _tokenId,\n      bytes _data\n    )\n      public;\n}\n",
-  "sourcePath": "/Users/billy/clovers/clovers-contracts/contracts/IClovers.sol",
+  "sourcePath": "/home/billyrennekamp/GitHub.com/clovers-network/clovers-contracts/contracts/IClovers.sol",
   "ast": {
-    "absolutePath": "/Users/billy/clovers/clovers-contracts/contracts/IClovers.sol",
+    "absolutePath": "/home/billyrennekamp/GitHub.com/clovers-network/clovers-contracts/contracts/IClovers.sol",
     "exportedSymbols": {
       "IClovers": [
         1838
@@ -3974,7 +3974,7 @@
     "src": "0:3011:1"
   },
   "legacyAST": {
-    "absolutePath": "/Users/billy/clovers/clovers-contracts/contracts/IClovers.sol",
+    "absolutePath": "/home/billyrennekamp/GitHub.com/clovers-network/clovers-contracts/contracts/IClovers.sol",
     "exportedSymbols": {
       "IClovers": [
         1838
@@ -7255,5 +7255,5 @@
   },
   "networks": {},
   "schemaVersion": "2.0.1",
-  "updatedAt": "2018-09-02T18:26:05.131Z"
+  "updatedAt": "2019-06-05T09:54:33.852Z"
 }

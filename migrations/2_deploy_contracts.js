@@ -8,9 +8,9 @@ var CurationMarket = artifacts.require('./CurationMarket.sol')
 var ClubToken = artifacts.require('./ClubToken.sol')
 
 const overwrites = {
-  Reversi: false,
-  Clovers: false,
-  CloversMetadata: false,
+  Reversi: true,
+  Clovers: true,
+  CloversMetadata: true,
   CloversController: true,
   ClubTokenController: true,
   SimpleCloversMarket: true,

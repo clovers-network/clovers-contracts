@@ -7,6 +7,12 @@ const HDWalletProvider = require("truffle-hdwallet-provider");
 module.exports = {
   // See <http://truffleframework.com/docs/advanced/configuration>
   // to customize your Truffle configuration!
+  solc: {
+    optimizer: {
+      enabled: true,
+      runs: 10000
+    }
+  },
   networks: {
     // test: {
     //   provider() {
@@ -34,7 +40,7 @@ module.exports = {
       host: "localhost",
       port: 9545,
       network_id: "*", // Match any network id
-      gas: 10000000
+      // gas: 10000000
     },
     ganache: {
       provider() {
@@ -67,7 +73,7 @@ module.exports = {
     rinkeby: {
       provider() {
         return new HDWalletProvider(
-          process.env.RINKEBY_MNEMONIC,
+          process.env.TRUFFLE_MNEMONIC,
           "https://rinkeby.infura.io/v3/" + process.env.INFURA_API_KEY,
           0,
           10

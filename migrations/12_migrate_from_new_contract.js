@@ -1,13 +1,12 @@
 var Clovers = artifacts.require('./Clovers.sol')
-var CloversController = artifacts.require('./CloversController.sol')
-var ClubToken = artifacts.require('./ClubToken.sol')
-var OldToken = artifacts.require('../contracts/OldToken.sol')
-var ethers = require('ethers')
-var start = 369
-// var start = 0;
+// var CloversController = artifacts.require('./CloversController.sol')
+// var ethers = require('ethers')
+var start = 0
 // var Reversi = require('../app/src/assets/reversi.js')
-var Reversi = require('clovers-reversi').default
-var Web3 = require('web3')
+// var Reversi = require('clovers-reversi').default
+// var Web3 = require('web3')
+var fs = require('fs');
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 module.exports = async function(deployer, network, accounts) {
   if (network === 'test') return
   var doFors = (n, i = 0, func) => {
@@ -39,68 +38,82 @@ module.exports = async function(deployer, network, accounts) {
 
   deployer.then(async () => {
     try {
-      var providers = require('ethers').providers
-      var network = providers.networks.rinkeby
-      var infuraProvider = new providers.InfuraProvider(network)
-      var etherscanProvider = new providers.EtherscanProvider(network)
-      var fallbackProvider = new providers.FallbackProvider([
-        infuraProvider,
-        etherscanProvider
-      ])
-      var provider = providers.getDefaultProvider(network)
+
+    //   var providers = require('ethers').providers
+    //   var network = providers.networks.rinkeby
+    //   var infuraProvider = new providers.InfuraProvider(network)
+    //   var etherscanProvider = new providers.EtherscanProvider(network)
+    //   var fallbackProvider = new providers.FallbackProvider([
+    //     infuraProvider,
+    //     etherscanProvider
+    //   ])
+    //   var provider = providers.getDefaultProvider(network)
       var clovers = await Clovers.deployed()
 
-      var cloversController = await CloversController.deployed()
+    //   var cloversController = await CloversController.deployed()
       // var web3Provider = ZeroClientProvider({
       //   getAccounts: function(){},
       //   rpcUrl: 'https://rinkeby.infura.io/Q5I7AA6unRLULsLTYd6d',
       // })
       // var _web3 = new Web3(web3Provider)
-      var address = '0xcc0604514f71b8d39e13315d59f4115702b42646'
-      var oldToken = new ethers.Contract(address, OldToken.abi, provider)
 
-      var getCloversCount = await oldToken.getCloversCount()
+      var getCloversCount = await clovers.totalSupply()
       console.log(getCloversCount.toString())
       await doFors(getCloversCount.toNumber(), start, i => {
         console.log(i + '/' + getCloversCount.toNumber())
         return new Promise(async (resolve, reject) => {
           try {
-            var clover = await oldToken.getCloverByKey(i)
+            var tokenId = await clovers.tokenByIndex(i)
 
-            var _tokenId = clover[0]
+            let owner = await clovers.ownerOf(tokenId)
+            let keep = await clovers.getKeep( tokenId)
+            let blockMinted = await clovers.getBlockMinted(tokenId)
+            let cloverMoves = await clovers.getCloverMoves(tokenId)
+            let reward = await clovers.getReward(tokenId)
+            let symmetries = await clovers.getSymmetries(tokenId)
+
+            let hash = await clovers.getHash(cloverMoves)
+
+            if (owner === ZERO_ADDRESS) resolve()
+
+            let clover = {
+                tokenId, owner, keep, blockMinted, cloverMoves, reward, symmetries, hash
+            }
+            const cloverPath = __dirname + '/../clovers/raw.json'
+            var allCloversString = fs.readFileSync(cloverPath).toString()
+            var allCloversJSON
+            try {
+                allCloversJSON = JSON.parse(allCloversString)
+            } catch(_) {
+                allCloversJSON = []
+            }
+            allCloversJSON.push(clover)
+
+            allCloversString = JSON.stringify(allCloversJSON)
+            fs.writeFileSync(cloverPath, allCloversString)
+            resolve() 
+
+            /*
             var reversi = new Reversi()
-            reversi.byteBoardPopulateBoard(_tokenId.toString(16))
+            reversi.byteBoardPopulateBoard(tokenId.toString(16))
             reversi.isSymmetrical()
-            var _to = clover[3]
-            var first32Moves = clover[4]
-            var lastMoves = clover[5]
+
+            var first32Moves = cloverMoves[0]
+            var lastMoves = cloverMoves[1]
 
             reversi.playGameByteMoves(first32Moves, lastMoves)
             let stringMoves = reversi.movesString
-            reversi.translateToC4Version()
-            if (
-              stringMoves.toLowerCase() !== reversi.movesString.toLowerCase()
-            ) {
-              console.log('needed to rotate board')
-              _tokenId = '0x' + reversi.byteBoard
-              first32Moves = '0x' + reversi.byteFirst32Moves
-              lastMoves = '0x' + reversi.byteLastMoves
-            }
-            var moves = [first32Moves, lastMoves]
-
-            var movesHash = await clovers.getHash(moves)
-            var blockNumber = await getBlockNumber()
 
             // setCommit
-            var tx = await cloversController._setCommit(movesHash, _to)
+            var tx = await cloversController._setCommit(hash, owner)
             console.log('setCommit')
             // console.log(tx.receipt.status)
             // setBlockMinted
-            tx = await clovers.setBlockMinted(_tokenId, blockNumber)
+            tx = await clovers.setBlockMinted(tokenId, blockMinted)
             console.log('setBlockMinted')
             // console.log(tx.receipt.status)
             // setCloverMoves
-            tx = await clovers.setCloverMoves(_tokenId, moves)
+            tx = await clovers.setCloverMoves(tokenId, cloverMoves)
             console.log('setCloverMoves')
             // console.log(tx.receipt.status)
 
@@ -116,7 +129,7 @@ module.exports = async function(deployer, network, accounts) {
               symmetries = symmetries.add(reversi.XYSym ? '0b00010' : 0)
               symmetries = symmetries.add(reversi.XnYSym ? '0b00001' : 0)
               // setSymmetries
-              tx = await clovers.setSymmetries(_tokenId, symmetries)
+              tx = await clovers.setSymmetries(tokenId, symmetries)
               console.log('setSymmetries')
 
               // setAllSymmetries
@@ -129,12 +142,13 @@ module.exports = async function(deployer, network, accounts) {
               tx = await clovers.setAllSymmetries(...allSymmetries)
               console.log('setAllSymmetries')
             }
-            if (!(await clovers.exists(_tokenId))) {
-              tx = await clovers.mint(_to, _tokenId)
+            if (!(await clovers.exists(tokenId))) {
+              tx = await clovers.mint(owner, tokenId)
               console.log('minted')
               console.log(tx.logs)
             }
             resolve()
+            */
           } catch (error) {
             if (error.message.indexOf('impossibru!!!') !== -1) {
               console.log('found a bad game!!!!')
