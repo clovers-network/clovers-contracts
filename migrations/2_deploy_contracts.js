@@ -4,7 +4,7 @@ var CloversMetadata = artifacts.require('./CloversMetadata.sol')
 var CloversController = artifacts.require('./CloversController.sol')
 var ClubTokenController = artifacts.require('./ClubTokenController.sol')
 var SimpleCloversMarket = artifacts.require('./SimpleCloversMarket.sol')
-var CurationMarket = artifacts.require('./CurationMarket.sol')
+// var CurationMarket = artifacts.require('./CurationMarket.sol')
 var ClubToken = artifacts.require('./ClubToken.sol')
 
 const overwrites = {
@@ -14,7 +14,7 @@ const overwrites = {
   CloversController: true,
   ClubTokenController: true,
   SimpleCloversMarket: true,
-  CurationMarket: true,
+  // CurationMarket: true,
   ClubToken: true
 }
 
@@ -113,26 +113,26 @@ module.exports = (deployer, network, accounts) => {
       )
       simpleCloversMarket = await SimpleCloversMarket.deployed()
 
-      // Deploy CurationMarket.sol
-      // -w virtualSupply
-      // -w virtualBalance
-      // -w reserveRatio
-      // -w Clovers address
-      // -w CloversController address
-      // -w ClubToken address
-      // -w ClubTokenController address
-      await deployer.deploy(
-        CurationMarket,
-        virtualSupplyCM,
-        virtualBalanceCM,
-        reserveRatio,
-        clovers.address,
-        cloversController.address,
-        clubToken.address,
-        clubTokenController.address,
-        { overwrite: overwrites['CurationMarket'] }
-      )
-      curationMarket = await CurationMarket.deployed()
+      // // Deploy CurationMarket.sol
+      // // -w virtualSupply
+      // // -w virtualBalance
+      // // -w reserveRatio
+      // // -w Clovers address
+      // // -w CloversController address
+      // // -w ClubToken address
+      // // -w ClubTokenController address
+      // await deployer.deploy(
+      //   CurationMarket,
+      //   virtualSupplyCM,
+      //   virtualBalanceCM,
+      //   reserveRatio,
+      //   clovers.address,
+      //   cloversController.address,
+      //   clubToken.address,
+      //   clubTokenController.address,
+      //   { overwrite: overwrites['CurationMarket'] }
+      // )
+      // curationMarket = await CurationMarket.deployed()
     } catch (error) {
       console.log(error)
     }

@@ -4,7 +4,7 @@ var Clovers = artifacts.require('./Clovers.sol')
 var CloversController = artifacts.require('./CloversController.sol')
 var ClubTokenController = artifacts.require('./ClubTokenController.sol')
 var SimpleCloversMarket = artifacts.require('./SimpleCloversMarket.sol')
-var CurationMarket = artifacts.require('./CurationMarket.sol')
+// var CurationMarket = artifacts.require('./CurationMarket.sol')
 var ClubToken = artifacts.require('./ClubToken.sol')
 
 const gasToCash = require('../helpers/utils').gasToCash
@@ -38,7 +38,7 @@ module.exports = (deployer, network, accounts) => {
 
       clubToken = await ClubToken.deployed()
       clubTokenController = await ClubTokenController.deployed()
-      curationMarket = await CurationMarket.deployed()
+      // curationMarket = await CurationMarket.deployed()
       simpleCloversMarket = await SimpleCloversMarket.deployed()
 
       // let rev = new Rev()

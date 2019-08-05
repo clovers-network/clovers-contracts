@@ -6,7 +6,7 @@ var CloversController = artifacts.require('./CloversController.sol')
 var ClubTokenController = artifacts.require('./ClubTokenController.sol')
 var SimpleCloversMarket = artifacts.require('./SimpleCloversMarket.sol')
 var ClubToken = artifacts.require('./ClubToken.sol')
-var CurationMarket = artifacts.require('./CurationMarket.sol')
+// var CurationMarket = artifacts.require('./CurationMarket.sol')
 
 var Rev = require('clovers-reversi').default
 const gasToCash = require('../helpers/utils').gasToCash
@@ -26,9 +26,9 @@ let basePrice = utils.toWei('0.001')
 
 let decimals = '18'
 
-let reserveRatio = '333333' // parts per million 500000 / 1000000 = 1/2
-let virtualBalance = utils.toWei('3333')
-let virtualSupply = utils.toWei('100000')
+let reserveRatio = '750000' // parts per million 500000 / 1000000 = 1/2
+let virtualBalance = utils.toWei('10')
+let virtualSupply = utils.toWei('10000')
 
 contract('Clovers', async function(accounts) {
   let oracle = accounts[8]
@@ -39,7 +39,7 @@ contract('Clovers', async function(accounts) {
     reversi,
     cloversController,
     clubTokenController,
-    curationMarket,
+    // curationMarket,
     simpleCloversMarket
   before(done => {
     ;(async () => {
@@ -154,22 +154,22 @@ contract('Clovers', async function(accounts) {
         // -w CloversController address
         // -w ClubToken address
         // -w ClubTokenController address
-        curationMarket = await CurationMarket.new(
-          virtualSupply,
-          virtualBalance,
-          reserveRatio,
-          clovers.address,
-          cloversController.address,
-          clubToken.address,
-          clubTokenController.address
-        )
-        var tx = web3.eth.getTransactionReceipt(
-          simpleCloversMarket.transactionHash
-        )
-        console.log(_ + 'Deploy curationMarket - ' + tx.gasUsed)
-        gasToCash(tx.gasUsed)
+        // curationMarket = await CurationMarket.new(
+        //   virtualSupply,
+        //   virtualBalance,
+        //   reserveRatio,
+        //   clovers.address,
+        //   cloversController.address,
+        //   clubToken.address,
+        //   clubTokenController.address
+        // )
+        // var tx = web3.eth.getTransactionReceipt(
+        //   curationMarket.transactionHash
+        // )
+        // console.log(_ + 'Deploy curationMarket - ' + tx.gasUsed)
+        // gasToCash(tx.gasUsed)
 
-        totalGas = totalGas.plus(tx.gasUsed)
+        // totalGas = totalGas.plus(tx.gasUsed)
 
         // Update Clovers.sol
         // -w ClubTokenController address
@@ -240,15 +240,15 @@ contract('Clovers', async function(accounts) {
 
         totalGas = totalGas.plus(tx.receipt.gasUsed)
 
-        var tx = await cloversController.updateCurationMarket(
-          curationMarket.address
-        )
-        console.log(
-          _ + 'cloversController.updateCurationMarket - ' + tx.receipt.gasUsed
-        )
-        gasToCash(tx.receipt.gasUsed)
+        // var tx = await cloversController.updateCurationMarket(
+        //   curationMarket.address
+        // )
+        // console.log(
+        //   _ + 'cloversController.updateCurationMarket - ' + tx.receipt.gasUsed
+        // )
+        // gasToCash(tx.receipt.gasUsed)
 
-        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        // totalGas = totalGas.plus(tx.receipt.gasUsed)
 
         var tx = await cloversController.updateSimpleCloversMarket(
           simpleCloversMarket.address
@@ -320,15 +320,15 @@ contract('Clovers', async function(accounts) {
 
         totalGas = totalGas.plus(tx.receipt.gasUsed)
 
-        var tx = await clubTokenController.updateCurationMarket(
-          curationMarket.address
-        )
-        console.log(
-          _ + 'clubTokenController.updateCurationMarket - ' + tx.receipt.gasUsed
-        )
-        gasToCash(tx.receipt.gasUsed)
+        // var tx = await clubTokenController.updateCurationMarket(
+        //   curationMarket.address
+        // )
+        // console.log(
+        //   _ + 'clubTokenController.updateCurationMarket - ' + tx.receipt.gasUsed
+        // )
+        // gasToCash(tx.receipt.gasUsed)
 
-        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        // totalGas = totalGas.plus(tx.receipt.gasUsed)
 
         var tx = await clubTokenController.updateReserveRatio(reserveRatio)
         console.log(
@@ -367,98 +367,98 @@ contract('Clovers', async function(accounts) {
   })
 
   describe('Clovers.sol', function() {
-    it('should be able to read metadata', async function() {
+    it.skip('should be able to read metadata', async function() {
       let metadata = await clovers.tokenURI(666)
       let _metadata = await cloversMetadata.tokenURI(666)
       assert(_metadata === metadata, '_metadata != metadata')
     })
   })
 
-  describe('CurationMarket.sol', function() {
-    let _curator = accounts[4]
-    let _curatorTokenId = '420'
-    it('should be able to read metadata', async () => {
-      let _clovers = await curationMarket.clovers()
-      assert(
-        _clovers.toString() === clovers.address.toString(),
-        '_clovers != clovers'
-      )
-      let _clubToken = await curationMarket.clubToken()
-      assert(
-        _clubToken.toString() === clubToken.address.toString(),
-        '_clubToken != clubToken'
-      )
-      let _cloversController = await curationMarket.cloversController()
-      assert(
-        _cloversController.toString() === cloversController.address.toString(),
-        '_cloversController != cloversController'
-      )
-      let _clubTokenController = await curationMarket.clubTokenController()
-      assert(
-        _clubTokenController.toString() ===
-          clubTokenController.address.toString(),
-        '_clubTokenController != clubTokenController'
-      )
-    })
+  // describe.skip('CurationMarket.sol', function() {
+  //   let _curator = accounts[4]
+  //   let _curatorTokenId = '420'
+  //   it.skip('should be able to read metadata', async () => {
+  //     let _clovers = await curationMarket.clovers()
+  //     assert(
+  //       _clovers.toString() === clovers.address.toString(),
+  //       '_clovers != clovers'
+  //     )
+  //     let _clubToken = await curationMarket.clubToken()
+  //     assert(
+  //       _clubToken.toString() === clubToken.address.toString(),
+  //       '_clubToken != clubToken'
+  //     )
+  //     let _cloversController = await curationMarket.cloversController()
+  //     assert(
+  //       _cloversController.toString() === cloversController.address.toString(),
+  //       '_cloversController != cloversController'
+  //     )
+  //     let _clubTokenController = await curationMarket.clubTokenController()
+  //     assert(
+  //       _clubTokenController.toString() ===
+  //         clubTokenController.address.toString(),
+  //       '_clubTokenController != clubTokenController'
+  //     )
+  //   })
 
-    it('should get a clover and start a market', async () => {
-      let _spendAmount = utils.toWei('1')
+  //   it.skip('should get a clover and start a market', async () => {
+  //     let _spendAmount = utils.toWei('1')
 
-      try {
-        tx = await clovers.mint(_curator, _curatorTokenId)
-        console.log(_ + 'clovers.mint - ' + tx.receipt.cumulativeGasUsed)
-        gasToCash(tx.receipt.cumulativeGasUsed)
-        let owner = await clovers.ownerOf(_curatorTokenId)
-        assert(
-          owner.toString() === _curator.toString(),
-          'owner is not curator ' +
-            owner.toString() +
-            '!=' +
-            _curator.toString()
-        )
-      } catch (error) {
-        assert(false, error.message)
-      }
+  //     try {
+  //       tx = await clovers.mint(_curator, _curatorTokenId)
+  //       console.log(_ + 'clovers.mint - ' + tx.receipt.cumulativeGasUsed)
+  //       gasToCash(tx.receipt.cumulativeGasUsed)
+  //       let owner = await clovers.ownerOf(_curatorTokenId)
+  //       assert(
+  //         owner.toString() === _curator.toString(),
+  //         'owner is not curator ' +
+  //           owner.toString() +
+  //           '!=' +
+  //           _curator.toString()
+  //       )
+  //     } catch (error) {
+  //       assert(false, error.message)
+  //     }
 
-      try {
-        let amountToSpend = await getLowestPrice(
-          clubTokenController,
-          _spendAmount
-        )
-        console.log(
-          _ + 'amount to spend is ' + utils.fromWei(amountToSpend.toString())
-        )
-        console.l
-        tx = await curationMarket.addCloverToMarket(
-          _curatorTokenId,
-          _spendAmount,
-          {
-            from: _curator,
-            value: amountToSpend
-          }
-        )
-        console.log(
-          _ +
-            'curationMarket.addCloverToMarket - ' +
-            tx.receipt.cumulativeGasUsed
-        )
-        gasToCash(tx.receipt.cumulativeGasUsed)
+  //     try {
+  //       let amountToSpend = await getLowestPrice(
+  //         clubTokenController,
+  //         _spendAmount
+  //       )
+  //       console.log(
+  //         _ + 'amount to spend is ' + utils.fromWei(amountToSpend.toString())
+  //       )
+  //       console.l
+  //       tx = await curationMarket.addCloverToMarket(
+  //         _curatorTokenId,
+  //         _spendAmount,
+  //         {
+  //           from: _curator,
+  //           value: amountToSpend
+  //         }
+  //       )
+  //       console.log(
+  //         _ +
+  //           'curationMarket.addCloverToMarket - ' +
+  //           tx.receipt.cumulativeGasUsed
+  //       )
+  //       gasToCash(tx.receipt.cumulativeGasUsed)
 
-        // let balance = await curationMarket.balanceOf(_curatorTokenId, _curator);
-        // assert(balance.gt(0), "doesn't own any shares");
-      } catch (error) {
-        assert(false, error.message)
-        assert(false, error.stack)
-      }
-    })
-  })
+  //       // let balance = await curationMarket.balanceOf(_curatorTokenId, _curator);
+  //       // assert(balance.gt(0), "doesn't own any shares");
+  //     } catch (error) {
+  //       assert(false, error.message)
+  //       assert(false, error.stack)
+  //     }
+  //   })
+  // })
 
   describe('SimpleCloversMarket.sol', function() {
     let _tokenId = '666'
     let _seller = accounts[9]
     let _buyer = accounts[8]
     let _price = new web3.BigNumber(utils.toWei('0.5'))
-    it('should have correct contract addresses', async function() {
+    it.skip('should have correct contract addresses', async function() {
       let _clovers = await simpleCloversMarket.clovers()
       assert(
         _clovers === clovers.address,
@@ -524,25 +524,25 @@ contract('Clovers', async function(accounts) {
 
     it('should buy the clover by minting ClubToken before', async () => {
       let buyerBalance = await clubToken.balanceOf(_buyer)
-      let amountToSpend
+      let amountToSpend, tx
       try {
         if (buyerBalance.lt(_price)) {
           amountToSpend = await getLowestPrice(clubTokenController, _price)
-          // tx = await clubTokenController.buy(_buyer, {
-          //   value: amountToSpend
-          // });
-          // console.log(
-          //   _ + "clubTokenController.buy - " + tx.receipt.cumulativeGasUsed
-          // );
-          // gasToCash(tx.receipt.cumulativeGasUsed);
-          // buyerBalance = await clubToken.balanceOf(_buyer);
-          // assert(
-          //   buyerBalance.gte(_price),
-          //   "buyer balance still isn't enough (" +
-          //     buyerBalance.toString() +
-          //     "<" +
-          //     _price.toString()
-          // );
+          tx = await clubTokenController.buy(_buyer, {
+            value: amountToSpend
+          });
+          console.log(
+            _ + "clubTokenController.buy - " + tx.receipt.cumulativeGasUsed
+          );
+          gasToCash(tx.receipt.cumulativeGasUsed);
+          buyerBalance = await clubToken.balanceOf(_buyer);
+          assert(
+            buyerBalance.gte(_price),
+            "buyer balance still isn't enough (" +
+              buyerBalance.toString() +
+              "<" +
+              _price.toString()
+          );
         } else {
           amountToSpend = '0'
         }
@@ -556,10 +556,11 @@ contract('Clovers', async function(accounts) {
           from.toString() === owner.toString(),
           'for sale from wrong person'
         )
+        console.log({from, owner, clovers: clovers.address, amountToSpend: amountToSpend.toString(10), _price: _price.toString(10), buyerBalance: buyerBalance.toString(10)})
 
         tx = await simpleCloversMarket.buy(_tokenId, {
           from: _buyer,
-          value: amountToSpend
+          // value: amountToSpend
         })
         console.log(
           _ + 'simpleCloversMarket.buy - ' + tx.receipt.cumulativeGasUsed
@@ -571,13 +572,14 @@ contract('Clovers', async function(accounts) {
           'buyer was unable to buy'
         )
       } catch (error) {
+        console.log({tx})
         assert(false, error.message)
       }
     })
   })
 
   describe('ClubTokenController.sol', function() {
-    it('should read parameters that were set', async function() {
+    it.skip('should read parameters that were set', async function() {
       let _reserveRatio = await clubTokenController.reserveRatio()
       assert(
         _reserveRatio.toString(10) === reserveRatio,
@@ -606,7 +608,7 @@ contract('Clovers', async function(accounts) {
       )
     })
 
-    it('should mint new tokens', async function() {
+    it.skip('should mint new tokens', async function() {
       let _depositAmount = utils.toWei('1')
       let buyer = accounts[5]
 
@@ -654,7 +656,7 @@ contract('Clovers', async function(accounts) {
           ')'
       )
     })
-    it('should sell the new tokens', async function() {
+    it.skip('should sell the new tokens', async function() {
       let buyer = accounts[5]
       let _depositAmount = utils.toWei('1')
 
@@ -762,7 +764,7 @@ contract('Clovers', async function(accounts) {
       )
     ]
 
-    it('should convert correctly', async function() {
+    it.skip('should convert correctly', async function() {
       let game = await reversi.getGame(_moves)
       let boardUint = await cloversController.convertBytes16ToUint(game[3])
       assert(
@@ -771,7 +773,7 @@ contract('Clovers', async function(accounts) {
       )
     })
 
-    it('should read parameters that were set', async function() {
+    it.skip('should read parameters that were set', async function() {
       let _stakeAmount = await cloversController.stakeAmount()
 
       assert(_stakeAmount.toString() === stakeAmount, 'stake amount not equal')
@@ -804,11 +806,11 @@ contract('Clovers', async function(accounts) {
       }
     })
 
-    it('should make sure can claimClover (keep = true) w valid game, owning no clubToken and approve from oracle', async function() {
+    it.skip('should make sure can claimClover (keep = true) w valid game, owning no clubToken and approve from oracle', async function() {
       await makeFullClaim({ user: accounts[6], buyClubToken: false })
     })
 
-    it('should make sure claimClover (_keep = false) is successful using valid game w/ invalid symmetries', async function() {
+    it.skip('should make sure claimClover (_keep = false) is successful using valid game w/ invalid symmetries', async function() {
       try {
         let options = [
           _moves,
@@ -839,7 +841,7 @@ contract('Clovers', async function(accounts) {
       }
     })
 
-    it('should make sure stake amount was removed from your account', async function() {
+    it.skip('should make sure stake amount was removed from your account', async function() {
       let gasCost = gasSpent * parseInt(gasPrice)
       _balance = web3.eth.getBalance(accounts[0])
       assert(
@@ -865,7 +867,7 @@ contract('Clovers', async function(accounts) {
       assert(!isVerified, 'clover is already verified somehow')
     })
 
-    it('should check the cost of challenging this clover w invalid symmetries', async function() {
+    it.skip('should check the cost of challenging this clover w invalid symmetries', async function() {
       try {
         gasEstimate = await cloversController.challengeClover.estimateGas(
           _tokenId,
@@ -882,7 +884,7 @@ contract('Clovers', async function(accounts) {
       }
     })
 
-    it('should update the stake amount with the gas Estimate from challengeClover', async function() {
+    it.skip('should update the stake amount with the gas Estimate from challengeClover', async function() {
       try {
         newStakeAmount = new web3.BigNumber(gasEstimate).mul(gasPrice).mul(40)
         tx = await cloversController.updateStakeAmount(newStakeAmount, {
@@ -909,7 +911,7 @@ contract('Clovers', async function(accounts) {
       }
     })
 
-    it('should check the stake amount for the token in question', async function() {
+    it.skip('should check the stake amount for the token in question', async function() {
       let _movesHashSol = await cloversController.getMovesHash(_tokenId)
       let currentStake = await cloversController.getStake(_movesHashSol)
       assert(
@@ -921,7 +923,7 @@ contract('Clovers', async function(accounts) {
       )
     })
 
-    it('should make sure it is verified after blocks increase', async function() {
+    it.skip('should make sure it is verified after blocks increase', async function() {
       await increaseBlocks(stakePeriod)
       isVerified = await cloversController.isVerified(_tokenId, {
         from: accounts[1]
@@ -933,7 +935,7 @@ contract('Clovers', async function(accounts) {
       clubBalance = await clubToken.balanceOf(accounts[0])
     })
 
-    it('should make sure retrieveStake tx was successful', async function() {
+    it.skip('should make sure retrieveStake tx was successful', async function() {
       try {
         tx = await cloversController.retrieveStake(_tokenId, { gasPrice })
 
@@ -957,7 +959,7 @@ contract('Clovers', async function(accounts) {
       }
     })
 
-    it('should make sure token exists & is owned by this clovers contract', async function() {
+    it.skip('should make sure token exists & is owned by this clovers contract', async function() {
       try {
         let owner = await clovers.ownerOf(_tokenId)
         assert(
@@ -974,7 +976,7 @@ contract('Clovers', async function(accounts) {
       }
     })
 
-    it('should make sure reward was received', async function() {
+    it.skip('should make sure reward was received', async function() {
       let _clubBalance = await clubToken.balanceOf(accounts[0])
       assert(
         _clubBalance.gt(clubBalance),
@@ -985,7 +987,7 @@ contract('Clovers', async function(accounts) {
       )
     })
 
-    it('should make sure stake amount was retured to your account', async function() {
+    it.skip('should make sure stake amount was retured to your account', async function() {
       gasCost = gasSpent * gasPrice
       _balance = web3.eth.getBalance(accounts[0])
       let result = balance.minus(gasCost)
@@ -1002,7 +1004,7 @@ contract('Clovers', async function(accounts) {
       )
     })
 
-    it('should make sure can claimClover (keep = true) w valid game, while owning enough clubToken and approve from oracle', async function() {
+    it.skip('should make sure can claimClover (keep = true) w valid game, while owning enough clubToken and approve from oracle', async function() {
       await makeFullClaim({ user: accounts[4], buyClubToken: true })
     })
   })
@@ -1205,7 +1207,7 @@ function decodeEventString(hexVal) {
     .map(a =>
       a
         .toLowerCase()
-        .split('')
+        .split.skip('')
         .reduce(
           (result, ch) => result * 16 + '0123456789abcdefgh'.indexOf(ch),
           0

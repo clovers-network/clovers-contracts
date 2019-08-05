@@ -4,7 +4,7 @@ var Clovers = artifacts.require('./Clovers.sol')
 var CloversController = artifacts.require('./CloversController.sol')
 var ClubTokenController = artifacts.require('./ClubTokenController.sol')
 var SimpleCloversMarket = artifacts.require('./SimpleCloversMarket.sol')
-var CurationMarket = artifacts.require('./CurationMarket.sol')
+// var CurationMarket = artifacts.require('./CurationMarket.sol')
 var ClubToken = artifacts.require('./ClubToken.sol')
 
 const gasToCash = require('../helpers/utils').gasToCash
@@ -36,7 +36,7 @@ module.exports = (deployer, network, accounts) => {
       reversi = await Reversi.deployed()
       clovers = await Clovers.deployed()
       clubToken = await ClubToken.deployed()
-      curationMarket = await CurationMarket.deployed()
+      // curationMarket = await CurationMarket.deployed()
       simpleCloversMarket = await SimpleCloversMarket.deployed()
       clubTokenController = await ClubTokenController.deployed()
 
@@ -54,13 +54,13 @@ module.exports = (deployer, network, accounts) => {
       await simpleCloversMarket.updateCloversController(
         cloversController.address
       )
-      await curationMarket.updateCloversController(cloversController.address)
+      // await curationMarket.updateCloversController(cloversController.address)
       await clovers.updateCloversControllerAddress(cloversController.address)
       await clubToken.updateCloversControllerAddress(cloversController.address)
 
       await updateCloversController({
         cloversController,
-        curationMarket,
+        // curationMarket,
         simpleCloversMarket
       })
     } catch (error) {

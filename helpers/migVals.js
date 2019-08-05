@@ -50,7 +50,7 @@ async function deployCloversController({
 }
 async function updateCloversController({
   cloversController,
-  curationMarket,
+  // curationMarket,
   simpleCloversMarket
 }) {
   // Update CloversController.sol
@@ -60,8 +60,8 @@ async function updateCloversController({
   // -w stakeAmount
   // -w stakePeriod
   // -w payMultiplier
-  console.log('cloversController.updateCurationMarket')
-  var tx = await cloversController.updateCurationMarket(curationMarket.address)
+  // console.log('cloversController.updateCurationMarket')
+  // var tx = await cloversController.updateCurationMarket(curationMarket.address)
 
   console.log('cloversController.updateSimpleCloversMarket')
   var tx = await cloversController.updateSimpleCloversMarket(
@@ -89,7 +89,7 @@ async function updateCloversController({
 
 async function updateClubTokenController({
   clubTokenController,
-  curationMarket,
+  // curationMarket,
   simpleCloversMarket
 }) {
   // Update ClubTokenController.sol
@@ -104,10 +104,10 @@ async function updateClubTokenController({
   var tx = await clubTokenController.updateSimpleCloversMarket(
     simpleCloversMarket.address
   )
-  console.log('clubTokenController.updateCurationMarket')
-  var tx = await clubTokenController.updateCurationMarket(
-    curationMarket.address
-  )
+  // console.log('clubTokenController.updateCurationMarket')
+  // var tx = await clubTokenController.updateCurationMarket(
+  //   curationMarket.address
+  // )
 
   console.log('clubTokenController.updateReserveRatio')
   var tx = await clubTokenController.updateReserveRatio(vals.reserveRatio)

@@ -4,7 +4,7 @@ var Clovers = artifacts.require('./Clovers.sol')
 var CloversController = artifacts.require('./CloversController.sol')
 var ClubTokenController = artifacts.require('./ClubTokenController.sol')
 var SimpleCloversMarket = artifacts.require('./SimpleCloversMarket.sol')
-var CurationMarket = artifacts.require('./CurationMarket.sol')
+// var CurationMarket = artifacts.require('./CurationMarket.sol')
 var ClubToken = artifacts.require('./ClubToken.sol')
 
 const gasToCash = require('../helpers/utils').gasToCash
@@ -51,33 +51,33 @@ module.exports = (deployer, network, accounts) => {
       // -w CloversController address
       // -w ClubToken address
       // -w ClubTokenController address
-      await deployer.deploy(
-        CurationMarket,
-        virtualSupplyCM,
-        virtualBalanceCM,
-        reserveRatio,
-        clovers.address,
-        cloversController.address,
-        clubToken.address,
-        clubTokenController.address,
-        { overwrite }
-      )
-      curationMarket = await CurationMarket.deployed()
+      // await deployer.deploy(
+      //   CurationMarket,
+      //   virtualSupplyCM,
+      //   virtualBalanceCM,
+      //   reserveRatio,
+      //   clovers.address,
+      //   cloversController.address,
+      //   clubToken.address,
+      //   clubTokenController.address,
+      //   { overwrite }
+      // )
+      // curationMarket = await CurationMarket.deployed()
       if (!overwrite) {
-        console.log('curationMarket.updateVirtualSupply')
-        var tx = await curationMarket.updateVirtualSupply(virtualSupplyCM)
+        // console.log('curationMarket.updateVirtualSupply')
+        // var tx = await curationMarket.updateVirtualSupply(virtualSupplyCM)
 
-        console.log('curationMarket.updateVirtualBalanceCM')
-        var tx = await curationMarket.updateVirtualBalance(virtualBalanceCM)
+        // console.log('curationMarket.updateVirtualBalanceCM')
+        // var tx = await curationMarket.updateVirtualBalance(virtualBalanceCM)
       } else {
-        console.log('clubTokenController.updateCurationMarket')
-        var tx = await clubTokenController.updateCurationMarket(
-          curationMarket.address
-        )
-        console.log('cloversController.updateCurationMarket')
-        var tx = await cloversController.updateCurationMarket(
-          curationMarket.address
-        )
+        // console.log('clubTokenController.updateCurationMarket')
+        // var tx = await clubTokenController.updateCurationMarket(
+        //   curationMarket.address
+        // )
+        // console.log('cloversController.updateCurationMarket')
+        // var tx = await cloversController.updateCurationMarket(
+        //   curationMarket.address
+        // )
       }
     } catch (error) {
       console.log(error)

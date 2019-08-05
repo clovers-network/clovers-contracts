@@ -4,7 +4,7 @@ var Clovers = artifacts.require('./Clovers.sol')
 var CloversController = artifacts.require('./CloversController.sol')
 var ClubTokenController = artifacts.require('./ClubTokenController.sol')
 var SimpleCloversMarket = artifacts.require('./SimpleCloversMarket.sol')
-var CurationMarket = artifacts.require('./CurationMarket.sol')
+// var CurationMarket = artifacts.require('./CurationMarket.sol')
 var ClubToken = artifacts.require('./ClubToken.sol')
 const Reversi = require('clovers-reversi').default
 
@@ -41,7 +41,7 @@ module.exports = (deployer, network, accounts) => {
 
       clubToken = await ClubToken.deployed()
       clubTokenController = await ClubTokenController.deployed()
-      curationMarket = await CurationMarket.deployed()
+      // curationMarket = await CurationMarket.deployed()
       simpleCloversMarket = await SimpleCloversMarket.deployed()
 
       let user = accounts[6]
@@ -105,24 +105,24 @@ module.exports = (deployer, network, accounts) => {
           console.log(error)
         }
       }
-      if ((await clovers.ownerOf(tokenId)) === accounts[0].toLowerCase()) {
-        console.log('is owner')
-        await curationMarket.addCloverToMarket(tokenId, '0')
-      } else {
-        console.log('is not ownder')
-      }
-      let value = await getLowestPrice(curationMarket, oneGwei, tokenId)
-      console.log(
-        'must spend ' + value.toString(16) + ' to buy ' + oneGwei.toString(16)
-      )
-      // function buy(address _to, uint256 _tokenId, uint256 _spendAmount) public payable
-      await curationMarket.buy(accounts[0], tokenId, oneGwei, {
-        value
-      })
+      // if ((await clovers.ownerOf(tokenId)) === accounts[0].toLowerCase()) {
+      //   console.log('is owner')
+      //   await curationMarket.addCloverToMarket(tokenId, '0')
+      // } else {
+      //   console.log('is not ownder')
+      // }
+      // let value = await getLowestPrice(curationMarket, oneGwei, tokenId)
+      // console.log(
+      //   'must spend ' + value.toString(16) + ' to buy ' + oneGwei.toString(16)
+      // )
+      // // function buy(address _to, uint256 _tokenId, uint256 _spendAmount) public payable
+      // await curationMarket.buy(accounts[0], tokenId, oneGwei, {
+      //   value
+      // })
 
-      let balanceOf = await curationMarket.balanceOf(tokenId, accounts[0])
-      await curationMarket.sell(tokenId, balanceOf)
-      // function sell(uint256 _tokenId, uint256 sellAmount) public
+      // let balanceOf = await curationMarket.balanceOf(tokenId, accounts[0])
+      // await curationMarket.sell(tokenId, balanceOf)
+      // // function sell(uint256 _tokenId, uint256 sellAmount) public
     } catch (error) {
       console.log(error)
     }
