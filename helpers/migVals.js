@@ -13,6 +13,7 @@ var vals = (module.exports = {
   payMultiplier: utils.toWei('0.1'),
   priceMultiplier: '10',
   basePrice: utils.toWei('1'),
+  paused: false,
 
   decimals: '18',
   oracle: '0xb20fbdc70c19d0ebcee204d32e1828fca9c2fb09',
@@ -117,6 +118,10 @@ async function updateClubTokenController({
 
   console.log('clubTokenController.updateVirtualBalance')
   var tx = await clubTokenController.updateVirtualBalance(vals.virtualBalance)
+
+  console.log('clubTokenController.updatePaused')
+  var tx = await clubTokenController.updatePaused(vals.paused)
+
   //
   // let poolBalance = await web3.eth.getBalance(clubToken.address)
   // console.log('poolBalance is ' + poolBalance.toString())

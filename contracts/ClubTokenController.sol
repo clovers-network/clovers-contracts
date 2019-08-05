@@ -33,8 +33,8 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
         buy(msg.sender);
     }
 
-    modifier isPaused() {
-        if (paused && msg.sender != owner) revert("contract paused");
+    modifier notPaused() {
+        require(!paused || msg.sender != owner, "Contract must not be paused");
         _;
     }
 
@@ -70,7 +70,7 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
             sellAmount);
     }
 
-    function setPaused(bool _paused) public onlyOwner {
+    function updatePaused(bool _paused) public onlyOwner {
         paused = _paused;
     }
 
@@ -136,7 +136,7 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
     /**
     * @dev donate Donate Eth to the poolBalance without increasing the totalSupply
     */
-    function donate() public payable isPaused {
+    function donate() public payable {
         require(msg.value > 0);
         /* poolBalance = safeAdd(poolBalance, msg.value); */
         clubToken.transfer(msg.value);
@@ -156,7 +156,7 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
     * @dev buy Buy ClubTokens with Eth
     * @param buyer The address that should receive the new tokens
     */
-    function buy(address buyer) public payable isPaused returns(bool) {
+    function buy(address buyer) public payable notPaused returns(bool) {
         require(msg.value > 0);
         uint256 tokens = getBuy(msg.value);
         require(tokens > 0);
@@ -171,7 +171,7 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
     * @dev sell Sell ClubTokens for Eth
     * @param sellAmount The amount of tokens to sell
     */
-    function sell(uint256 sellAmount) public isPaused returns(bool) {
+    function sell(uint256 sellAmount) public notPaused returns(bool) {
         require(sellAmount > 0);
         require(IClubToken(clubToken).balanceOf(msg.sender) >= sellAmount);
         uint256 saleReturn = getSell(sellAmount);
