@@ -16,9 +16,9 @@ var vals = (module.exports = {
 
   decimals: '18',
   oracle: '0xb20fbdc70c19d0ebcee204d32e1828fca9c2fb09',
-  reserveRatio: '333333', // parts per million 500000 / 1000000 = 1/2
-  virtualBalance: utils.toWei('33'),
-  virtualSupply: utils.toWei('100000'),
+  reserveRatio: '750000', // parts per million 500000 / 1000000 = 1/2
+  virtualBalance: utils.toWei('10'),
+  virtualSupply: utils.toWei('10000'),
   virtualBalanceCM: utils.toWei('33333'),
   virtualSupplyCM: utils.toWei('100000'),
   updateCloversController,

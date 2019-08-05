@@ -70,7 +70,12 @@ contract SimpleCloversMarket is Ownable {
         if(IClubToken(clubToken).balanceOf(msg.sender) < sellPrice) {
             IClubTokenController(clubTokenController).buy.value(msg.value)(msg.sender);
         }
-        IClubTokenController(clubTokenController).transferFrom(msg.sender, sellFrom, sellPrice);
+        // if seller is Clovers Contract, burn the money
+        if (sellFrom == clovers) {
+            IClubTokenController(clubTokenController).burn(msg.sender, sellPrice);
+        } else {
+            IClubTokenController(clubTokenController).transferFrom(msg.sender, sellFrom, sellPrice);
+        }
         ICloversController(cloversController).transferFrom(sellFrom, msg.sender, _tokenId);
         delete(sells[_tokenId]);
         updatePrice(_tokenId, 0);

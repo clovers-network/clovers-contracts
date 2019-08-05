@@ -142,6 +142,11 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
         clubToken.transfer(msg.value);
     }
 
+    function burn(address from, uint256 amount) public {
+        require(msg.sender == simpleCloversMarket);
+        IClubToken(clubToken).burn(from, amount);
+    }
+
     function transferFrom(address from, address to, uint256 amount) public {
         require(msg.sender == simpleCloversMarket || msg.sender == curationMarket);
         IClubToken(clubToken).transferFrom(from, to, amount);
