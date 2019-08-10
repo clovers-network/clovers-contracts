@@ -1,7 +1,6 @@
 pragma solidity ^0.4.18;
 
 import "./ClubTokenController.sol";
-import "./ClubToken.sol";
 
 contract Support {
     function() public payable {
@@ -78,7 +77,7 @@ contract Support {
 
     function makeBuy() public onlyOwner isNotDone isNotActive{
         bondingCurve.buy.value(address(this).balance)(address(this));
-        totalTokens = ClubToken(bondingCurve.clubToken()).balanceOf(address(this));
+        totalTokens = IClubToken(bondingCurve.clubToken()).balanceOf(address(this));
         remainingTokens = totalTokens;
         done = true;
     }
@@ -91,6 +90,6 @@ contract Support {
             percentage = remainingTokens;
         }
         remainingTokens = remainingTokens - percentage;
-        ClubToken(bondingCurve.clubToken()).transferFrom(address(this), msg.sender, percentage);
+        IClubToken(bondingCurve.clubToken()).transferFrom(address(this), msg.sender, percentage);
     }
 }

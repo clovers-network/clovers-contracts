@@ -48,7 +48,7 @@ module.exports = (deployer, network, accounts) => {
       // Deploy Clovers.sol (NFT)
       // -w NFT name
       // -w NFT symbol
-      await deployer.deploy(Clovers, 'Clovers', 'CLVR', {
+      await deployer.deploy(Clovers, 'Clovers', 'CLV', {
         overwrite: overwrites['Clovers']
       })
       clovers = await Clovers.deployed()
@@ -70,7 +70,7 @@ module.exports = (deployer, network, accounts) => {
       // -w ERC20 name
       // -w ERC20 symbol
       // -w ERC20 decimals
-      await deployer.deploy(ClubToken, 'ClubToken', 'CLB', decimals, {
+      await deployer.deploy(ClubToken, 'CloverCoin', 'CLC', decimals, {
         overwrite: overwrites['ClubToken']
       })
       clubToken = await ClubToken.deployed()

@@ -6,9 +6,9 @@ pragma experimental ABIEncoderV2;
  * with upgradeable contract reference for returning metadata.
  */
 
-import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
-import "zeppelin-solidity/contracts/token/ERC721/ERC721Token.sol";
-import "zeppelin-solidity/contracts/ownership/Ownable.sol";
+import "../node_modules/zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "../node_modules/zeppelin-solidity/contracts/token/ERC721/ERC721Token.sol";
+import "../node_modules/zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./IClovers.sol";
 import "./CloversMetadata.sol";
 

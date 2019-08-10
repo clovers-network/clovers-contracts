@@ -405,9 +405,9 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.4.18;\npragma experimental ABIEncoderV2;\n\n/**\n * The Clovers contract is the interface for the CloversController Contract\n */\n\n\ncontract ICloversController {\n\n    event cloverCommitted(bytes32 movesHash, address owner);\n    event cloverClaimed(bytes28[2] moves, uint256 tokenId, address owner, uint stake, uint reward, uint256 symmetries);\n    event stakeRetrieved(uint256 tokenId, address owner);\n    event cloverChallenged(bytes28[2] moves, uint256 tokenId, address owner, address challenger, uint stake);\n\n    function basePrice() public constant returns(uint256);\n    function priceMultiplier() public constant returns(uint256);\n    function isValid(bytes28[2] moves) public constant returns (bool);\n    function isVerified(uint256 _tokenId) public constant returns (bool);\n    function calculateReward(uint256 _symmetries) public constant returns (uint256);\n    function getCommit(bytes32 movesHash) public view returns (address);\n    function getStake(bytes32 movesHash) public view returns (uint256);\n    function transferFrom(address _from, address _to, uint256 _tokenId) public;\n\n    function claimClover(bytes28[2] moves, uint256 _tokenId, uint256 _symmetries, address _to) public payable returns (bool);\n    function claimCloverCommit(bytes32 movesHash, address _to) public payable returns (bool);\n    function claimCloverReveal(bytes28[2] moves, uint256 _tokenId, uint256 _symmetries) public returns (bool);\n    function retrieveStake(uint256 _tokenId, bool _keep, uint256 _amountToPayToKeep) public payable returns (bool);\n    function buyCloverFromContract(uint256 _tokenId) public payable returns(bool);\n    function challengeClover(uint256 _tokenId, address _to) public returns (bool);\n\n}\n",
-  "sourcePath": "/home/billyrennekamp/GitHub.com/clovers-network/clovers-contracts/contracts/ICloversController.sol",
+  "sourcePath": "/home/billy/GitHub.com/clovers-network/clovers-contracts/contracts/ICloversController.sol",
   "ast": {
-    "absolutePath": "/home/billyrennekamp/GitHub.com/clovers-network/clovers-contracts/contracts/ICloversController.sol",
+    "absolutePath": "/home/billy/GitHub.com/clovers-network/clovers-contracts/contracts/ICloversController.sol",
     "exportedSymbols": {
       "ICloversController": [
         3468
@@ -2424,7 +2424,7 @@
     "src": "0:1723:6"
   },
   "legacyAST": {
-    "absolutePath": "/home/billyrennekamp/GitHub.com/clovers-network/clovers-contracts/contracts/ICloversController.sol",
+    "absolutePath": "/home/billy/GitHub.com/clovers-network/clovers-contracts/contracts/ICloversController.sol",
     "exportedSymbols": {
       "ICloversController": [
         3468
@@ -4446,5 +4446,5 @@
   },
   "networks": {},
   "schemaVersion": "2.0.1",
-  "updatedAt": "2019-08-10T10:58:15.798Z"
+  "updatedAt": "2019-08-10T12:32:14.735Z"
 }

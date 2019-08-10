@@ -11,9 +11,9 @@ import "./IClubToken.sol";
 import "./ICloversController.sol";
 import "./IClubTokenController.sol";
 import "./ISimpleCloversMarket.sol";
-import "zeppelin-solidity/contracts/ownership/HasNoTokens.sol";
-import "zeppelin-solidity/contracts/ownership/HasNoEther.sol";
-import "zeppelin-solidity/contracts/math/SafeMath.sol";
+import "../node_modules/zeppelin-solidity/contracts/ownership/HasNoTokens.sol";
+import "../node_modules/zeppelin-solidity/contracts/ownership/HasNoEther.sol";
+import "../node_modules/zeppelin-solidity/contracts/math/SafeMath.sol";
 
 
 contract CloversController is HasNoEther, HasNoTokens {
