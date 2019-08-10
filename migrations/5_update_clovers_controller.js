@@ -28,6 +28,7 @@ var {
 } = require('../helpers/migVals')
 
 module.exports = (deployer, network, accounts) => {
+  return
   deployer.then(async () => {
     if (network === 'test') return
     try {

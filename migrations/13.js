@@ -2,7 +2,7 @@ var Clovers = artifacts.require('./Clovers.sol')
 var SimpleCloversMarket = artifacts.require('./SimpleCloversMarket.sol')
 // var CloversController = artifacts.require('./CloversController.sol')
 // var ethers = require('ethers')
-var start = 381
+var start = 1355
 // var Reversi = require('../app/src/assets/reversi.js')
 // var Reversi = require('clovers-reversi').default
 // var Web3 = require('web3')
@@ -63,7 +63,7 @@ module.exports = async function(deployer, network, accounts) {
       // var _web3 = new Web3(web3Provider)
 
       var getCloversCount = await clovers.totalSupply()
-      await doFors(1000, start, i => {
+      await doFors(2000, start, i => {
         console.log(i + '/' + getCloversCount.toNumber())
         return new Promise(async (resolve, reject) => {
           try {
@@ -109,7 +109,7 @@ module.exports = async function(deployer, network, accounts) {
             let clover = {
                 tokenId: tokenId.toString(16), owner, keep, blockMinted, cloverMoves, reward, symmetries, hash, price
             }
-            const cloverPath = __dirname + '/../clovers/raw-1.json'
+            const cloverPath = __dirname + '/../clovers/raw-2.json'
             var allCloversString = fs.readFileSync(cloverPath).toString()
             var allCloversJSON
             try {

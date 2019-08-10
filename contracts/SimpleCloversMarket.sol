@@ -57,7 +57,11 @@ contract SimpleCloversMarket is Ownable {
 
     function sell(uint256 _tokenId, uint256 price) public {
         require(price > 0);
-        require(IClovers(clovers).ownerOf(_tokenId) == msg.sender || msg.sender == cloversController);
+        address tokenOwner = IClovers(clovers).ownerOf(_tokenId);
+        require(tokenOwner == msg.sender || tokenOwner == clovers || msg.sender == cloversController);
+        if (tokenOwner == clovers) {
+            require(sells[_tokenId].price == 0);
+        }
         sells[_tokenId].price = price;
         sells[_tokenId].from = IClovers(clovers).ownerOf(_tokenId);
         updatePrice(_tokenId, price);

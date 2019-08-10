@@ -27,6 +27,7 @@ var {
 } = require('../helpers/migVals')
 // const Rev = require('clovers-reversi')
 module.exports = (deployer, network, accounts) => {
+  return
   if (network === 'test') return
   deployer.then(async () => {
     try {

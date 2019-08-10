@@ -8,7 +8,7 @@ var ClubTokenController = require("./build/contracts/ClubTokenController.json");
 // var ICloversController = require("./build/contracts/ICloversController.json");
 // var Reversi = require("./build/contracts/Reversi.json");
 var SimpleCloversMarket = require("./build/contracts/SimpleCloversMarket.json");
-var CurationMarket = require("./build/contracts/CurationMarket.json");
+// var CurationMarket = require("./build/contracts/CurationMarket.json");
 
 Clovers = {
   abi: Clovers.abi,
@@ -30,10 +30,10 @@ SimpleCloversMarket = {
   abi: SimpleCloversMarket.abi,
   networks: SimpleCloversMarket.networks
 }
-CurationMarket = {
-  abi: CurationMarket.abi,
-  networks: CurationMarket.networks
-}
+// CurationMarket = {
+//   abi: CurationMarket.abi,
+//   networks: CurationMarket.networks
+// }
 let printable = `module.exports = {
   Clovers: ${JSON.stringify(Clovers)},
   CloversController: ${JSON.stringify(CloversController)},

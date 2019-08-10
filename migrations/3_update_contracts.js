@@ -1,4 +1,5 @@
 var Reversi = artifacts.require('./Reversi.sol')
+var Support = artifacts.require('./Support.sol')
 var Clovers = artifacts.require('./Clovers.sol')
 var CloversMetadata = artifacts.require('./CloversMetadata.sol')
 var CloversController = artifacts.require('./CloversController.sol')
@@ -36,6 +37,7 @@ module.exports = (deployer, network, accounts) => {
       cloversMetadata = await CloversMetadata.deployed()
       clubToken = await ClubToken.deployed()
       reversi = await Reversi.deployed()
+      support = await Support.deployed()
       clubTokenController = await ClubTokenController.deployed()
       cloversController = await CloversController.deployed()
       simpleCloversMarket = await SimpleCloversMarket.deployed()
@@ -76,7 +78,8 @@ module.exports = (deployer, network, accounts) => {
       await updateClubTokenController({
         clubTokenController,
         // curationMarket,
-        simpleCloversMarket
+        simpleCloversMarket,
+        support
       })
     } catch (error) {
       console.log(error)

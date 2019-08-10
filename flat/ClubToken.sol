@@ -1,6 +1,8 @@
-pragma solidity ^0.4.24;
 
 // File: zeppelin-solidity/contracts/token/ERC20/ERC20Basic.sol
+
+pragma solidity ^0.4.24;
+
 
 /**
  * @title ERC20Basic
@@ -15,6 +17,9 @@ contract ERC20Basic {
 }
 
 // File: zeppelin-solidity/contracts/math/SafeMath.sol
+
+pragma solidity ^0.4.24;
+
 
 /**
  * @title SafeMath
@@ -68,6 +73,11 @@ library SafeMath {
 
 // File: zeppelin-solidity/contracts/token/ERC20/BasicToken.sol
 
+pragma solidity ^0.4.24;
+
+
+
+
 /**
  * @title Basic token
  * @dev Basic version of StandardToken, with no allowances.
@@ -114,6 +124,10 @@ contract BasicToken is ERC20Basic {
 
 // File: zeppelin-solidity/contracts/token/ERC20/ERC20.sol
 
+pragma solidity ^0.4.24;
+
+
+
 /**
  * @title ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/20
@@ -134,6 +148,11 @@ contract ERC20 is ERC20Basic {
 }
 
 // File: zeppelin-solidity/contracts/token/ERC20/StandardToken.sol
+
+pragma solidity ^0.4.24;
+
+
+
 
 /**
  * @title Standard ERC20 token
@@ -256,6 +275,10 @@ contract StandardToken is ERC20, BasicToken {
 
 // File: zeppelin-solidity/contracts/token/ERC20/DetailedERC20.sol
 
+pragma solidity ^0.4.24;
+
+
+
 /**
  * @title DetailedERC20 token
  * @dev The decimals are only for visualization purposes.
@@ -275,6 +298,9 @@ contract DetailedERC20 is ERC20 {
 }
 
 // File: zeppelin-solidity/contracts/ownership/Ownable.sol
+
+pragma solidity ^0.4.24;
+
 
 /**
  * @title Ownable
@@ -340,6 +366,11 @@ contract Ownable {
 
 // File: zeppelin-solidity/contracts/token/ERC20/MintableToken.sol
 
+pragma solidity ^0.4.24;
+
+
+
+
 /**
  * @title Mintable token
  * @dev Simple ERC20 Token example, with mintable token creation
@@ -397,6 +428,10 @@ contract MintableToken is StandardToken, Ownable {
 
 // File: zeppelin-solidity/contracts/token/ERC20/BurnableToken.sol
 
+pragma solidity ^0.4.24;
+
+
+
 /**
  * @title Burnable Token
  * @dev Token that can be irreversibly burned (destroyed).
@@ -427,6 +462,8 @@ contract BurnableToken is BasicToken {
 
 // File: contracts/IClubToken.sol
 
+pragma solidity ^0.4.18;
+
 /**
  * Interface for ERC20 Club Token
  */
@@ -452,6 +489,8 @@ contract IClubToken {
 }
 
 // File: contracts/ClubToken.sol
+
+pragma solidity ^0.4.18;
 
 /**
  * ClubToken adheres to ERC20

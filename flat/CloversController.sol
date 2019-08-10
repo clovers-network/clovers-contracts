@@ -1,8 +1,7 @@
-pragma solidity ^0.4.24;
 
 // File: contracts/Reversi.sol
 
-/* pragma experimental ABIEncoderV2; */
+pragma solidity ^0.4.18;
 
 library Reversi {
     // event DebugBool(bool boolean);
@@ -34,27 +33,27 @@ library Reversi {
 
 
     function isValid (bytes28[2] moves) public pure returns (bool) {
-      Game memory game = playGame(moves);
-      if (game.error) {
-        return false;
-      } else if (!game.complete) {
-        return false;
-      } else {
-        return true;
-      }
+        Game memory game = playGame(moves);
+        if (game.error) {
+            return false;
+        } else if (!game.complete) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     function getGame (bytes28[2] moves) public pure returns (bool error, bool complete, bool symmetrical, bytes16 board, uint8 currentPlayer, uint8 moveKey) {
       Game memory game = playGame(moves);
-      return (
-         game.error,
-         game.complete,
-         game.symmetrical,
-         game.board,
-         game.currentPlayer,
-         game.moveKey
-         // game.msg
-      );
+        return (
+            game.error,
+            game.complete,
+            game.symmetrical,
+            game.board,
+            game.currentPlayer,
+            game.moveKey
+            // game.msg
+        );
     }
 
     function showColors () public pure returns(uint8, uint8, uint8) {
@@ -372,7 +371,7 @@ library Reversi {
 
     // Utilities
 
-    function returnSymmetricals (bool RotSym, bool Y0Sym, bool X0Sym, bool XYSym, bool XnYSym) public constant returns (uint256) {
+    function returnSymmetricals (bool RotSym, bool Y0Sym, bool X0Sym, bool XYSym, bool XnYSym) public view returns (uint256) {
         uint256 symmetries = (RotSym ? 1  : 0) << 1;
         symmetries = (symmetries & (Y0Sym ? 1 : 0)) << 1;
         symmetries = (symmetries & (X0Sym ? 1 : 0)) << 1;
@@ -437,6 +436,8 @@ library Reversi {
 }
 
 // File: contracts/IClovers.sol
+
+pragma solidity ^0.4.18;
 
 /**
  * Interface for Digital Asset Registry for the Non Fungible Token Clover
@@ -516,6 +517,8 @@ contract IClovers {
 
 // File: contracts/IClubToken.sol
 
+pragma solidity ^0.4.18;
+
 /**
  * Interface for ERC20 Club Token
  */
@@ -542,7 +545,7 @@ contract IClubToken {
 
 // File: contracts/ICloversController.sol
 
-pragma experimental ABIEncoderV2;
+pragma solidity ^0.4.18;
 
 /**
  * The Clovers contract is the interface for the CloversController Contract
@@ -576,6 +579,8 @@ contract ICloversController {
 
 // File: contracts/IClubTokenController.sol
 
+pragma solidity ^0.4.18;
+
 /**
  * The Clovers contract is the interface for the CloversController Contract
  */
@@ -583,16 +588,22 @@ contract ICloversController {
 
 contract IClubTokenController {
     function buy(address buyer) public payable returns(bool);
+    function burn(address from, uint256 amount) public;
     function transferFrom(address from, address to, uint256 amount) public;
 }
 
 // File: contracts/ISimpleCloversMarket.sol
+
+pragma solidity ^0.4.24;
 
 contract ISimpleCloversMarket {
     function sell(uint256 _tokenId, uint256 price) public;
 }
 
 // File: zeppelin-solidity/contracts/ownership/Ownable.sol
+
+pragma solidity ^0.4.24;
+
 
 /**
  * @title Ownable
@@ -658,6 +669,9 @@ contract Ownable {
 
 // File: zeppelin-solidity/contracts/token/ERC20/ERC20Basic.sol
 
+pragma solidity ^0.4.24;
+
+
 /**
  * @title ERC20Basic
  * @dev Simpler version of ERC20 interface
@@ -671,6 +685,10 @@ contract ERC20Basic {
 }
 
 // File: zeppelin-solidity/contracts/token/ERC20/ERC20.sol
+
+pragma solidity ^0.4.24;
+
+
 
 /**
  * @title ERC20 interface
@@ -692,6 +710,11 @@ contract ERC20 is ERC20Basic {
 }
 
 // File: zeppelin-solidity/contracts/token/ERC20/SafeERC20.sol
+
+pragma solidity ^0.4.24;
+
+
+
 
 /**
  * @title SafeERC20
@@ -722,6 +745,12 @@ library SafeERC20 {
 
 // File: zeppelin-solidity/contracts/ownership/CanReclaimToken.sol
 
+pragma solidity ^0.4.24;
+
+
+
+
+
 /**
  * @title Contracts that should be able to recover tokens
  * @author SylTi
@@ -743,6 +772,10 @@ contract CanReclaimToken is Ownable {
 }
 
 // File: zeppelin-solidity/contracts/ownership/HasNoTokens.sol
+
+pragma solidity ^0.4.24;
+
+
 
 /**
  * @title Contracts that should not own Tokens
@@ -769,6 +802,10 @@ contract HasNoTokens is CanReclaimToken {
 }
 
 // File: zeppelin-solidity/contracts/ownership/HasNoEther.sol
+
+pragma solidity ^0.4.24;
+
+
 
 /**
  * @title Contracts that should not own Ether
@@ -808,6 +845,9 @@ contract HasNoEther is Ownable {
 }
 
 // File: zeppelin-solidity/contracts/math/SafeMath.sol
+
+pragma solidity ^0.4.24;
+
 
 /**
  * @title SafeMath
@@ -861,7 +901,7 @@ library SafeMath {
 
 // File: contracts/CloversController.sol
 
-pragma experimental ABIEncoderV2;
+pragma solidity ^0.4.18;
 
 /**
  * The CloversController is a replaceable endpoint for minting and unminting Clovers.sol and ClubToken.sol
@@ -890,6 +930,7 @@ contract CloversController is HasNoEther, HasNoTokens {
     address public clubToken;
     address public clubTokenController;
     address public simpleCloversMarket;
+    address public curationMarket;
 
     uint256 public basePrice;
     uint256 public priceMultiplier;
@@ -941,17 +982,18 @@ contract CloversController is HasNoEther, HasNoTokens {
     */
     function isValid(bytes28[2] moves) public constant returns (bool) {
         Reversi.Game memory game = Reversi.playGame(moves);
-        return isValidGame(game);
+        return isValidGame(game.error, game.complete);
     }
 
     /**
     * @dev Checks whether the game is valid.
-    * @param game The pre-played game.
+    * @param error The pre-played game error
+    * @param complete The pre-played game complete boolean
     * @return A boolean representing whether or not the game is valid.
     */
-    function isValidGame(Reversi.Game game) public pure returns (bool) {
-        if (game.error) return false;
-        if (!game.complete) return false;
+    function isValidGame(bool error, bool complete) public pure returns (bool) {
+        if (error) return false;
+        if (!complete) return false;
         return true;
     }
     /**
@@ -995,7 +1037,7 @@ contract CloversController is HasNoEther, HasNoTokens {
     // NOTE: Disabled to reduce contract size
     function instantClaimClover(bytes28[2] moves, bool _keep) public payable returns (bool) {
         Reversi.Game memory game = Reversi.playGame(moves);
-        require(isValidGame(game));
+        require(isValidGame(game.error, game.complete));
         uint256 tokenId = uint256(game.board);
         require(IClovers(clovers).getBlockMinted(tokenId) == 0);
         require(!IClovers(clovers).exists(tokenId));
@@ -1014,7 +1056,7 @@ contract CloversController is HasNoEther, HasNoTokens {
             // If the user decides to keep the Clover, they must
             // pay for it in club tokens according to the reward price.
             if (IClubToken(clubToken).balanceOf(msg.sender) < reward) {
-                IClubTokenController(clubTokenController).buy(msg.sender); // msg.value needs to be enough to buy "reward" amount of Club Token
+                IClubTokenController(clubTokenController).buy.value(msg.value)(msg.sender); // msg.value needs to be enough to buy "reward" amount of Club Token
             }
             if (reward > 0) {
                 // IClubToken(clubToken).transferFrom(msg.sender, clubToken, reward); // if we'd rather keep the money
@@ -1033,6 +1075,9 @@ contract CloversController is HasNoEther, HasNoTokens {
 
     } */
 
+    function getPrice(uint256 _symmetries) public constant returns(uint256) {
+        return basePrice.add(calculateReward(_symmetries));
+    }
 
     /**
     * @dev Claim the Clover without a commit or reveal. Payable so you can attach enough for the stake,
@@ -1044,6 +1089,8 @@ contract CloversController is HasNoEther, HasNoTokens {
     * @return A boolean representing whether or not the claim was successful.
     */
     function claimClover(bytes28[2] moves, uint256 _tokenId, uint256 _symmetries, bool _keep) public payable returns (bool) {
+        emit cloverClaimed(moves, _tokenId, msg.sender, _tokenId, _tokenId, _symmetries, _keep);
+
         bytes32 movesHash = keccak256(moves);
 
         require(msg.value >= stakeAmount);
@@ -1075,14 +1122,13 @@ contract CloversController is HasNoEther, HasNoTokens {
             // If the user decides to keep the Clover, they must
             // pay for it in club tokens according to the reward price.
             if (IClubToken(clubToken).balanceOf(msg.sender) < price) {
-                IClubTokenController(clubTokenController).buy(msg.sender);
+                IClubTokenController(clubTokenController).buy.value(msg.value.sub(stakeAmount))(msg.sender);
             }
-            IClubToken(clubToken).transferFrom(msg.sender, clovers, price);
-            /* IClubToken(clubToken).burn(committer, price); */
+            require(IClubToken(clubToken).transferFrom(msg.sender, clovers, price));
+            // IClubToken(clubToken).burn(committer, price);
         }
         IClovers(clovers).mint(clovers, _tokenId);
         emit cloverClaimed(moves, _tokenId, msg.sender, stakeAmount, reward, _symmetries, _keep);
-
         return true;
     }
     /**
@@ -1154,8 +1200,7 @@ contract CloversController is HasNoEther, HasNoTokens {
         uint256 stake = getStake(movesHash);
         addSymmetries(_tokenId);
         address committer = getCommit(movesHash);
-        require(msg.sender == committer);
-
+        require(committer == msg.sender || msg.sender == owner || msg.sender == oracle);
         uint256 reward = IClovers(clovers).getReward(_tokenId);
         bool _keep = IClovers(clovers).getKeep(_tokenId);
 
@@ -1173,9 +1218,9 @@ contract CloversController is HasNoEther, HasNoTokens {
             }
         }
         if (stake > 0) {
-            IClovers(clovers).moveEth(committer, stake);
+            IClovers(clovers).moveEth(msg.sender, stake);
         }
-        emit stakeRetrieved(_tokenId, committer, stake);
+        emit stakeRetrieved(_tokenId, msg.sender, stake);
         return true;
     }
 
@@ -1205,7 +1250,7 @@ contract CloversController is HasNoEther, HasNoTokens {
             if(convertBytes16ToUint(game.board) != _tokenId) {
                 valid = false;
             }
-            if(valid && isValidGame(game)) {
+            if(valid && isValidGame(game.error, game.complete)) {
                 uint256 _symmetries = IClovers(clovers).getSymmetries(_tokenId);
                 valid = (_symmetries >> 4 & 1) > 0 == game.RotSym ? valid : false;
                 valid = (_symmetries >> 3 & 1) > 0 == game.Y0Sym ? valid : false;
@@ -1243,10 +1288,17 @@ contract CloversController is HasNoEther, HasNoTokens {
     * @param _tokenId The Clover
     */
     function transferFrom(address _from, address _to, uint256 _tokenId) public {
-        require(msg.sender == simpleCloversMarket);
+        require(msg.sender == simpleCloversMarket || msg.sender == curationMarket);
         IClovers(clovers).transferFrom(_from, _to, _tokenId);
     }
 
+    /**
+    * @dev Updates curationMarket Address.
+    * @param _curationMarket The new curationMarket Address.
+    */
+    function updateCurationMarket(address _curationMarket) public onlyOwner {
+        curationMarket = _curationMarket;
+    }
     /**
     * @dev Updates oracle Address.
     * @param _oracle The new oracle Address.

@@ -53,6 +53,18 @@ contract Support {
         whitelist[whitelisted] = true;
     }
 
+    function onWhitelist(address whitelisted) public view returns(bool) {
+        return whitelist[whitelisted];
+    }
+
+    function hasWithdrawn(address whitelisted) public view returns(bool) {
+        return withdrawn[whitelisted];
+    }
+
+    function currentContribution(address whitelisted) public view returns(uint256) {
+        return contributions[whitelisted];
+    }
+
     function removeFromWhitelist(address blacklisted) public onlyOwner {
         whitelist[blacklisted] = false;
         msg.sender.transfer(contributions[blacklisted]);
@@ -90,6 +102,6 @@ contract Support {
             percentage = remainingTokens;
         }
         remainingTokens = remainingTokens - percentage;
-        IClubToken(bondingCurve.clubToken()).transferFrom(address(this), msg.sender, percentage);
+        ClubTokenController(bondingCurve).transferFrom(address(this), msg.sender, percentage);
     }
 }

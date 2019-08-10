@@ -29,6 +29,7 @@ var {
 } = require('../helpers/migVals')
 const overwrite = false
 module.exports = (deployer, network, accounts) => {
+  return
   if (network === 'test') return
   deployer.then(async () => {
     try {

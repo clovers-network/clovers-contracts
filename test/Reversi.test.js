@@ -11,7 +11,6 @@ contract('Reversi', async function(accounts) {
     ;(async () => {
       try {
         reversi = await Reversi_.new()
-
         await ReversiMock.link('Reversi', reversi.address)
         reversiMock = await ReversiMock.new()
         done()
@@ -50,6 +49,7 @@ contract('Reversi', async function(accounts) {
     })
 
     it('should play a valid game without error', async function() {
+      console.log({reversi})
       let isValid = await reversi.isValid(_realMoves)
       assert(isValid, 'Game was not valid')
     })

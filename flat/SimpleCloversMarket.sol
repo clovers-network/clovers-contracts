@@ -1,6 +1,7 @@
-pragma solidity ^0.4.24;
 
 // File: contracts/IClovers.sol
+
+pragma solidity ^0.4.18;
 
 /**
  * Interface for Digital Asset Registry for the Non Fungible Token Clover
@@ -80,6 +81,8 @@ contract IClovers {
 
 // File: contracts/IClubToken.sol
 
+pragma solidity ^0.4.18;
+
 /**
  * Interface for ERC20 Club Token
  */
@@ -106,6 +109,8 @@ contract IClubToken {
 
 // File: contracts/IClubTokenController.sol
 
+pragma solidity ^0.4.18;
+
 /**
  * The Clovers contract is the interface for the CloversController Contract
  */
@@ -113,12 +118,13 @@ contract IClubToken {
 
 contract IClubTokenController {
     function buy(address buyer) public payable returns(bool);
+    function burn(address from, uint256 amount) public;
     function transferFrom(address from, address to, uint256 amount) public;
 }
 
 // File: contracts/ICloversController.sol
 
-pragma experimental ABIEncoderV2;
+pragma solidity ^0.4.18;
 
 /**
  * The Clovers contract is the interface for the CloversController Contract
@@ -151,6 +157,9 @@ contract ICloversController {
 }
 
 // File: zeppelin-solidity/contracts/ownership/Ownable.sol
+
+pragma solidity ^0.4.24;
+
 
 /**
  * @title Ownable
@@ -216,6 +225,9 @@ contract Ownable {
 
 // File: zeppelin-solidity/contracts/math/SafeMath.sol
 
+pragma solidity ^0.4.24;
+
+
 /**
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
@@ -268,6 +280,14 @@ library SafeMath {
 
 // File: contracts/SimpleCloversMarket.sol
 
+pragma solidity ^0.4.24;
+
+
+
+
+
+
+
 contract SimpleCloversMarket is Ownable {
 
     event updatePrice(uint256 _tokenId, uint256 price);
@@ -313,11 +333,16 @@ contract SimpleCloversMarket is Ownable {
         address seller = sells[_tokenId].from;
         require(owner == msg.sender || owner != seller);
         delete(sells[_tokenId]);
+        updatePrice(_tokenId, 0);
     }
 
     function sell(uint256 _tokenId, uint256 price) public {
         require(price > 0);
-        require(IClovers(clovers).ownerOf(_tokenId) == msg.sender || msg.sender == cloversController);
+        address tokenOwner = IClovers(clovers).ownerOf(_tokenId);
+        require(tokenOwner == msg.sender || tokenOwner == clovers || msg.sender == cloversController);
+        if (tokenOwner == clovers) {
+            require(sells[_tokenId].price == 0);
+        }
         sells[_tokenId].price = price;
         sells[_tokenId].from = IClovers(clovers).ownerOf(_tokenId);
         updatePrice(_tokenId, price);
@@ -328,32 +353,17 @@ contract SimpleCloversMarket is Ownable {
         require(sellPrice > 0);
         require(IClovers(clovers).ownerOf(_tokenId) == sellFrom);
         if(IClubToken(clubToken).balanceOf(msg.sender) < sellPrice) {
-            IClubTokenController(clubTokenController).buy(msg.sender);
+            IClubTokenController(clubTokenController).buy.value(msg.value)(msg.sender);
         }
-        IClubTokenController(clubTokenController).transferFrom(msg.sender, sellFrom, sellPrice);
+        // if seller is Clovers Contract, burn the money
+        if (sellFrom == clovers) {
+            IClubTokenController(clubTokenController).burn(msg.sender, sellPrice);
+        } else {
+            IClubTokenController(clubTokenController).transferFrom(msg.sender, sellFrom, sellPrice);
+        }
         ICloversController(cloversController).transferFrom(sellFrom, msg.sender, _tokenId);
         delete(sells[_tokenId]);
         updatePrice(_tokenId, 0);
     }
 
-    /**
-    * @dev Buy one of the Clovers which were given up when mining.
-    * @param _tokenId The board being bought.
-    * @return A boolean representing whether or not the purchase was successful.
-    */
-    /* function buyCloverFromContract(uint256 _tokenId) public payable returns(bool) {
-        require(IClovers(clovers).ownerOf(_tokenId) == clovers);
-        uint256 reward = IClovers(clovers).getReward(_tokenId);
-        uint256 toPay = ICloversController(cloversController).basePrice().add(reward.mul(ICloversController(cloversController).priceMultiplier()));
-        if (IClubToken(clubToken).balanceOf(msg.sender) < toPay) {
-            IClubTokenController(clubTokenController).buy(msg.sender); // msg.value needs to be enough to buy "toPay" amount of Club Token
-        }
-        if (toPay > 0) {
-            // IClubToken(clubToken).transferFrom(msg.sender, clubToken, toPay); // if we'd rather keep the money
-            IClubToken(clubToken).burn(msg.sender, toPay);
-        }
-        IClovers(clovers).transferFrom(clovers, msg.sender, _tokenId);
-        updatePrice(_tokenId, 0);
-        return true;
-    } */
 }

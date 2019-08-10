@@ -1,13 +1,15 @@
 var Clovers = artifacts.require('./Clovers.sol')
 var CloversController = artifacts.require('./CloversController.sol')
+var SimpleCloversMarket = artifacts.require('./SimpleCloversMarket.sol')
 // var ethers = require('ethers')
-var start = 0
+var start = 13
 // var Reversi = require('../app/src/assets/reversi.js')
 var Reversi = require('clovers-reversi').default
 // var Web3 = require('web3')
 var fs = require('fs');
 const gasToCash = require('../helpers/utils').gasToCash
 const _ = require('../helpers/utils')._
+var BigNumber = require('bignumber.js')
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 module.exports = async function(deployer, network, accounts) {
@@ -54,7 +56,7 @@ module.exports = async function(deployer, network, accounts) {
       
       var clovers = await Clovers.deployed()
       var cloversController = await CloversController.deployed()
-      
+      var simpleCloversMarket = await SimpleCloversMarket.deployed()
       var totalGas = new web3.BigNumber('0')
       
       // var web3Provider = ZeroClientProvider({
@@ -63,21 +65,49 @@ module.exports = async function(deployer, network, accounts) {
       // })
       // var _web3 = new Web3(web3Provider)
       
-      const cloverPath = __dirname + '/../clovers/raw.json'
+      const cloverPath = __dirname + '/../clovers/raw-1.json'
+      const cloverPath2 = __dirname + '/../clovers/raw-2.json'
+      const cloverPath3 = __dirname + '/../clovers/raw-3.json'
+      const cloverPath4 = __dirname + '/../clovers/raw-4.json'
+
       var allCloversString = fs.readFileSync(cloverPath).toString()
       var allCloversJSON = JSON.parse(allCloversString)
+
+      allCloversString = fs.readFileSync(cloverPath2).toString()
+      allCloversJSON.push(...JSON.parse(allCloversString))
+
+
+      allCloversString = fs.readFileSync(cloverPath3).toString()
+      allCloversJSON.push(...JSON.parse(allCloversString))
+
+
+      allCloversString = fs.readFileSync(cloverPath4).toString()
+      allCloversJSON.push(...JSON.parse(allCloversString))
+
+    
+
+
       var getCloversCount = allCloversJSON.length
       console.log(getCloversCount.toString())
+
       await doFors(getCloversCount, start, i => {
         console.log(i + '/' + getCloversCount)
         return new Promise(async (resolve, reject) => {
-          resolve()
-          return
           try {
             
             var clover = allCloversJSON[i]
-            var {owner, keep, blockMinted, cloverMoves, reward, symmetries, hash} = clover
-            
+            var {owner, keep, blockMinted, cloverMoves, reward, symmetries, hash, price} = clover
+            price = new BigNumber(price)
+            if (owner.toLowerCase() === '0xcde232e835330dafa2ebc629219bbf4fc92cfa24'.toLowerCase()) {
+              // some old account that is probably lost
+              owner = '0x45e25795A72881a4D80C59B5c60120655215a053'
+            }
+
+            if (owner.toLowerCase() === ('0x8A0011ccb1850e18A9D2D4b15bd7F9E9E423c11b').toLowerCase()) {
+              // this is owned by old Clovers contract
+              // should be owned by new Clovers contract
+              owner = clovers.address
+            }
             var reversi = new Reversi()
             
             
@@ -116,13 +146,13 @@ module.exports = async function(deployer, network, accounts) {
               if (reversi.symmetrical) {
                 // console.log(reversi)
                 
-                var symmetries = new web3.BigNumber(0)
+                // var symmetries = new web3.BigNumber(0)
                 
-                symmetries = symmetries.add(reversi.RotSym ? '0b10000' : 0)
-                symmetries = symmetries.add(reversi.Y0Sym ? '0b01000' : 0)
-                symmetries = symmetries.add(reversi.X0Sym ? '0b00100' : 0)
-                symmetries = symmetries.add(reversi.XYSym ? '0b00010' : 0)
-                symmetries = symmetries.add(reversi.XnYSym ? '0b00001' : 0)
+                // symmetries = symmetries.add(reversi.RotSym ? '0b10000' : 0)
+                // symmetries = symmetries.add(reversi.Y0Sym ? '0b01000' : 0)
+                // symmetries = symmetries.add(reversi.X0Sym ? '0b00100' : 0)
+                // symmetries = symmetries.add(reversi.XYSym ? '0b00010' : 0)
+                // symmetries = symmetries.add(reversi.XnYSym ? '0b00001' : 0)
                 // setSymmetries
                 var {receipt} = await clovers.setSymmetries(tokenId, symmetries)
                 console.log(_ + 'setSymmetries - ' + receipt.gasUsed)
@@ -134,6 +164,13 @@ module.exports = async function(deployer, network, accounts) {
               console.log(_ + 'minted - ' + receipt.gasUsed)
               gasToCash(receipt.gasUsed)
               totalGas = totalGas.plus(receipt.gasUsed)
+
+              if (!price.eq("0") && owner == clovers.address) {
+                var {receipt} = await simpleCloversMarket.sell(tokenId, price.toString(10))
+                console.log(_ + 'added token for sale - ' + receipt.gasUsed)
+                gasToCash(receipt.gasUsed)
+                totalGas = totalGas.plus(receipt.gasUsed)
+              }
             }
             resolve()
           } catch (error) {

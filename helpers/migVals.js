@@ -14,7 +14,7 @@ var vals = (module.exports = {
   priceMultiplier: '10',
   basePrice: utils.toWei('1'),
   paused: false,
-
+  limit: utils.toWei('5'),
   decimals: '18',
   oracle: '0xb20fbdc70c19d0ebcee204d32e1828fca9c2fb09',
   reserveRatio: '750000', // parts per million 500000 / 1000000 = 1/2
@@ -91,7 +91,8 @@ async function updateCloversController({
 async function updateClubTokenController({
   clubTokenController,
   // curationMarket,
-  simpleCloversMarket
+  simpleCloversMarket,
+  support
 }) {
   // Update ClubTokenController.sol
   // -w simpleCloversMarket
@@ -121,6 +122,9 @@ async function updateClubTokenController({
 
   console.log('clubTokenController.updatePaused')
   var tx = await clubTokenController.updatePaused(vals.paused)
+
+  console.log('clubTokenController.updateSupport')
+  var tx = await clubTokenController.updateSupport(support.address)
 
   //
   // let poolBalance = await web3.eth.getBalance(clubToken.address)

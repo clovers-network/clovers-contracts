@@ -1,6 +1,7 @@
 var utils = require('web3-utils')
 var Reversi = artifacts.require('./Reversi.sol')
 var Clovers = artifacts.require('./Clovers.sol')
+var Support = artifacts.require('./Support.sol')
 var CloversController = artifacts.require('./CloversController.sol')
 var ClubTokenController = artifacts.require('./ClubTokenController.sol')
 var SimpleCloversMarket = artifacts.require('./SimpleCloversMarket.sol')
@@ -27,12 +28,14 @@ var {
 } = require('../helpers/migVals')
 
 module.exports = (deployer, network, accounts) => {
+  return 
   if (network === 'test') return
   deployer.then(async () => {
     try {
       var totalGas = new web3.BigNumber('0')
 
       // reversi = await Reversi.deployed()
+      support = await Support.deployed()
       clovers = await Clovers.deployed()
       cloversController = await CloversController.deployed()
       clubToken = await ClubToken.deployed()
@@ -62,7 +65,8 @@ module.exports = (deployer, network, accounts) => {
       await updateClubTokenController({
         clubTokenController,
         // curationMarket,
-        simpleCloversMarket
+        simpleCloversMarket,
+        support
       })
     } catch (error) {
       console.log(error)

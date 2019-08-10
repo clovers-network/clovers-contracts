@@ -1,5 +1,6 @@
 var utils = require('web3-utils')
 var Reversi = artifacts.require('./Reversi.sol')
+var Support = artifacts.require('./Support.sol')
 var Clovers = artifacts.require('./Clovers.sol')
 var CloversMetadata = artifacts.require('./CloversMetadata.sol')
 var CloversController = artifacts.require('./CloversController.sol')
@@ -29,11 +30,14 @@ let decimals = '18'
 let reserveRatio = '750000' // parts per million 500000 / 1000000 = 1/2
 let virtualBalance = utils.toWei('10')
 let virtualSupply = utils.toWei('10000')
+let limit = utils.toWei('5')
+
 
 contract('Clovers', async function(accounts) {
   let oracle = accounts[8]
 
   let clovers,
+    support,
     cloversMetadata,
     clubToken,
     reversi,
@@ -52,8 +56,6 @@ contract('Clovers', async function(accounts) {
 
         console.log(_ + 'Deploy clovers - ' + tx.gasUsed)
         gasToCash(tx.gasUsed)
-        console.log(tx.gasUsed)
-        console.log(totalGas)
         totalGas = totalGas.plus(tx.gasUsed)
 
         // Deploy CloversMetadata.sol
@@ -142,6 +144,23 @@ contract('Clovers', async function(accounts) {
         )
 
         console.log(_ + 'Deploy simpleCloversMarket - ' + tx.gasUsed)
+        gasToCash(tx.gasUsed)
+
+        totalGas = totalGas.plus(tx.gasUsed)
+
+        // Deploy Support.sol
+        // -w limit
+        // -w ClubTokenController address
+
+        support = await Support.new(
+          limit,
+          clubTokenController.address
+        )
+        var tx = web3.eth.getTransactionReceipt(
+          support.transactionHash
+        )
+
+        console.log(_ + 'Deploy support - ' + tx.gasUsed)
         gasToCash(tx.gasUsed)
 
         totalGas = totalGas.plus(tx.gasUsed)
@@ -320,6 +339,17 @@ contract('Clovers', async function(accounts) {
 
         totalGas = totalGas.plus(tx.receipt.gasUsed)
 
+        var tx = await clubTokenController.updateSupport(
+          support.address
+        )
+        console.log(
+          _ + 'clubTokenController.updateSupport - ' + tx.receipt.gasUsed
+        )
+        gasToCash(tx.receipt.gasUsed)
+
+        totalGas = totalGas.plus(tx.receipt.gasUsed)
+
+
         // var tx = await clubTokenController.updateCurationMarket(
         //   curationMarket.address
         // )
@@ -364,7 +394,6 @@ contract('Clovers', async function(accounts) {
 
         console.log(_ + totalGas.toFormat(0) + ' - Total Gas')
         gasToCash(totalGas)
-
         done()
       } catch (error) {
         console.log('error:', error)
@@ -374,7 +403,7 @@ contract('Clovers', async function(accounts) {
     })()
   })
 
-  describe('Clovers.sol', function() {
+  describe.skip('Clovers.sol', function() {
     it('should be able to read metadata', async function() {
       let metadata = await clovers.tokenURI(666)
       let _metadata = await cloversMetadata.tokenURI(666)
@@ -461,7 +490,7 @@ contract('Clovers', async function(accounts) {
   //   })
   // })
 
-  describe('SimpleCloversMarket.sol', function() {
+  describe.skip('SimpleCloversMarket.sol', function() {
     let _tokenId = '666'
     let _seller = accounts[9]
     let _buyer = accounts[8]
@@ -586,7 +615,7 @@ contract('Clovers', async function(accounts) {
     })
   })
 
-  describe('ClubTokenController.sol', function() {
+  describe.skip('ClubTokenController.sol', function() {
     it('should read parameters that were set', async function() {
       let _reserveRatio = await clubTokenController.reserveRatio()
       assert(
@@ -738,7 +767,103 @@ contract('Clovers', async function(accounts) {
     })
   })
 
-  describe('CloversController.sol', function() {
+  describe('Support.sol', function() {
+    it('should set pause to true', async function() {
+      await clubTokenController.updatePaused(true)
+      let paused = await clubTokenController.paused()
+      assert(paused, 'paused isnt true')
+    })
+    it('should still be paused', async function() {
+      let paused = await clubTokenController.paused()
+      assert(paused, 'paused isnt true')
+    })
+
+    it ('should allow owner to add user to whitelist', async function() {
+      await support.addToWhitelist(accounts[2], {from: accounts[0]})
+      let whitelisted = await support.onWhitelist(accounts[2])
+      assert(whitelisted, "Supposed to be on whitelist")
+    })
+
+    it('should faile whitelisted user if not active', async function () {
+      try {
+        await  support.support({value: limit.toString(10), from: accounts[2]})
+        assert(false, "should fail")
+      } catch (error) {
+        assert(true, "should fail")
+      }
+      })
+
+    it('should allow whitelisted user to donate limit', async function () {
+      await support.setActive(true)
+      await support.support({value: limit.toString(10), from: accounts[2]})
+
+      let currentContribution = await support.currentContribution(accounts[2])
+      assert(currentContribution.eq(limit), "Contributions dont match")
+    })
+
+    it('should fail when whitelist tries to add more than limit', async function () {
+      try {
+        await support.support({value: limit, from: accounts[1]})
+        console.log("ACTUALLY AN ERROR HERE")
+        assert(false, 'shouldnt pass')
+      } catch(error) {
+        assert(true, 'should fail')
+      }
+    })
+
+    it ('should allow second contributor', async function () {
+      await support.addToWhitelist(accounts[1])
+      await support.support({value: utils.toWei('2'), from: accounts[1]})
+
+      let currentContribution = await support.currentContribution(accounts[1])
+      assert(currentContribution.eq(utils.toWei("2")), "Contributions dont match: " + currentContribution.toString(10))
+    })
+
+    it("should be able to make buy and withdraw after active = false", async function () {
+      await support.setActive(false)
+      await support.makeBuy()
+      let tokens = await clubToken.balanceOf(support.address)
+
+
+      let totalContributions = await support.totalContributions()
+      assert(totalContributions.eq((new web3.BigNumber(limit)).plus(utils.toWei("2"))), "totalContribution doenst match sum of contributions: " + totalContributions.toString(10))
+
+      let totalTokens = await support.totalTokens()
+      assert(totalTokens.eq(tokens), "tokens should be same: " + totalTokens.toString(10))
+
+      await support.withdraw({from: accounts[2]})
+      let supporterTokens = await clubToken.balanceOf(accounts[2])
+      assert(supporterTokens.sub(totalTokens.mul("5").div("7")).abs().lt("1"), `tokens (${totalTokens.mul("5").div("7").toString(10)}) did not equal supporter tokens ${supporterTokens.toString(10)}`)
+
+      await support.withdraw({from: accounts[1]})
+      supporterTokens = await clubToken.balanceOf(accounts[1])
+      assert(supporterTokens.sub(totalTokens.mul("2").div("7")).abs().lt("1"), "tokens did not equal supporter tokens")
+
+      try {
+        await support.withdraw({from: accounts[3]})
+        assert(false, "shouldnt be here")
+      } catch (error) {
+        assert(true, "should fail")
+      }
+
+
+      try {
+        await support.support({from: accounts[2]})
+        assert(false, "shouldnt be here")
+      } catch (error) {
+        assert(true, "should fail")
+      }
+
+      contractBalance = await web3.eth.getBalance(support.address)
+      assert(contractBalance.eq(0), "contract balance didnt equal 0" + contractBalance.toString(10))
+
+      curveBalance = await web3.eth.getBalance(clubToken.address)
+      assert(curveBalance.eq(utils.toWei("7")), "clubToken has wrong balance" + curveBalance.toString(10))
+
+    })
+  })
+
+  describe.skip('CloversController.sol', function() {
     let balance,
       _balance,
       tx,

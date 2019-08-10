@@ -1,5 +1,4 @@
 pragma solidity ^0.4.18;
-pragma experimental ABIEncoderV2;
 
 /**
 * CloversMetadata contract is upgradeable and returns metadata about Clovers

@@ -1,5 +1,4 @@
 pragma solidity ^0.4.18;
-pragma experimental ABIEncoderV2;
 
 /**
  * The CloversController is a replaceable endpoint for minting and unminting Clovers.sol and ClubToken.sol
@@ -81,17 +80,18 @@ contract CloversController is HasNoEther, HasNoTokens {
     */
     function isValid(bytes28[2] moves) public constant returns (bool) {
         Reversi.Game memory game = Reversi.playGame(moves);
-        return isValidGame(game);
+        return isValidGame(game.error, game.complete);
     }
 
     /**
     * @dev Checks whether the game is valid.
-    * @param game The pre-played game.
+    * @param error The pre-played game error
+    * @param complete The pre-played game complete boolean
     * @return A boolean representing whether or not the game is valid.
     */
-    function isValidGame(Reversi.Game game) public pure returns (bool) {
-        if (game.error) return false;
-        if (!game.complete) return false;
+    function isValidGame(bool error, bool complete) public pure returns (bool) {
+        if (error) return false;
+        if (!complete) return false;
         return true;
     }
     /**
@@ -135,7 +135,7 @@ contract CloversController is HasNoEther, HasNoTokens {
     // NOTE: Disabled to reduce contract size
     function instantClaimClover(bytes28[2] moves, bool _keep) public payable returns (bool) {
         Reversi.Game memory game = Reversi.playGame(moves);
-        require(isValidGame(game));
+        require(isValidGame(game.error, game.complete));
         uint256 tokenId = uint256(game.board);
         require(IClovers(clovers).getBlockMinted(tokenId) == 0);
         require(!IClovers(clovers).exists(tokenId));
@@ -348,7 +348,7 @@ contract CloversController is HasNoEther, HasNoTokens {
             if(convertBytes16ToUint(game.board) != _tokenId) {
                 valid = false;
             }
-            if(valid && isValidGame(game)) {
+            if(valid && isValidGame(game.error, game.complete)) {
                 uint256 _symmetries = IClovers(clovers).getSymmetries(_tokenId);
                 valid = (_symmetries >> 4 & 1) > 0 == game.RotSym ? valid : false;
                 valid = (_symmetries >> 3 & 1) > 0 == game.Y0Sym ? valid : false;

@@ -3,15 +3,14 @@ require("dotenv").config();
 // require('babel-polyfill')
 
 const HDWalletProvider = require("truffle-hdwallet-provider");
-
 module.exports = {
   // See <http://truffleframework.com/docs/advanced/configuration>
   // to customize your Truffle configuration!
   solc: {
-    optimizer: {
-      enabled: true,
-      runs: 10000
-    }
+    // optimizer: {
+    //   enabled: true,
+    //   runs: 10000
+    // }
   },
   networks: {
     // test: {
@@ -86,8 +85,8 @@ module.exports = {
     ropsten: {
       provider() {
         return new HDWalletProvider(
-          process.env.RINKEBY_MNEMONIC,
-          "https://ropsten.infura.io/" + process.env.INFURA_API_KEY,
+          process.env.TRUFFLE_MNEMONIC,
+          "https://ropsten.infura.io/v3/" + process.env.INFURA_API_KEY,
           0,
           10
         );

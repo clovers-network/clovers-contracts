@@ -9,6 +9,7 @@ var start = 369
 var Reversi = require('clovers-reversi').default
 var Web3 = require('web3')
 module.exports = async function(deployer, network, accounts) {
+  return
   if (network === 'test') return
   var doFors = (n, i = 0, func) => {
     // console.log(n, i, func)

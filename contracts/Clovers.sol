@@ -1,5 +1,4 @@
 pragma solidity ^0.4.18;
-pragma experimental ABIEncoderV2;
 
 /**
  * Digital Asset Registry for the Non Fungible Token Clover

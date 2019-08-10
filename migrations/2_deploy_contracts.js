@@ -6,9 +6,11 @@ var ClubTokenController = artifacts.require('./ClubTokenController.sol')
 var SimpleCloversMarket = artifacts.require('./SimpleCloversMarket.sol')
 // var CurationMarket = artifacts.require('./CurationMarket.sol')
 var ClubToken = artifacts.require('./ClubToken.sol')
+var Support = artifacts.require('./Support.sol')
 
 const overwrites = {
   Reversi: true,
+  Support: true,
   Clovers: true,
   CloversMetadata: true,
   CloversController: true,
@@ -22,6 +24,7 @@ const gasToCash = require('../helpers/utils').gasToCash
 const _ = require('../helpers/utils')._
 
 var {
+  limit,
   stakeAmount,
   ethPrice,
   oneGwei,
@@ -112,6 +115,19 @@ module.exports = (deployer, network, accounts) => {
         { overwrite: overwrites['SimpleCloversMarket'] }
       )
       simpleCloversMarket = await SimpleCloversMarket.deployed()
+
+      // Deploy Support.sol
+        // -w limit
+        // -w clubTokenController
+        await deployer.deploy(
+          Support,
+          limit,
+          clubTokenController.address,
+          { overwrite: overwrites['Support'] }
+        )
+        support = await Support.deployed()
+
+
 
       // // Deploy CurationMarket.sol
       // // -w virtualSupply

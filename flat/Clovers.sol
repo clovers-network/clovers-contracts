@@ -1775,7 +1775,6 @@ library strings {
 // File: contracts/CloversMetadata.sol
 
 pragma solidity ^0.4.18;
-pragma experimental ABIEncoderV2;
 
 /**
 * CloversMetadata contract is upgradeable and returns metadata about Clovers
@@ -1815,7 +1814,6 @@ contract CloversMetadata {
 // File: contracts/Clovers.sol
 
 pragma solidity ^0.4.18;
-pragma experimental ABIEncoderV2;
 
 /**
  * Digital Asset Registry for the Non Fungible Token Clover

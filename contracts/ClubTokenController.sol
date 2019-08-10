@@ -18,6 +18,7 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
     address public clubToken;
     address public simpleCloversMarket;
     address public curationMarket;
+    address public support;
 
     /* uint256 public poolBalance; */
     uint256 public virtualSupply;
@@ -34,7 +35,7 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
     }
 
     modifier notPaused() {
-        require(!paused || msg.sender == owner || msg.origin == owner, "Contract must not be paused");
+        require(!paused || msg.sender == owner || tx.origin == owner, "Contract must not be paused");
         _;
     }
 
@@ -134,6 +135,16 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
     }
 
     /**
+    * @dev updates the Support address
+    * @param _support The address of the Support
+    * @return A boolean representing whether or not the update was successful.
+    */
+    function updateSupport(address _support) public onlyOwner returns(bool){
+        support = _support;
+        return true;
+    }
+
+    /**
     * @dev donate Donate Eth to the poolBalance without increasing the totalSupply
     */
     function donate() public payable {
@@ -148,7 +159,7 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
     }
 
     function transferFrom(address from, address to, uint256 amount) public {
-        require(msg.sender == simpleCloversMarket || msg.sender == curationMarket);
+        require(msg.sender == simpleCloversMarket || msg.sender == curationMarket || msg.sender == support);
         IClubToken(clubToken).transferFrom(from, to, amount);
     }
 
