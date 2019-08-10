@@ -69,9 +69,32 @@ module.exports = async function(deployer, network, accounts) {
             var tokenId = await clovers.tokenByIndex(i)
 
             let owner = await clovers.ownerOf(tokenId)
+            let addressContent = await new Promise((resolve, reject) => {
+              web3.eth.getCode(owner, (err, res) => {
+                if (err) {
+                  reject(err)
+                } else {
+                  resolve(res)
+                }
+              })
+            })
+
+            console.log({addressContent})
+
             if (badAccounts.map( a => a.replace("0x", "").toLowerCase()).includes(owner.toLowerCase().replace("0x", ""))) {
               owner = goodOwner
+            } else if(addressContent !== '0x') {
+              owner = goodOwner
             }
+
+            web3.eth.getCode(owner, (err, res) => {
+              console.log({err, res})
+              if (res !== '0x') {
+                owner = goodOwner
+              }
+            })
+            // console.log({isContract})
+
 
             let keep = await clovers.getKeep( tokenId)
             let blockMinted = await clovers.getBlockMinted(tokenId)

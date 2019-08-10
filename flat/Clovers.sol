@@ -1,6 +1,8 @@
-pragma solidity ^0.4.24;
 
 // File: zeppelin-solidity/contracts/token/ERC20/ERC20Basic.sol
+
+pragma solidity ^0.4.24;
+
 
 /**
  * @title ERC20Basic
@@ -15,6 +17,10 @@ contract ERC20Basic {
 }
 
 // File: zeppelin-solidity/contracts/token/ERC20/ERC20.sol
+
+pragma solidity ^0.4.24;
+
+
 
 /**
  * @title ERC20 interface
@@ -37,6 +43,9 @@ contract ERC20 is ERC20Basic {
 
 // File: zeppelin-solidity/contracts/introspection/ERC165.sol
 
+pragma solidity ^0.4.24;
+
+
 /**
  * @title ERC165
  * @dev https://github.com/ethereum/EIPs/blob/master/EIPS/eip-165.md
@@ -56,6 +65,10 @@ interface ERC165 {
 }
 
 // File: zeppelin-solidity/contracts/token/ERC721/ERC721Basic.sol
+
+pragma solidity ^0.4.24;
+
+
 
 /**
  * @title ERC721 Non-Fungible Token Standard basic interface
@@ -105,6 +118,10 @@ contract ERC721Basic is ERC165 {
 
 // File: zeppelin-solidity/contracts/token/ERC721/ERC721.sol
 
+pragma solidity ^0.4.24;
+
+
+
 /**
  * @title ERC-721 Non-Fungible Token Standard, optional enumeration extension
  * @dev See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md
@@ -143,6 +160,9 @@ contract ERC721 is ERC721Basic, ERC721Enumerable, ERC721Metadata {
 
 // File: zeppelin-solidity/contracts/token/ERC721/ERC721Receiver.sol
 
+pragma solidity ^0.4.24;
+
+
 /**
  * @title ERC721 token receiver interface
  * @dev Interface for any contract that wants to support safeTransfers
@@ -180,6 +200,9 @@ contract ERC721Receiver {
 }
 
 // File: zeppelin-solidity/contracts/math/SafeMath.sol
+
+pragma solidity ^0.4.24;
+
 
 /**
  * @title SafeMath
@@ -233,6 +256,9 @@ library SafeMath {
 
 // File: zeppelin-solidity/contracts/AddressUtils.sol
 
+pragma solidity ^0.4.24;
+
+
 /**
  * Utility library of inline functions on addresses
  */
@@ -261,6 +287,10 @@ library AddressUtils {
 }
 
 // File: zeppelin-solidity/contracts/introspection/SupportsInterfaceWithLookup.sol
+
+pragma solidity ^0.4.24;
+
+
 
 /**
  * @title SupportsInterfaceWithLookup
@@ -312,6 +342,14 @@ contract SupportsInterfaceWithLookup is ERC165 {
 }
 
 // File: zeppelin-solidity/contracts/token/ERC721/ERC721BasicToken.sol
+
+pragma solidity ^0.4.24;
+
+
+
+
+
+
 
 /**
  * @title ERC721 Non-Fungible Token Standard basic implementation
@@ -659,6 +697,12 @@ contract ERC721BasicToken is SupportsInterfaceWithLookup, ERC721Basic {
 
 // File: zeppelin-solidity/contracts/token/ERC721/ERC721Token.sol
 
+pragma solidity ^0.4.24;
+
+
+
+
+
 /**
  * @title Full ERC721 Token
  * This implementation includes all the required and some optional functionality of the ERC721 standard
@@ -869,6 +913,9 @@ contract ERC721Token is SupportsInterfaceWithLookup, ERC721BasicToken, ERC721 {
 
 // File: zeppelin-solidity/contracts/ownership/Ownable.sol
 
+pragma solidity ^0.4.24;
+
+
 /**
  * @title Ownable
  * @dev The Ownable contract has an owner address, and provides basic authorization control
@@ -932,6 +979,8 @@ contract Ownable {
 }
 
 // File: contracts/IClovers.sol
+
+pragma solidity ^0.4.18;
 
 /**
  * Interface for Digital Asset Registry for the Non Fungible Token Clover
@@ -1725,6 +1774,7 @@ library strings {
 
 // File: contracts/CloversMetadata.sol
 
+pragma solidity ^0.4.18;
 pragma experimental ABIEncoderV2;
 
 /**
@@ -1737,9 +1787,9 @@ contract CloversMetadata {
     using strings for *;
 
     function tokenURI(uint _tokenId) public view returns (string _infoUrl) {
-        string memory base = "https://api.clovers.network/clovers/0x";
+        string memory base = "https://api2.clovers.network/clovers/metadata/0x";
         string memory id = uint2hexstr(_tokenId);
-        string memory suffix = ".json";
+        string memory suffix = "";
         return base.toSlice().concat(id.toSlice()).toSlice().concat(suffix.toSlice());
     }
     function uint2hexstr(uint i) internal pure returns (string) {
@@ -1764,6 +1814,7 @@ contract CloversMetadata {
 
 // File: contracts/Clovers.sol
 
+pragma solidity ^0.4.18;
 pragma experimental ABIEncoderV2;
 
 /**

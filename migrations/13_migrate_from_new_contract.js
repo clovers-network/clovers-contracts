@@ -71,6 +71,8 @@ module.exports = async function(deployer, network, accounts) {
       await doFors(getCloversCount, start, i => {
         console.log(i + '/' + getCloversCount)
         return new Promise(async (resolve, reject) => {
+          resolve()
+          return
           try {
             
             var clover = allCloversJSON[i]
