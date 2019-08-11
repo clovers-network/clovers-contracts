@@ -5,20 +5,19 @@ pragma solidity ^0.4.18;
  * with upgradeable contract reference for returning metadata.
  */
 
-import "../node_modules/zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
-import "../node_modules/zeppelin-solidity/contracts/token/ERC721/ERC721Token.sol";
-import "../node_modules/zeppelin-solidity/contracts/ownership/Ownable.sol";
-import "./IClovers.sol";
+import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "zeppelin-solidity/contracts/token/ERC721/ERC721Token.sol";
+import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./CloversMetadata.sol";
 
 
-contract Clovers is IClovers, ERC721Token, Ownable {
+contract Clovers is ERC721Token, Ownable {
 
-    address cloversMetadata;
-    uint256 totalSymmetries;
+    address public cloversMetadata;
+    uint256 public totalSymmetries;
     uint256[5] symmetries; // RotSym, Y0Sym, X0Sym, XYSym, XnYSym
-    address cloversController;
-    address clubTokenController;
+    address public cloversController;
+    address public clubTokenController;
 
     mapping (uint256 => Clover) public clovers;
     struct Clover {
@@ -58,19 +57,7 @@ contract Clovers is IClovers, ERC721Token, Ownable {
     }
 
     function tokenURI(uint _tokenId) public view returns (string _infoUrl) {
-        // require(ownerOf(_tokenId) != 0);
-        address _impl = implementation();
-        bytes memory data = msg.data;
-        assembly {
-            let result := delegatecall(gas, _impl, add(data, 0x20), mload(data), 0, 0)
-            let size := returndatasize
-            let ptr := mload(0x40)
-            returndatacopy(ptr, 0, size)
-            switch result
-            case 0 { revert(ptr, size) }
-            default { return(ptr, size) }
-        }
-        // return CloversMetadata(cloversMetadata).tokenMetadata(_tokenId);
+        return CloversMetadata(cloversMetadata).tokenURI(_tokenId);
     }
     function getHash(bytes28[2] moves) public pure returns (bytes32) {
         return keccak256(moves);

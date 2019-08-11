@@ -978,86 +978,6 @@ contract Ownable {
   }
 }
 
-// File: contracts/IClovers.sol
-
-pragma solidity ^0.4.18;
-
-/**
- * Interface for Digital Asset Registry for the Non Fungible Token Clover
- * with upgradeable contract reference for returning metadata.
- */
-
-
-contract IClovers {
-
-    function tokenURI(uint _tokenId) public view returns (string _infoUrl);
-
-    function getKeep(uint256 _tokenId) public view returns (bool);
-    function getBlockMinted(uint256 _tokenId) public view returns (uint256);
-    function getCloverMoves(uint256 _tokenId) public view returns (bytes28[2]);
-    function getReward(uint256 _tokenId) public view returns (uint256);
-    function getSymmetries(uint256 _tokenId) public view returns (uint256);
-    function getAllSymmetries() public view returns (uint256, uint256, uint256, uint256, uint256, uint256);
-
-    function moveEth(address _to, uint256 _amount) public;
-    function moveToken(address _to, uint256 _amount, address _token) public returns (bool);
-    function approveToken(address _to, uint256 _amount, address _token) public returns (bool);
-
-    function setKeep(uint256 _tokenId, bool value) public;
-    function setBlockMinted(uint256 _tokenId, uint256 value) public;
-    function setCloverMoves(uint256 _tokenId, bytes28[2] moves) public;
-    function setReward(uint256 _tokenId, uint256 _amount) public;
-    function setSymmetries(uint256 _tokenId, uint256 _symmetries) public;
-    function setAllSymmetries(uint256 _totalSymmetries, uint256 RotSym, uint256 Y0Sym, uint256 X0Sym, uint256 XYSym, uint256 XnYSym) public;
-    function deleteClover(uint256 _tokenId) public;
-
-    function updateCloversControllerAddress(address _cloversController) public;
-    function updateCloversMetadataAddress(address _cloversMetadata) public;
-
-    function mint (address _to, uint256 _tokenId) public;
-    function unmint (uint256 _tokenId) public;
-
-    event Transfer(
-      address indexed _from,
-      address indexed _to,
-      uint256 indexed _tokenId
-    );
-    event Approval(
-      address indexed _owner,
-      address indexed _approved,
-      uint256 indexed _tokenId
-    );
-    event ApprovalForAll(
-      address indexed _owner,
-      address indexed _operator,
-      bool _approved
-    );
-
-    function balanceOf(address _owner) public view returns (uint256 _balance);
-    function ownerOf(uint256 _tokenId) public view returns (address _owner);
-    function exists(uint256 _tokenId) public view returns (bool _exists);
-
-    function approve(address _to, uint256 _tokenId) public;
-    function getApproved(uint256 _tokenId)
-      public view returns (address _operator);
-
-    function setApprovalForAll(address _operator, bool _approved) public;
-    function isApprovedForAll(address _owner, address _operator)
-      public view returns (bool);
-
-    function transferFrom(address _from, address _to, uint256 _tokenId) public;
-    function safeTransferFrom(address _from, address _to, uint256 _tokenId)
-      public;
-
-    function safeTransferFrom(
-      address _from,
-      address _to,
-      uint256 _tokenId,
-      bytes _data
-    )
-      public;
-}
-
 // File: contracts/helpers/strings.sol
 
 /*
@@ -1825,14 +1745,13 @@ pragma solidity ^0.4.18;
 
 
 
+contract Clovers is ERC721Token, Ownable {
 
-contract Clovers is IClovers, ERC721Token, Ownable {
-
-    address cloversMetadata;
-    uint256 totalSymmetries;
+    address public cloversMetadata;
+    uint256 public totalSymmetries;
     uint256[5] symmetries; // RotSym, Y0Sym, X0Sym, XYSym, XnYSym
-    address cloversController;
-    address clubTokenController;
+    address public cloversController;
+    address public clubTokenController;
 
     mapping (uint256 => Clover) public clovers;
     struct Clover {
@@ -1872,19 +1791,7 @@ contract Clovers is IClovers, ERC721Token, Ownable {
     }
 
     function tokenURI(uint _tokenId) public view returns (string _infoUrl) {
-        // require(ownerOf(_tokenId) != 0);
-        address _impl = implementation();
-        bytes memory data = msg.data;
-        assembly {
-            let result := delegatecall(gas, _impl, add(data, 0x20), mload(data), 0, 0)
-            let size := returndatasize
-            let ptr := mload(0x40)
-            returndatacopy(ptr, 0, size)
-            switch result
-            case 0 { revert(ptr, size) }
-            default { return(ptr, size) }
-        }
-        // return CloversMetadata(cloversMetadata).tokenMetadata(_tokenId);
+        return CloversMetadata(cloversMetadata).tokenURI(_tokenId);
     }
     function getHash(bytes28[2] moves) public pure returns (bytes32) {
         return keccak256(moves);

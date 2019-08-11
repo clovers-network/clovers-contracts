@@ -127,6 +127,8 @@ contract('Clovers', async function(accounts) {
         console.log(_ + 'Deploy cloversController - ' + tx.gasUsed)
         gasToCash(tx.gasUsed)
 
+        await cloversController.updatePaused(false)
+
         totalGas = totalGas.plus(tx.gasUsed)
 
         // Deploy SimpleCloversMarket.sol
@@ -403,7 +405,7 @@ contract('Clovers', async function(accounts) {
     })()
   })
 
-  describe.skip('Clovers.sol', function() {
+  describe('Clovers.sol', function() {
     it('should be able to read metadata', async function() {
       let metadata = await clovers.tokenURI(666)
       let _metadata = await cloversMetadata.tokenURI(666)
@@ -490,7 +492,7 @@ contract('Clovers', async function(accounts) {
   //   })
   // })
 
-  describe.skip('SimpleCloversMarket.sol', function() {
+  describe('SimpleCloversMarket.sol', function() {
     let _tokenId = '666'
     let _seller = accounts[9]
     let _buyer = accounts[8]
@@ -615,7 +617,7 @@ contract('Clovers', async function(accounts) {
     })
   })
 
-  describe.skip('ClubTokenController.sol', function() {
+  describe('ClubTokenController.sol', function() {
     it('should read parameters that were set', async function() {
       let _reserveRatio = await clubTokenController.reserveRatio()
       assert(
@@ -820,6 +822,10 @@ contract('Clovers', async function(accounts) {
     })
 
     it("should be able to make buy and withdraw after active = false", async function () {
+
+      var originalCurveBalance = await web3.eth.getBalance(clubToken.address)
+
+
       await support.setActive(false)
       await support.makeBuy()
       let tokens = await clubToken.balanceOf(support.address)
@@ -858,12 +864,15 @@ contract('Clovers', async function(accounts) {
       assert(contractBalance.eq(0), "contract balance didnt equal 0" + contractBalance.toString(10))
 
       curveBalance = await web3.eth.getBalance(clubToken.address)
-      assert(curveBalance.eq(utils.toWei("7")), "clubToken has wrong balance" + curveBalance.toString(10))
+      assert(curveBalance.sub(originalCurveBalance).eq(utils.toWei("7")), `clubToken has wrong balance of ${curveBalance.toString(10)} when it should have ${utils.toWei("7")}`)
+     
+      // dont forget to unpause the clubTokenController
+      await clubTokenController.updatePaused(false)
 
     })
   })
 
-  describe.skip('CloversController.sol', function() {
+  describe('CloversController.sol', function() {
     let balance,
       _balance,
       tx,
@@ -940,7 +949,10 @@ contract('Clovers', async function(accounts) {
     })
 
     it('should make sure can claimClover (keep = true) w valid game, owning no clubToken and approve from oracle', async function() {
+      var currentPaused = await clubTokenController.paused()
+      // await clubTokenController.updatePaused(false)
       await makeFullClaim({ user: accounts[6], buyClubToken: false })
+      // await clubTokenController.updatePaused(true)
     })
 
     it('should make sure claimClover (_keep = false) is successful using valid game w/ invalid symmetries', async function() {

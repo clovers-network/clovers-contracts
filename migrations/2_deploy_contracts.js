@@ -9,15 +9,15 @@ var ClubToken = artifacts.require('./ClubToken.sol')
 var Support = artifacts.require('./Support.sol')
 
 const overwrites = {
-  Reversi: true,
-  Support: true,
-  Clovers: true,
-  CloversMetadata: true,
-  CloversController: true,
-  ClubTokenController: true,
-  SimpleCloversMarket: true,
+  Reversi: false,
+  Support: false,
+  Clovers: false,
+  CloversMetadata: false,
+  CloversController: false,
+  ClubTokenController: false,
+  SimpleCloversMarket: false,
   // CurationMarket: true,
-  ClubToken: true
+  ClubToken: false
 }
 
 const gasToCash = require('../helpers/utils').gasToCash
@@ -63,11 +63,15 @@ module.exports = (deployer, network, accounts) => {
       })
       cloversMetadata = await CloversMetadata.deployed()
 
-      // Update Clovers.sol
-      // -w CloversMetadata address
-      var tx = await clovers.updateCloversMetadataAddress(
-        cloversMetadata.address
-      )
+
+      var currentMetadataAddress = await clovers.cloversMetadata()
+      if (currentMetadataAddress.toLowerCase() !== cloversMetadata.address.toLowerCase()) {
+        // Update Clovers.sol
+        // -w CloversMetadata address
+        var tx = await clovers.updateCloversMetadataAddress(
+          cloversMetadata.address
+        )
+      }
 
       // Deploy ClubToken.sol (ERC20)
       // -w ERC20 name

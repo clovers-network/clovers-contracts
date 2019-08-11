@@ -1,11 +1,15 @@
 pragma solidity ^0.4.24;
 
-import "./IClovers.sol";
-import "./IClubToken.sol";
-import "./IClubTokenController.sol";
-import "./ICloversController.sol";
+import "./Clovers.sol";
+import "./ClubToken.sol";
+import "./ClubTokenController.sol";
+// import "./CloversController.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
+
+contract CloversController {
+    function transferFrom(address _from, address _to, uint256 _tokenId) public;
+}
 
 contract SimpleCloversMarket is Ownable {
 
@@ -48,7 +52,7 @@ contract SimpleCloversMarket is Ownable {
         clovers = _clovers;
     }
     function removeSell(uint256 _tokenId) public {
-        address owner = IClovers(clovers).ownerOf(_tokenId);
+        address owner = Clovers(clovers).ownerOf(_tokenId);
         address seller = sells[_tokenId].from;
         require(owner == msg.sender || owner != seller);
         delete(sells[_tokenId]);
@@ -57,30 +61,30 @@ contract SimpleCloversMarket is Ownable {
 
     function sell(uint256 _tokenId, uint256 price) public {
         require(price > 0);
-        address tokenOwner = IClovers(clovers).ownerOf(_tokenId);
+        address tokenOwner = Clovers(clovers).ownerOf(_tokenId);
         require(tokenOwner == msg.sender || tokenOwner == clovers || msg.sender == cloversController);
         if (tokenOwner == clovers) {
             require(sells[_tokenId].price == 0);
         }
         sells[_tokenId].price = price;
-        sells[_tokenId].from = IClovers(clovers).ownerOf(_tokenId);
+        sells[_tokenId].from = Clovers(clovers).ownerOf(_tokenId);
         updatePrice(_tokenId, price);
     }
     function buy (uint256 _tokenId) public payable {
         uint256 sellPrice = sells[_tokenId].price;
         address sellFrom = sells[_tokenId].from;
         require(sellPrice > 0);
-        require(IClovers(clovers).ownerOf(_tokenId) == sellFrom);
-        if(IClubToken(clubToken).balanceOf(msg.sender) < sellPrice) {
-            IClubTokenController(clubTokenController).buy.value(msg.value)(msg.sender);
+        require(Clovers(clovers).ownerOf(_tokenId) == sellFrom);
+        if(ClubToken(clubToken).balanceOf(msg.sender) < sellPrice) {
+            ClubTokenController(clubTokenController).buy.value(msg.value)(msg.sender);
         }
         // if seller is Clovers Contract, burn the money
         if (sellFrom == clovers) {
-            IClubTokenController(clubTokenController).burn(msg.sender, sellPrice);
+            ClubTokenController(clubTokenController).burn(msg.sender, sellPrice);
         } else {
-            IClubTokenController(clubTokenController).transferFrom(msg.sender, sellFrom, sellPrice);
+            ClubTokenController(clubTokenController).transferFrom(msg.sender, sellFrom, sellPrice);
         }
-        ICloversController(cloversController).transferFrom(sellFrom, msg.sender, _tokenId);
+        CloversController(cloversController).transferFrom(sellFrom, msg.sender, _tokenId);
         delete(sells[_tokenId]);
         updatePrice(_tokenId, 0);
     }

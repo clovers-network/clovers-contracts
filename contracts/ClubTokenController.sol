@@ -5,12 +5,11 @@ pragma solidity ^0.4.18;
 */
 
 
-import './IClubToken.sol';
-import './IClubTokenController.sol';
+import './ClubToken.sol';
 import "bancor-contracts/solidity/contracts/converter/BancorFormula.sol";
-import "../node_modules/zeppelin-solidity/contracts/ownership/HasNoTokens.sol";
+import "zeppelin-solidity/contracts/ownership/HasNoTokens.sol";
 
-contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens {
+contract ClubTokenController is BancorFormula, HasNoTokens {
     event Buy(address buyer, uint256 tokens, uint256 value, uint256 poolBalance, uint256 tokenSupply);
     event Sell(address seller, uint256 tokens, uint256 value, uint256 poolBalance, uint256 tokenSupply);
 
@@ -50,7 +49,7 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
     */
     function getBuy(uint256 buyValue) public constant returns(uint256) {
         return calculatePurchaseReturn(
-            safeAdd(IClubToken(clubToken).totalSupply(), virtualSupply),
+            safeAdd(ClubToken(clubToken).totalSupply(), virtualSupply),
             safeAdd(poolBalance(), virtualBalance),
             reserveRatio,
             buyValue);
@@ -65,7 +64,7 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
 
     function getSell(uint256 sellAmount) public constant returns(uint256) {
         return calculateSaleReturn(
-            safeAdd(IClubToken(clubToken).totalSupply(), virtualSupply),
+            safeAdd(ClubToken(clubToken).totalSupply(), virtualSupply),
             safeAdd(poolBalance(), virtualBalance),
             reserveRatio,
             sellAmount);
@@ -155,12 +154,12 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
 
     function burn(address from, uint256 amount) public {
         require(msg.sender == simpleCloversMarket);
-        IClubToken(clubToken).burn(from, amount);
+        ClubToken(clubToken).burn(from, amount);
     }
 
     function transferFrom(address from, address to, uint256 amount) public {
         require(msg.sender == simpleCloversMarket || msg.sender == curationMarket || msg.sender == support);
-        IClubToken(clubToken).transferFrom(from, to, amount);
+        ClubToken(clubToken).transferFrom(from, to, amount);
     }
 
     /**
@@ -171,10 +170,10 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
         require(msg.value > 0);
         uint256 tokens = getBuy(msg.value);
         require(tokens > 0);
-        require(IClubToken(clubToken).mint(buyer, tokens));
+        require(ClubToken(clubToken).mint(buyer, tokens));
         /* poolBalance = safeAdd(poolBalance, msg.value); */
         clubToken.transfer(msg.value);
-        emit Buy(buyer, tokens, msg.value, poolBalance(), IClubToken(clubToken).totalSupply());
+        emit Buy(buyer, tokens, msg.value, poolBalance(), ClubToken(clubToken).totalSupply());
     }
 
 
@@ -184,15 +183,15 @@ contract ClubTokenController is IClubTokenController, BancorFormula, HasNoTokens
     */
     function sell(uint256 sellAmount) public notPaused returns(bool) {
         require(sellAmount > 0);
-        require(IClubToken(clubToken).balanceOf(msg.sender) >= sellAmount);
+        require(ClubToken(clubToken).balanceOf(msg.sender) >= sellAmount);
         uint256 saleReturn = getSell(sellAmount);
         require(saleReturn > 0);
         require(saleReturn <= poolBalance());
         require(saleReturn <= clubToken.balance);
-        IClubToken(clubToken).burn(msg.sender, sellAmount);
+        ClubToken(clubToken).burn(msg.sender, sellAmount);
         /* poolBalance = safeSub(poolBalance, saleReturn); */
-        IClubToken(clubToken).moveEth(msg.sender, saleReturn);
-        emit Sell(msg.sender, sellAmount, saleReturn, poolBalance(), IClubToken(clubToken).totalSupply());
+        ClubToken(clubToken).moveEth(msg.sender, saleReturn);
+        emit Sell(msg.sender, sellAmount, saleReturn, poolBalance(), ClubToken(clubToken).totalSupply());
     }
 
 

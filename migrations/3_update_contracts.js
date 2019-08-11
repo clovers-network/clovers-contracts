@@ -47,25 +47,50 @@ module.exports = (deployer, network, accounts) => {
       // -w CloversController address
       // -w ClubTokenController address
 
-      var tx = await clovers.updateCloversControllerAddress(
-        cloversController.address
-      )
+      var currentCloversControllerAddress = await clovers.cloversController()
+      if (currentCloversControllerAddress.toLowerCase() !== cloversController.address.toLowerCase()) {
+        console.log(`update clovers with cloversControllerAddress from ${currentCloversControllerAddress} to ${cloversController.address}`)
+        var tx = await clovers.updateCloversControllerAddress(
+          cloversController.address
+        )
+      } else {
+        console.log('cloversController didnt change in clovers')
+      }
 
-      var tx = await clovers.updateClubTokenController(
-        clubTokenController.address
-      )
+      var currentClubTokenControllerAddress = await clovers.clubTokenController()
+
+      if (currentClubTokenControllerAddress.toLowerCase() !== clubTokenController.address.toLowerCase()) {
+        console.log(`update clovers with clubTokenControllerAddress from ${currentClubTokenControllerAddress} to ${clubTokenController.address}`)
+        var tx = await clovers.updateClubTokenController(
+          clubTokenController.address
+        )
+      } else {
+        console.log('clubTokenController didnt change in clovers')
+      }
 
       // Update ClubToken.sol
       // -w CloversController address
       // -w ClubTokenController address
 
-      var tx = await clubToken.updateCloversControllerAddress(
-        cloversController.address
-      )
+      var currentCloversControllerAddress = await clubToken.cloversController()
+      if (currentCloversControllerAddress.toLowerCase() !== cloversController.address.toLowerCase()) {
+        console.log(`update clubToken with cloversController from ${currentCloversControllerAddress} to ${cloversController.address}`)
+        var tx = await clubToken.updateCloversControllerAddress(
+          cloversController.address
+        )
+      } else {
+        console.log('cloversController didnt change in clubToken')
+      }
 
-      var tx = await clubToken.updateClubTokenControllerAddress(
-        clubTokenController.address
-      )
+      var currentClubTokenControllerAddress = await clubToken.clubTokenController()
+      if (currentClubTokenControllerAddress.toLowerCase() !== clubTokenController.address.toLowerCase()) {
+        console.log(`update clubToken with clubTokenControllerAddress from ${currentClubTokenControllerAddress} to ${clubTokenController.address}`)
+        var tx = await clubToken.updateClubTokenControllerAddress(
+          clubTokenController.address
+        )
+      } else {
+        console.log(`clubTokenController didnt change in clubToken`)
+      }
 
       // Update CloversController
       await updateCloversController({

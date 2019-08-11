@@ -89,7 +89,7 @@ contract Support {
 
     function makeBuy() public onlyOwner isNotDone isNotActive{
         bondingCurve.buy.value(address(this).balance)(address(this));
-        totalTokens = IClubToken(bondingCurve.clubToken()).balanceOf(address(this));
+        totalTokens = ClubToken(bondingCurve.clubToken()).balanceOf(address(this));
         remainingTokens = totalTokens;
         done = true;
     }
