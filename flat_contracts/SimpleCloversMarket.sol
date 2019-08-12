@@ -911,7 +911,7 @@ contract ERC721Token is SupportsInterfaceWithLookup, ERC721BasicToken, ERC721 {
 
 }
 
-// File: zeppelin-solidity/contracts/ownership/Ownable.sol
+// File: contracts/helpers/MultiOwnable.sol
 
 pragma solidity ^0.4.24;
 
@@ -921,8 +921,8 @@ pragma solidity ^0.4.24;
  * @dev The Ownable contract has an owner address, and provides basic authorization control
  * functions, this simplifies the implementation of "user permissions".
  */
-contract Ownable {
-  address public owner;
+contract MultiOwnable {
+  mapping (address => bool) public owners;
 
 
   event OwnershipRenounced(address indexed previousOwner);
@@ -937,16 +937,20 @@ contract Ownable {
    * account.
    */
   constructor() public {
-    owner = msg.sender;
+    owners[msg.sender] = true;
   }
 
   /**
    * @dev Throws if called by any account other than the owner.
    */
   modifier onlyOwner() {
-    require(msg.sender == owner);
+    require(owners[msg.sender]);
     _;
   }
+
+    function isOwner(address _isOwner) public view returns(bool) {
+        return owners[_isOwner];
+    }
 
   /**
    * @dev Allows the current owner to relinquish control of the contract.
@@ -954,9 +958,9 @@ contract Ownable {
    * It will not be possible to call the functions with the `onlyOwner`
    * modifier anymore.
    */
-  function renounceOwnership() public onlyOwner {
-    emit OwnershipRenounced(owner);
-    owner = address(0);
+  function renounceOwnership(address _previousOwner) public onlyOwner {
+    emit OwnershipRenounced(_previousOwner);
+    owners[_previousOwner] = false;
   }
 
   /**
@@ -973,8 +977,8 @@ contract Ownable {
    */
   function _transferOwnership(address _newOwner) internal {
     require(_newOwner != address(0));
-    emit OwnershipTransferred(owner, _newOwner);
-    owner = _newOwner;
+    emit OwnershipTransferred(msg.sender, _newOwner);
+    owners[_newOwner] = true;
   }
 }
 
@@ -1745,7 +1749,7 @@ pragma solidity ^0.4.18;
 
 
 
-contract Clovers is ERC721Token, Ownable {
+contract Clovers is ERC721Token, MultiOwnable {
 
     address public cloversMetadata;
     uint256 public totalSymmetries;
@@ -1765,7 +1769,7 @@ contract Clovers is ERC721Token, Ownable {
     modifier onlyOwnerOrController() {
         require(
             msg.sender == cloversController ||
-            msg.sender == owner
+            owners[msg.sender]
         );
         _;
     }
@@ -2143,6 +2147,73 @@ contract DetailedERC20 is ERC20 {
     name = _name;
     symbol = _symbol;
     decimals = _decimals;
+  }
+}
+
+// File: zeppelin-solidity/contracts/ownership/Ownable.sol
+
+pragma solidity ^0.4.24;
+
+
+/**
+ * @title Ownable
+ * @dev The Ownable contract has an owner address, and provides basic authorization control
+ * functions, this simplifies the implementation of "user permissions".
+ */
+contract Ownable {
+  address public owner;
+
+
+  event OwnershipRenounced(address indexed previousOwner);
+  event OwnershipTransferred(
+    address indexed previousOwner,
+    address indexed newOwner
+  );
+
+
+  /**
+   * @dev The Ownable constructor sets the original `owner` of the contract to the sender
+   * account.
+   */
+  constructor() public {
+    owner = msg.sender;
+  }
+
+  /**
+   * @dev Throws if called by any account other than the owner.
+   */
+  modifier onlyOwner() {
+    require(msg.sender == owner);
+    _;
+  }
+
+  /**
+   * @dev Allows the current owner to relinquish control of the contract.
+   * @notice Renouncing to ownership will leave the contract without an owner.
+   * It will not be possible to call the functions with the `onlyOwner`
+   * modifier anymore.
+   */
+  function renounceOwnership() public onlyOwner {
+    emit OwnershipRenounced(owner);
+    owner = address(0);
+  }
+
+  /**
+   * @dev Allows the current owner to transfer control of the contract to a newOwner.
+   * @param _newOwner The address to transfer ownership to.
+   */
+  function transferOwnership(address _newOwner) public onlyOwner {
+    _transferOwnership(_newOwner);
+  }
+
+  /**
+   * @dev Transfers control of the contract to a newOwner.
+   * @param _newOwner The address to transfer ownership to.
+   */
+  function _transferOwnership(address _newOwner) internal {
+    require(_newOwner != address(0));
+    emit OwnershipTransferred(owner, _newOwner);
+    owner = _newOwner;
   }
 }
 
@@ -2989,98 +3060,6 @@ contract BancorFormula is IBancorFormula, Utils {
     }
 }
 
-// File: zeppelin-solidity/contracts/token/ERC20/SafeERC20.sol
-
-pragma solidity ^0.4.24;
-
-
-
-
-/**
- * @title SafeERC20
- * @dev Wrappers around ERC20 operations that throw on failure.
- * To use this library you can add a `using SafeERC20 for ERC20;` statement to your contract,
- * which allows you to call the safe operations as `token.safeTransfer(...)`, etc.
- */
-library SafeERC20 {
-  function safeTransfer(ERC20Basic token, address to, uint256 value) internal {
-    require(token.transfer(to, value));
-  }
-
-  function safeTransferFrom(
-    ERC20 token,
-    address from,
-    address to,
-    uint256 value
-  )
-    internal
-  {
-    require(token.transferFrom(from, to, value));
-  }
-
-  function safeApprove(ERC20 token, address spender, uint256 value) internal {
-    require(token.approve(spender, value));
-  }
-}
-
-// File: zeppelin-solidity/contracts/ownership/CanReclaimToken.sol
-
-pragma solidity ^0.4.24;
-
-
-
-
-
-/**
- * @title Contracts that should be able to recover tokens
- * @author SylTi
- * @dev This allow a contract to recover any ERC20 token received in a contract by transferring the balance to the contract owner.
- * This will prevent any accidental loss of tokens.
- */
-contract CanReclaimToken is Ownable {
-  using SafeERC20 for ERC20Basic;
-
-  /**
-   * @dev Reclaim all ERC20Basic compatible tokens
-   * @param token ERC20Basic The address of the token contract
-   */
-  function reclaimToken(ERC20Basic token) external onlyOwner {
-    uint256 balance = token.balanceOf(this);
-    token.safeTransfer(owner, balance);
-  }
-
-}
-
-// File: zeppelin-solidity/contracts/ownership/HasNoTokens.sol
-
-pragma solidity ^0.4.24;
-
-
-
-/**
- * @title Contracts that should not own Tokens
- * @author Remco Bloemen <remco@2π.com>
- * @dev This blocks incoming ERC223 tokens to prevent accidental loss of tokens.
- * Should tokens (any ERC20Basic compatible) end up in the contract, it allows the
- * owner to reclaim the tokens.
- */
-contract HasNoTokens is CanReclaimToken {
-
- /**
-  * @dev Reject all ERC223 compatible tokens
-  * @param from_ address The address that is transferring the tokens
-  * @param value_ uint256 the amount of the specified token
-  * @param data_ Bytes The data passed from the caller.
-  */
-  function tokenFallback(address from_, uint256 value_, bytes data_) external {
-    from_;
-    value_;
-    data_;
-    revert();
-  }
-
-}
-
 // File: contracts/ClubTokenController.sol
 
 pragma solidity ^0.4.18;
@@ -3092,7 +3071,7 @@ pragma solidity ^0.4.18;
 
 
 
-contract ClubTokenController is BancorFormula, HasNoTokens {
+contract ClubTokenController is BancorFormula, MultiOwnable {
     event Buy(address buyer, uint256 tokens, uint256 value, uint256 poolBalance, uint256 tokenSupply);
     event Sell(address seller, uint256 tokens, uint256 value, uint256 poolBalance, uint256 tokenSupply);
 
@@ -3117,7 +3096,7 @@ contract ClubTokenController is BancorFormula, HasNoTokens {
     }
 
     modifier notPaused() {
-        require(!paused || msg.sender == owner || tx.origin == owner, "Contract must not be paused");
+        require(!paused || owners[msg.sender] || owners[tx.origin], "Contract must not be paused");
         _;
     }
 

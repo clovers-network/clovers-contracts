@@ -13,7 +13,7 @@ var vals = (module.exports = {
   payMultiplier: utils.toWei('0.1'),
   priceMultiplier: '10',
   basePrice: utils.toWei('1'),
-  paused: false,
+  paused: true,
   limit: utils.toWei('5'),
   decimals: '18',
   oracle: '0xb20fbdc70c19d0ebcee204d32e1828fca9c2fb09',
@@ -126,13 +126,24 @@ async function updateCloversController({
     console.log('basePrice hasnt changed')
   }
 
+
+  var currentPaused = await cloversController.paused()
+  if (currentPaused !== vals.paused) {
+    console.log(`cloversController.updatePaused from ${currentPaused} to ${vals.paused}`)
+    var tx = await cloversController.updatePaused(vals.paused)
+  } else {
+    console.log('paused hasnt changed')
+  }
+
+
 }
 
 async function updateClubTokenController({
   clubTokenController,
   // curationMarket,
   simpleCloversMarket,
-  support
+  support,
+  accounts
 }) {
   // Update ClubTokenController.sol
   // -w simpleCloversMarket
@@ -198,5 +209,42 @@ async function updateClubTokenController({
   } else {
     console.log('support hasnt changed')
   }
+
+
+
+  var secondOwner = await clubTokenController.isOwner(accounts[1])
+  if (!secondOwner) {
+    console.log(`adding ${accounts[1]} as owner`)
+    await clubTokenController.transferOwnership(accounts[1])
+  } else {
+    console.log(`${accounts[1]} is already an owner`)
+  }
+
+  var secondOwner = await clubTokenController.isOwner(accounts[2])
+  if (!secondOwner) {
+    console.log(`adding ${accounts[2]} as owner`)
+    await clubTokenController.transferOwnership(accounts[2])
+  } else {
+    console.log(`${accounts[2]} is already an owner`)
+  }
+
+  var secondOwner = await clubTokenController.isOwner(accounts[3])
+  if (!secondOwner) {
+    console.log(`adding ${accounts[3]} as owner`)
+    await clubTokenController.transferOwnership(accounts[3])
+  } else {
+    console.log(`${accounts[3]} is already an owner`)
+  }
+
+  var secondOwner = await clubTokenController.isOwner(accounts[4])
+  if (!secondOwner) {
+    console.log(`adding ${accounts[4]} as owner`)
+    await clubTokenController.transferOwnership(accounts[4])
+  } else {
+    console.log(`${accounts[4]} is already an owner`)
+  }
+
+
+
 
 }

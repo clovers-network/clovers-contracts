@@ -46,6 +46,7 @@ module.exports = (deployer, network, accounts) => {
       // Update Clovers.sol
       // -w CloversController address
       // -w ClubTokenController address
+      // -w multiple owners
 
       var currentCloversControllerAddress = await clovers.cloversController()
       if (currentCloversControllerAddress.toLowerCase() !== cloversController.address.toLowerCase()) {
@@ -67,6 +68,40 @@ module.exports = (deployer, network, accounts) => {
       } else {
         console.log('clubTokenController didnt change in clovers')
       }
+
+      var secondOwner = await clovers.isOwner(accounts[1])
+      if (!secondOwner) {
+        console.log(`adding ${accounts[1]} as owner`)
+        await clovers.transferOwnership(accounts[1])
+      } else {
+        console.log(`${accounts[1]} is already an owner`)
+      }
+
+      var secondOwner = await clovers.isOwner(accounts[2])
+      if (!secondOwner) {
+        console.log(`adding ${accounts[2]} as owner`)
+        await clovers.transferOwnership(accounts[2])
+      } else {
+        console.log(`${accounts[2]} is already an owner`)
+      }
+
+      var secondOwner = await clovers.isOwner(accounts[3])
+      if (!secondOwner) {
+        console.log(`adding ${accounts[3]} as owner`)
+        await clovers.transferOwnership(accounts[3])
+      } else {
+        console.log(`${accounts[3]} is already an owner`)
+      }
+
+      var secondOwner = await clovers.isOwner(accounts[4])
+      if (!secondOwner) {
+        console.log(`adding ${accounts[4]} as owner`)
+        await clovers.transferOwnership(accounts[4])
+      } else {
+        console.log(`${accounts[4]} is already an owner`)
+      }
+
+
 
       // Update ClubToken.sol
       // -w CloversController address
@@ -104,8 +139,43 @@ module.exports = (deployer, network, accounts) => {
         clubTokenController,
         // curationMarket,
         simpleCloversMarket,
-        support
+        support,
+        accounts
       })
+
+      var currentCloversAddress = await simpleCloversMarket.clovers()
+      if (currentCloversAddress.toLowerCase() !== clovers.address.toLowerCase()) {
+        console.log(`update simpleCloversMarket with cloversAddress from ${currentCloversAddress} to ${clovers.address}`)
+        await simpleCloversMarket.updateClovers(clovers.address)
+      } else {
+        console.log(`simpleCloversMarket didnt change clovers address`)
+      }
+
+      var currentClubTokenAddress = await simpleCloversMarket.clubToken()
+      if (currentClubTokenAddress.toLowerCase() !== clubToken.address.toLowerCase()) {
+        console.log(`update simpleCloversMarket with clubToken Address from ${currentClubTokenAddress} to ${clubToken.address}`)
+        await simpleCloversMarket.updateClubToken(clubToken.address)
+      } else {
+        console.log(`simpleCloversMarket didnt change clubToken address`)
+      }
+
+      var currentClubTokenControllerAddress = await simpleCloversMarket.clubTokenController()
+      if (currentClubTokenControllerAddress.toLowerCase() !== clubTokenController.address.toLowerCase()) {
+        console.log(`update simpleCloversMarket with clubTokenControllerAddress from ${currentClubTokenControllerAddress} to ${clubTokenController.address}`)
+        await simpleCloversMarket.updateClubTokenController(clubTokenController.address)
+      } else {
+        console.log(`simpleCloversMarket didnt change clovers address`)
+      }
+
+      var currentCloversControllerAddress = await simpleCloversMarket.cloversController()
+      if (currentCloversControllerAddress.toLowerCase() !== cloversController.address.toLowerCase()) {
+        console.log(`update simpleCloversMarket with cloversControllerAddress from ${currentCloversControllerAddress} to ${cloversController.address}`)
+        await simpleCloversMarket.updateCloversController(cloversController.address)
+      } else {
+        console.log(`simpleCloversMarket didnt change cloversController address`)
+      }
+
+
     } catch (error) {
       console.log(error)
     }

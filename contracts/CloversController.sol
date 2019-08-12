@@ -13,7 +13,7 @@ import "zeppelin-solidity/contracts/ownership/HasNoEther.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 
 
-contract SimpleCloversMarket {
+contract ISimpleCloversMarket {
     function sell(uint256 _tokenId, uint256 price) public;
 } 
 
@@ -326,7 +326,7 @@ contract CloversController is HasNoEther, HasNoTokens {
             // If the user decided not to keep the Clover, they will
             // receive the reward price in club tokens, and the clover will
             // go for sale by the contract.
-            SimpleCloversMarket(simpleCloversMarket).sell(_tokenId, basePrice.add(reward.mul(priceMultiplier)));
+            ISimpleCloversMarket(simpleCloversMarket).sell(_tokenId, basePrice.add(reward.mul(priceMultiplier)));
             if (reward > 0) {
                 require(ClubToken(clubToken).mint(committer, reward));
             }

@@ -74,7 +74,7 @@ module.exports = {
         return new HDWalletProvider(
           process.env.TRUFFLE_MNEMONIC,
           "https://rinkeby.infura.io/v3/" + process.env.INFURA_API_KEY,
-          0,
+          4,
           10
         );
       },

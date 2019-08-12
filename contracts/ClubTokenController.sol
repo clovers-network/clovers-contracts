@@ -7,9 +7,9 @@ pragma solidity ^0.4.18;
 
 import './ClubToken.sol';
 import "bancor-contracts/solidity/contracts/converter/BancorFormula.sol";
-import "zeppelin-solidity/contracts/ownership/HasNoTokens.sol";
+import './helpers/MultiOwnable.sol';
 
-contract ClubTokenController is BancorFormula, HasNoTokens {
+contract ClubTokenController is BancorFormula, MultiOwnable {
     event Buy(address buyer, uint256 tokens, uint256 value, uint256 poolBalance, uint256 tokenSupply);
     event Sell(address seller, uint256 tokens, uint256 value, uint256 poolBalance, uint256 tokenSupply);
 
@@ -34,7 +34,7 @@ contract ClubTokenController is BancorFormula, HasNoTokens {
     }
 
     modifier notPaused() {
-        require(!paused || msg.sender == owner || tx.origin == owner, "Contract must not be paused");
+        require(!paused || owners[msg.sender] || owners[tx.origin], "Contract must not be paused");
         _;
     }
 

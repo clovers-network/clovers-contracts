@@ -911,7 +911,7 @@ contract ERC721Token is SupportsInterfaceWithLookup, ERC721BasicToken, ERC721 {
 
 }
 
-// File: zeppelin-solidity/contracts/ownership/Ownable.sol
+// File: contracts/helpers/MultiOwnable.sol
 
 pragma solidity ^0.4.24;
 
@@ -921,8 +921,8 @@ pragma solidity ^0.4.24;
  * @dev The Ownable contract has an owner address, and provides basic authorization control
  * functions, this simplifies the implementation of "user permissions".
  */
-contract Ownable {
-  address public owner;
+contract MultiOwnable {
+  mapping (address => bool) public owners;
 
 
   event OwnershipRenounced(address indexed previousOwner);
@@ -937,16 +937,20 @@ contract Ownable {
    * account.
    */
   constructor() public {
-    owner = msg.sender;
+    owners[msg.sender] = true;
   }
 
   /**
    * @dev Throws if called by any account other than the owner.
    */
   modifier onlyOwner() {
-    require(msg.sender == owner);
+    require(owners[msg.sender]);
     _;
   }
+
+    function isOwner(address _isOwner) public view returns(bool) {
+        return owners[_isOwner];
+    }
 
   /**
    * @dev Allows the current owner to relinquish control of the contract.
@@ -954,9 +958,9 @@ contract Ownable {
    * It will not be possible to call the functions with the `onlyOwner`
    * modifier anymore.
    */
-  function renounceOwnership() public onlyOwner {
-    emit OwnershipRenounced(owner);
-    owner = address(0);
+  function renounceOwnership(address _previousOwner) public onlyOwner {
+    emit OwnershipRenounced(_previousOwner);
+    owners[_previousOwner] = false;
   }
 
   /**
@@ -973,8 +977,8 @@ contract Ownable {
    */
   function _transferOwnership(address _newOwner) internal {
     require(_newOwner != address(0));
-    emit OwnershipTransferred(owner, _newOwner);
-    owner = _newOwner;
+    emit OwnershipTransferred(msg.sender, _newOwner);
+    owners[_newOwner] = true;
   }
 }
 
@@ -1745,7 +1749,7 @@ pragma solidity ^0.4.18;
 
 
 
-contract Clovers is ERC721Token, Ownable {
+contract Clovers is ERC721Token, MultiOwnable {
 
     address public cloversMetadata;
     uint256 public totalSymmetries;
@@ -1765,7 +1769,7 @@ contract Clovers is ERC721Token, Ownable {
     modifier onlyOwnerOrController() {
         require(
             msg.sender == cloversController ||
-            msg.sender == owner
+            owners[msg.sender]
         );
         _;
     }

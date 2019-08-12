@@ -1,9 +1,10 @@
 var Clovers = artifacts.require('./Clovers.sol')
-var CloversController = artifacts.require('./CloversController.sol')
+// var CloversController = artifacts.require('./CloversController.sol')
 var SimpleCloversMarket = artifacts.require('./SimpleCloversMarket.sol')
 // var ethers = require('ethers')
-var start = 0
-// var getCloversCount = 3000
+var increments = [0, 750, 1500, 2250, 3000, false]
+var start = increments[4]
+var getCloversCount = increments[5]
 
 // var Reversi = require('../app/src/assets/reversi.js')
 var Reversi = require('clovers-reversi').default
@@ -12,6 +13,8 @@ var fs = require('fs');
 const gasToCash = require('../helpers/utils').gasToCash
 const _ = require('../helpers/utils')._
 var BigNumber = require('bignumber.js')
+
+const oldCloversAddress = '0x8A0011ccb1850e18A9D2D4b15bd7F9E9E423c11b'
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 module.exports = async function(callback) {
@@ -46,7 +49,7 @@ module.exports = async function(callback) {
   
     
     var clovers = await Clovers.deployed()
-    var cloversController = await CloversController.deployed()
+    // var cloversController = await CloversController.deployed()
     var simpleCloversMarket = await SimpleCloversMarket.deployed()
     var totalGas = new web3.BigNumber('0')
     
@@ -72,7 +75,7 @@ module.exports = async function(callback) {
   
 
 
-    var getCloversCount = allCloversJSON.length
+    getCloversCount = getCloversCount ? getCloversCount : allCloversJSON.length
     console.log(getCloversCount.toString())
 
     await doFors(getCloversCount, start, i => {
@@ -87,7 +90,7 @@ module.exports = async function(callback) {
             owner = '0x45e25795A72881a4D80C59B5c60120655215a053'
           }
 
-          if (owner.toLowerCase() === ('0x8A0011ccb1850e18A9D2D4b15bd7F9E9E423c11b').toLowerCase()) {
+          if (owner.toLowerCase() === oldCloversAddress.toLowerCase()) {
             // this is owned by old Clovers contract
             // should be owned by new Clovers contract
             owner = clovers.address
@@ -139,13 +142,26 @@ module.exports = async function(callback) {
             gasToCash(receipt.gasUsed)
             totalGas = totalGas.plus(receipt.gasUsed)
 
-            if (!price.eq("0") && owner == clovers.address) {
+          }
+
+          
+          if (owner == clovers.address) {
+            if (price.eq("0")) {
+              console.log("empty price now equal to 10")
+              price = web3.toWei("10")
+            } else {
+              console.log(`price is ${price.toString(10)}`)
+            }
+
+            var currentPrice = await simpleCloversMarket.sellPrice(tokenId)
+            if (!currentPrice.eq(price)) {
               var {receipt} = await simpleCloversMarket.sell(tokenId, price.toString(10))
               console.log(_ + 'added token for sale - ' + receipt.gasUsed)
               gasToCash(receipt.gasUsed)
               totalGas = totalGas.plus(receipt.gasUsed)
             }
           }
+
           resolve()
         } catch (error) {
           

@@ -7,11 +7,11 @@ pragma solidity ^0.4.18;
 
 import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "zeppelin-solidity/contracts/token/ERC721/ERC721Token.sol";
-import "zeppelin-solidity/contracts/ownership/Ownable.sol";
+import "./helpers/MultiOwnable.sol";
 import "./CloversMetadata.sol";
 
 
-contract Clovers is ERC721Token, Ownable {
+contract Clovers is ERC721Token, MultiOwnable {
 
     address public cloversMetadata;
     uint256 public totalSymmetries;
@@ -31,7 +31,7 @@ contract Clovers is ERC721Token, Ownable {
     modifier onlyOwnerOrController() {
         require(
             msg.sender == cloversController ||
-            msg.sender == owner
+            owners[msg.sender]
         );
         _;
     }

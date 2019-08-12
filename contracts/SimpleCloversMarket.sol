@@ -7,7 +7,7 @@ import "./ClubTokenController.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 
-contract CloversController {
+contract ICloversController {
     function transferFrom(address _from, address _to, uint256 _tokenId) public;
 }
 
@@ -67,7 +67,7 @@ contract SimpleCloversMarket is Ownable {
             require(sells[_tokenId].price == 0);
         }
         sells[_tokenId].price = price;
-        sells[_tokenId].from = Clovers(clovers).ownerOf(_tokenId);
+        sells[_tokenId].from = tokenOwner;
         updatePrice(_tokenId, price);
     }
     function buy (uint256 _tokenId) public payable {
@@ -84,7 +84,7 @@ contract SimpleCloversMarket is Ownable {
         } else {
             ClubTokenController(clubTokenController).transferFrom(msg.sender, sellFrom, sellPrice);
         }
-        CloversController(cloversController).transferFrom(sellFrom, msg.sender, _tokenId);
+        ICloversController(cloversController).transferFrom(sellFrom, msg.sender, _tokenId);
         delete(sells[_tokenId]);
         updatePrice(_tokenId, 0);
     }
