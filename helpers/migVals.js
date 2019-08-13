@@ -24,7 +24,8 @@ var vals = (module.exports = {
   virtualSupplyCM: utils.toWei('100000'),
   updateCloversController,
   updateClubTokenController,
-  deployCloversController
+  deployCloversController,
+  addAsAdmin
 })
 
 async function deployCloversController({
@@ -210,41 +211,47 @@ async function updateClubTokenController({
     console.log('support hasnt changed')
   }
 
+  console.log('add as admins to clubTokenController')
+  await addAsAdmin(clubTokenController, accounts)
 
 
-  var secondOwner = await clubTokenController.isOwner(accounts[1])
+
+}
+
+
+
+
+async function addAsAdmin(contract, accounts) {
+
+  var secondOwner = await contract.isAdmin(accounts[1])
   if (!secondOwner) {
-    console.log(`adding ${accounts[1]} as owner`)
-    await clubTokenController.transferOwnership(accounts[1])
+    console.log(`adding ${accounts[1]} as owner in contract`)
+    await contract.transferAdminship(accounts[1])
   } else {
-    console.log(`${accounts[1]} is already an owner`)
+    console.log(`${accounts[1]} is already an owner in contract`)
   }
 
-  var secondOwner = await clubTokenController.isOwner(accounts[2])
+  var secondOwner = await contract.isAdmin(accounts[2])
   if (!secondOwner) {
-    console.log(`adding ${accounts[2]} as owner`)
-    await clubTokenController.transferOwnership(accounts[2])
+    console.log(`adding ${accounts[2]} as owner in contract`)
+    await contract.transferAdminship(accounts[2])
   } else {
-    console.log(`${accounts[2]} is already an owner`)
+    console.log(`${accounts[2]} is already an owner in contract`)
   }
 
-  var secondOwner = await clubTokenController.isOwner(accounts[3])
+  var secondOwner = await contract.isAdmin(accounts[3])
   if (!secondOwner) {
-    console.log(`adding ${accounts[3]} as owner`)
-    await clubTokenController.transferOwnership(accounts[3])
+    console.log(`adding ${accounts[3]} as owner in contract`)
+    await contract.transferAdminship(accounts[3])
   } else {
-    console.log(`${accounts[3]} is already an owner`)
+    console.log(`${accounts[3]} is already an owner in contract`)
   }
 
-  var secondOwner = await clubTokenController.isOwner(accounts[4])
+  var secondOwner = await contract.isAdmin(accounts[4])
   if (!secondOwner) {
-    console.log(`adding ${accounts[4]} as owner`)
-    await clubTokenController.transferOwnership(accounts[4])
+    console.log(`adding ${accounts[4]} as owner in contract`)
+    await contract.transferAdminship(accounts[4])
   } else {
-    console.log(`${accounts[4]} is already an owner`)
+    console.log(`${accounts[4]} is already an owner in contract`)
   }
-
-
-
-
 }

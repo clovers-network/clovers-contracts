@@ -786,9 +786,10 @@ contract('Clovers', async function(accounts) {
       assert(whitelisted, "Supposed to be on whitelist")
     })
 
-    it('should faile whitelisted user if not active', async function () {
+    it('should fail whitelisted user if not active', async function () {
       try {
         await  support.support({value: limit.toString(10), from: accounts[2]})
+        console.log("ACTUALLY AN ERROR HERE - 1")
         assert(false, "should fail")
       } catch (error) {
         assert(true, "should fail")
@@ -806,16 +807,17 @@ contract('Clovers', async function(accounts) {
     it('should fail when whitelist tries to add more than limit', async function () {
       try {
         await support.support({value: limit, from: accounts[1]})
-        console.log("ACTUALLY AN ERROR HERE")
+        console.log("ACTUALLY AN ERROR HERE - 2")
         assert(false, 'shouldnt pass')
       } catch(error) {
         assert(true, 'should fail')
       }
     })
 
-    it ('should allow second contributor', async function () {
+    it ('should allow second contributor via contract and direct send', async function () {
       await support.addToWhitelist(accounts[1])
-      await support.support({value: utils.toWei('2'), from: accounts[1]})
+      await support.support({value: utils.toWei('1'), from: accounts[1]})
+      await support.sendTransaction({from: accounts[1], gas: 34000, value: utils.toWei('1')})
 
       let currentContribution = await support.currentContribution(accounts[1])
       assert(currentContribution.eq(utils.toWei("2")), "Contributions dont match: " + currentContribution.toString(10))
@@ -847,6 +849,7 @@ contract('Clovers', async function(accounts) {
 
       try {
         await support.withdraw({from: accounts[3]})
+        console.log("ACTUALLY AN ERROR HERE - 3")
         assert(false, "shouldnt be here")
       } catch (error) {
         assert(true, "should fail")
@@ -855,7 +858,7 @@ contract('Clovers', async function(accounts) {
 
       try {
         await support.support({from: accounts[2]})
-        assert(false, "shouldnt be here")
+        assert(false, "ACTUALLY AN ERROR HERE - 4")
       } catch (error) {
         assert(true, "should fail")
       }
