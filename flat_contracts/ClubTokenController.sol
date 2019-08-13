@@ -1207,74 +1207,74 @@ contract BancorFormula is IBancorFormula, Utils {
     }
 }
 
-// File: contracts/helpers/MultiOwnable.sol
+// File: contracts/helpers/Admin.sol
 
 pragma solidity ^0.4.24;
 
 
 /**
  * @title Ownable
- * @dev The Ownable contract has an owner address, and provides basic authorization control
+ * @dev The Ownable contract has an admin address, and provides basic authorization control
  * functions, this simplifies the implementation of "user permissions".
  */
-contract MultiOwnable {
-  mapping (address => bool) public owners;
+contract Admin {
+  mapping (address => bool) public admins;
 
 
-  event OwnershipRenounced(address indexed previousOwner);
-  event OwnershipTransferred(
-    address indexed previousOwner,
-    address indexed newOwner
+  event AdminshipRenounced(address indexed previousAdmin);
+  event AdminshipTransferred(
+    address indexed previousAdmin,
+    address indexed newAdmin
   );
 
 
   /**
-   * @dev The Ownable constructor sets the original `owner` of the contract to the sender
+   * @dev The Ownable constructor sets the original `admin` of the contract to the sender
    * account.
    */
   constructor() public {
-    owners[msg.sender] = true;
+    admins[msg.sender] = true;
   }
 
   /**
-   * @dev Throws if called by any account other than the owner.
+   * @dev Throws if called by any account other than the admin.
    */
-  modifier onlyOwner() {
-    require(owners[msg.sender]);
+  modifier onlyAdmin() {
+    require(admins[msg.sender]);
     _;
   }
 
-    function isOwner(address _isOwner) public view returns(bool) {
-        return owners[_isOwner];
-    }
+  function isAdmin(address _admin) public view returns(bool) {
+    return admins[_admin];
+  }
 
   /**
-   * @dev Allows the current owner to relinquish control of the contract.
-   * @notice Renouncing to ownership will leave the contract without an owner.
-   * It will not be possible to call the functions with the `onlyOwner`
+   * @dev Allows the current admin to relinquish control of the contract.
+   * @notice Renouncing to adminship will leave the contract without an admin.
+   * It will not be possible to call the functions with the `onlyAdmin`
    * modifier anymore.
    */
-  function renounceOwnership(address _previousOwner) public onlyOwner {
-    emit OwnershipRenounced(_previousOwner);
-    owners[_previousOwner] = false;
+  function renounceAdminship(address _previousAdmin) public onlyAdmin {
+    emit AdminshipRenounced(_previousAdmin);
+    admins[_previousAdmin] = false;
   }
 
   /**
-   * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param _newOwner The address to transfer ownership to.
+   * @dev Allows the current admin to transfer control of the contract to a newAdmin.
+   * @param _newAdmin The address to transfer adminship to.
    */
-  function transferOwnership(address _newOwner) public onlyOwner {
-    _transferOwnership(_newOwner);
+  function transferAdminship(address _newAdmin) public onlyAdmin {
+    _transferAdminship(_newAdmin);
   }
 
   /**
-   * @dev Transfers control of the contract to a newOwner.
-   * @param _newOwner The address to transfer ownership to.
+   * @dev Transfers control of the contract to a newAdmin.
+   * @param _newAdmin The address to transfer adminship to.
    */
-  function _transferOwnership(address _newOwner) internal {
-    require(_newOwner != address(0));
-    emit OwnershipTransferred(msg.sender, _newOwner);
-    owners[_newOwner] = true;
+  function _transferAdminship(address _newAdmin) internal {
+    require(_newAdmin != address(0));
+    emit AdminshipTransferred(msg.sender, _newAdmin);
+    admins[_newAdmin] = true;
   }
 }
 
@@ -1289,7 +1289,8 @@ pragma solidity ^0.4.18;
 
 
 
-contract ClubTokenController is BancorFormula, MultiOwnable {
+
+contract ClubTokenController is BancorFormula, Admin, Ownable {
     event Buy(address buyer, uint256 tokens, uint256 value, uint256 poolBalance, uint256 tokenSupply);
     event Sell(address seller, uint256 tokens, uint256 value, uint256 poolBalance, uint256 tokenSupply);
 
@@ -1314,7 +1315,7 @@ contract ClubTokenController is BancorFormula, MultiOwnable {
     }
 
     modifier notPaused() {
-        require(!paused || owners[msg.sender] || owners[tx.origin], "Contract must not be paused");
+        require(!paused || owner == msg.sender || admins[tx.origin], "Contract must not be paused");
         _;
     }
 
