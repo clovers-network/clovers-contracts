@@ -62,7 +62,7 @@ module.exports = {
         return new HDWalletProvider(
           process.env.RINKEBY_MNEMONIC,
           "https://kovan.infura.io/" + process.env.INFURA_API_KEY,
-          1,
+          4,
           10
         );
       },
@@ -74,13 +74,13 @@ module.exports = {
         return new HDWalletProvider(
           process.env.TRUFFLE_MNEMONIC,
           "https://rinkeby.infura.io/v3/" + process.env.INFURA_API_KEY,
-          4,
+          0,
           10
         );
       },
       network_id: 4,
       // gas: 4700000,
-      gasPrice: 100000000000
+      gasPrice: 2000000000 // 1 GWEI
     },
     ropsten: {
       provider() {

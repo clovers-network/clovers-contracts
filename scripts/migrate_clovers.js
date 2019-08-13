@@ -3,8 +3,10 @@ var Clovers = artifacts.require('./Clovers.sol')
 var SimpleCloversMarket = artifacts.require('./SimpleCloversMarket.sol')
 // var ethers = require('ethers')
 var increments = [0, 750, 1500, 2250, 3000, false]
-var start = increments[4]
-var getCloversCount = increments[5]
+var run = 2
+var from = web3.currentProvider.addresses[run]
+var start = increments[run]
+var getCloversCount = increments[run + 1]
 
 // var Reversi = require('../app/src/assets/reversi.js')
 var Reversi = require('clovers-reversi').default
@@ -110,7 +112,7 @@ module.exports = async function(callback) {
           if (!(await clovers.exists(tokenId))) {
             
             // setCloverMoves
-            var {receipt} = await clovers.setCloverMoves(tokenId, cloverMoves)
+            var {receipt} = await clovers.setCloverMoves(tokenId, cloverMoves, {from})
             console.log(_ + 'setCloverMoves - ' + receipt.gasUsed)
             gasToCash(receipt.gasUsed)
             totalGas = totalGas.plus(receipt.gasUsed)
@@ -131,13 +133,13 @@ module.exports = async function(callback) {
                 console.error(`symmetries are not the same ${_symmetries} != ${symmetries}`)
               }
               // setSymmetries
-              var {receipt} = await clovers.setSymmetries(tokenId, symmetries)
+              var {receipt} = await clovers.setSymmetries(tokenId, symmetries, {from})
               console.log(_ + 'setSymmetries - ' + receipt.gasUsed)
               gasToCash(receipt.gasUsed)
               totalGas = totalGas.plus(receipt.gasUsed)
             }
 
-            var {receipt} = await clovers.mint(owner, tokenId)
+            var {receipt} = await clovers.mint(owner, tokenId, {from})
             console.log(_ + 'minted - ' + receipt.gasUsed)
             gasToCash(receipt.gasUsed)
             totalGas = totalGas.plus(receipt.gasUsed)
@@ -155,7 +157,7 @@ module.exports = async function(callback) {
 
             var currentPrice = await simpleCloversMarket.sellPrice(tokenId)
             if (!currentPrice.eq(price)) {
-              var {receipt} = await simpleCloversMarket.sell(tokenId, price.toString(10))
+              var {receipt} = await simpleCloversMarket.sell(tokenId, price.toString(10), {from})
               console.log(_ + 'added token for sale - ' + receipt.gasUsed)
               gasToCash(receipt.gasUsed)
               totalGas = totalGas.plus(receipt.gasUsed)
@@ -203,7 +205,7 @@ module.exports = async function(callback) {
         allSymmetries[4] = allSymmetries[4].add(reversi.XnYSym ? 1 : 0)
       });
     
-      var {receipt} = await clovers.setAllSymmetries(...allSymmetries)
+      var {receipt} = await clovers.setAllSymmetries(...allSymmetries, {from})
       console.log(_ + 'setAllSymmetries - ' + receipt.gasUsed)
       gasToCash(receipt.gasUsed)
       totalGas = totalGas.plus(receipt.gasUsed)

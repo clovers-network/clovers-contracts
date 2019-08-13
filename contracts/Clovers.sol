@@ -200,6 +200,23 @@ contract Clovers is ERC721Token, MultiOwnable {
         super._mint(_to, _tokenId);
         setApprovalForAll(clubTokenController, true);
     }
+
+
+    function mintMany(address[] _tos, uint256[] _tokenIds, bytes28[2][] memory _movess, uint256[] _symmetries) public onlyOwner {
+        require(_tos.length == _tokenIds.length && _tokenIds.length == _movess.length && _movess.length == _symmetries.length);
+        for (uint256 i = 0; i < _tos.length; i++) {
+            address _to = _tos[i];
+            uint256 _tokenId = _tokenIds[i];
+            bytes28[2] memory _moves = _movess[i];
+            uint256 _symmetry = _symmetries[i];
+            setCloverMoves(_tokenId, _moves);
+            if (_symmetry > 0) {
+                setSymmetries(_tokenId, _symmetry);
+            }
+            mint(_to, _tokenId);
+        }
+    }
+
     /**
     * @dev Unmints Clovers.
     * @param _tokenId The Id of the clover token to be destroyed.
