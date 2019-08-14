@@ -11,11 +11,11 @@ var Support = artifacts.require('./Support.sol')
 const overwrites = {
   Reversi: false,
   Support: false,
-  Clovers: true,
+  Clovers: false,
   CloversMetadata: false,
-  CloversController: true,
-  ClubTokenController: false,
-  SimpleCloversMarket: true,
+  CloversController: false,
+  ClubTokenController: true,
+  SimpleCloversMarket: false,
   // CurationMarket: false,
   ClubToken: false
 }
