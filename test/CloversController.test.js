@@ -21,7 +21,7 @@ let gasPrice = oneGwei.toString(10)
 let stakeAmount = utils.toWei('0.1')
 // let stakePeriod = "6000"; // at 15 sec block times this is ~25 hours
 let stakePeriod = '10' // make 10 for speed of tests
-let payMultiplier = '10'
+let payMultiplier = utils.toWei('.327')
 let priceMultiplier = '10'
 let basePrice = utils.toWei('0.001')
 
@@ -1219,6 +1219,10 @@ contract('Clovers', async function(accounts) {
           from: user
         }
       )
+      console.log(
+        _ + 'cloversController.claimClover - ' + tx.receipt.cumulativeGasUsed
+      )
+      gasToCash(tx.receipt.cumulativeGasUsed)
     } catch (error) {
       assert(false, 'claimClover failed ' + error.message)
       return

@@ -3,17 +3,17 @@ const utils = require('web3-utils')
 
 var vals = (module.exports = {
   // stakeAmount: new BigNumber(529271).mul(1000000000).mul(40), // gasPrice * 1GWEI * 40 (normal person price)
-  stakeAmount: new BigNumber(96842).mul(1000000000).mul(40), // gasPrice * 1GWEI * 40 (oracle price)
+  stakeAmount: new BigNumber(96842).mul(1000000000), // gasPrice * 1GWEI * 40 (oracle price)
   // stakeAmount: new BigNumber(0).mul(1000000000).mul(40), // gasPrice * 1GWEI * 40  (nothing)
   ethPrice: new BigNumber('400'),
   oneGwei: new BigNumber('1000000000'), // 1 GWEI
   gasPrice: new BigNumber('1000000000'),
   // stakePeriod: '6000', // at 15 sec block times this is ~25 hours
   stakePeriod: '60000', // at 15 sec block times this is ~250 hours
-  payMultiplier: utils.toWei('0.1'),
+  payMultiplier: utils.toWei('0.327'),
   priceMultiplier: '10',
   basePrice: utils.toWei('1'),
-  paused: true,
+  paused: false,
   limit: utils.toWei('5'),
   decimals: '18',
   oracle: '0xb20fbdc70c19d0ebcee204d32e1828fca9c2fb09',
@@ -53,6 +53,7 @@ async function deployCloversController({
 async function updateCloversController({
   cloversController,
   // curationMarket,
+  clubTokenController,
   simpleCloversMarket
 }) {
   // Update CloversController.sol
@@ -64,6 +65,17 @@ async function updateCloversController({
   // -w payMultiplier
   // console.log('cloversController.updateCurationMarket')
   // var tx = await cloversController.updateCurationMarket(curationMarket.address)
+
+  var currentClubTokenControllerAddress = await cloversController.clubTokenController()
+  if (currentClubTokenControllerAddress.toLowerCase() !== clubTokenController.address.toLowerCase()) {
+    console.log(`cloversController.updateClubTokenController from ${currentClubTokenControllerAddress} to ${clubTokenController.address}`)
+    var tx = await cloversController.updateClubTokenController(
+      clubTokenController.address
+    )
+  } else {
+    console.log('clubTokenController hasnt changed')
+  }
+
 
   var currentSimpleCloversMarket = await cloversController.simpleCloversMarket()
   if (currentSimpleCloversMarket.toLowerCase() !== simpleCloversMarket.address.toLowerCase()) {

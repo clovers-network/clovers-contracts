@@ -106,6 +106,7 @@ module.exports = (deployer, network, accounts) => {
       await updateCloversController({
         cloversController,
         // curationMarket,
+        clubTokenController,
         simpleCloversMarket
       })
 
