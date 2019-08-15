@@ -3,9 +3,9 @@ const utils = require('web3-utils')
 
 var vals = (module.exports = {
   // stakeAmount: new BigNumber(529271).mul(1000000000).mul(40), // gasPrice * 1GWEI * 40 (normal person price)
-  stakeAmount: new BigNumber(96842).mul(1000000000), // gasPrice * 1GWEI * 40 (oracle price)
+  stakeAmount: new BigNumber(96842).mul(1000000000).mul(10), // gasPrice * 1GWEI * 40 (oracle price)
   // stakeAmount: new BigNumber(0).mul(1000000000).mul(40), // gasPrice * 1GWEI * 40  (nothing)
-  ethPrice: new BigNumber('400'),
+  ethPrice: new BigNumber('200'),
   oneGwei: new BigNumber('1000000000'), // 1 GWEI
   gasPrice: new BigNumber('1000000000'),
   // stakePeriod: '6000', // at 15 sec block times this is ~25 hours
