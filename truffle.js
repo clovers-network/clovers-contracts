@@ -60,7 +60,7 @@ module.exports = {
       provider() {
         // using wallet at index 1 ----------------------------------------------------------------------------------------v
         return new HDWalletProvider(
-          process.env.MAINNET_NEMONIC,
+          process.env.MAINNET_MNEMONIC,
           "https://mainnet.infura.io/v3/" + process.env.INFURA_API_KEY,
           0,
           10
