@@ -16,7 +16,7 @@ const overwrites = {
   CloversController: false,
   ClubTokenController: false,
   SimpleCloversMarket: false,
-  // CurationMarket: true,
+  // CurationMarket: false,
   ClubToken: false
 }
 

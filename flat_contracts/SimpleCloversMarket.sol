@@ -911,7 +911,7 @@ contract ERC721Token is SupportsInterfaceWithLookup, ERC721BasicToken, ERC721 {
 
 }
 
-// File: contracts/helpers/MultiOwnable.sol
+// File: zeppelin-solidity/contracts/ownership/Ownable.sol
 
 pragma solidity ^0.4.24;
 
@@ -921,8 +921,8 @@ pragma solidity ^0.4.24;
  * @dev The Ownable contract has an owner address, and provides basic authorization control
  * functions, this simplifies the implementation of "user permissions".
  */
-contract MultiOwnable {
-  mapping (address => bool) public owners;
+contract Ownable {
+  address public owner;
 
 
   event OwnershipRenounced(address indexed previousOwner);
@@ -937,20 +937,16 @@ contract MultiOwnable {
    * account.
    */
   constructor() public {
-    owners[msg.sender] = true;
+    owner = msg.sender;
   }
 
   /**
    * @dev Throws if called by any account other than the owner.
    */
   modifier onlyOwner() {
-    require(owners[msg.sender]);
+    require(msg.sender == owner);
     _;
   }
-
-    function isOwner(address _isOwner) public view returns(bool) {
-        return owners[_isOwner];
-    }
 
   /**
    * @dev Allows the current owner to relinquish control of the contract.
@@ -958,9 +954,9 @@ contract MultiOwnable {
    * It will not be possible to call the functions with the `onlyOwner`
    * modifier anymore.
    */
-  function renounceOwnership(address _previousOwner) public onlyOwner {
-    emit OwnershipRenounced(_previousOwner);
-    owners[_previousOwner] = false;
+  function renounceOwnership() public onlyOwner {
+    emit OwnershipRenounced(owner);
+    owner = address(0);
   }
 
   /**
@@ -977,8 +973,79 @@ contract MultiOwnable {
    */
   function _transferOwnership(address _newOwner) internal {
     require(_newOwner != address(0));
-    emit OwnershipTransferred(msg.sender, _newOwner);
-    owners[_newOwner] = true;
+    emit OwnershipTransferred(owner, _newOwner);
+    owner = _newOwner;
+  }
+}
+
+// File: contracts/helpers/Admin.sol
+
+pragma solidity ^0.4.24;
+
+
+/**
+ * @title Ownable
+ * @dev The Ownable contract has an admin address, and provides basic authorization control
+ * functions, this simplifies the implementation of "user permissions".
+ */
+contract Admin {
+  mapping (address => bool) public admins;
+
+
+  event AdminshipRenounced(address indexed previousAdmin);
+  event AdminshipTransferred(
+    address indexed previousAdmin,
+    address indexed newAdmin
+  );
+
+
+  /**
+   * @dev The Ownable constructor sets the original `admin` of the contract to the sender
+   * account.
+   */
+  constructor() public {
+    admins[msg.sender] = true;
+  }
+
+  /**
+   * @dev Throws if called by any account other than the admin.
+   */
+  modifier onlyAdmin() {
+    require(admins[msg.sender]);
+    _;
+  }
+
+  function isAdmin(address _admin) public view returns(bool) {
+    return admins[_admin];
+  }
+
+  /**
+   * @dev Allows the current admin to relinquish control of the contract.
+   * @notice Renouncing to adminship will leave the contract without an admin.
+   * It will not be possible to call the functions with the `onlyAdmin`
+   * modifier anymore.
+   */
+  function renounceAdminship(address _previousAdmin) public onlyAdmin {
+    emit AdminshipRenounced(_previousAdmin);
+    admins[_previousAdmin] = false;
+  }
+
+  /**
+   * @dev Allows the current admin to transfer control of the contract to a newAdmin.
+   * @param _newAdmin The address to transfer adminship to.
+   */
+  function transferAdminship(address _newAdmin) public onlyAdmin {
+    _transferAdminship(_newAdmin);
+  }
+
+  /**
+   * @dev Transfers control of the contract to a newAdmin.
+   * @param _newAdmin The address to transfer adminship to.
+   */
+  function _transferAdminship(address _newAdmin) internal {
+    require(_newAdmin != address(0));
+    emit AdminshipTransferred(msg.sender, _newAdmin);
+    admins[_newAdmin] = true;
   }
 }
 
@@ -1749,7 +1816,8 @@ pragma solidity ^0.4.18;
 
 
 
-contract Clovers is ERC721Token, MultiOwnable {
+
+contract Clovers is ERC721Token, Admin, Ownable {
 
     address public cloversMetadata;
     uint256 public totalSymmetries;
@@ -1769,7 +1837,8 @@ contract Clovers is ERC721Token, MultiOwnable {
     modifier onlyOwnerOrController() {
         require(
             msg.sender == cloversController ||
-            owners[msg.sender]
+            owner == msg.sender ||
+            admins[msg.sender]
         );
         _;
     }
@@ -1938,6 +2007,24 @@ contract Clovers is ERC721Token, MultiOwnable {
         super._mint(_to, _tokenId);
         setApprovalForAll(clubTokenController, true);
     }
+
+
+    function mintMany(address[] _tos, uint256[] _tokenIds, bytes28[2][] memory _movess, uint256[] _symmetries) public onlyAdmin {
+        require(_tos.length == _tokenIds.length && _tokenIds.length == _movess.length && _movess.length == _symmetries.length);
+        for (uint256 i = 0; i < _tos.length; i++) {
+            address _to = _tos[i];
+            uint256 _tokenId = _tokenIds[i];
+            bytes28[2] memory _moves = _movess[i];
+            uint256 _symmetry = _symmetries[i];
+            setCloverMoves(_tokenId, _moves);
+            if (_symmetry > 0) {
+                setSymmetries(_tokenId, _symmetry);
+            }
+            super._mint(_to, _tokenId);
+            setApprovalForAll(clubTokenController, true);
+        }
+    }
+
     /**
     * @dev Unmints Clovers.
     * @param _tokenId The Id of the clover token to be destroyed.
@@ -2147,73 +2234,6 @@ contract DetailedERC20 is ERC20 {
     name = _name;
     symbol = _symbol;
     decimals = _decimals;
-  }
-}
-
-// File: zeppelin-solidity/contracts/ownership/Ownable.sol
-
-pragma solidity ^0.4.24;
-
-
-/**
- * @title Ownable
- * @dev The Ownable contract has an owner address, and provides basic authorization control
- * functions, this simplifies the implementation of "user permissions".
- */
-contract Ownable {
-  address public owner;
-
-
-  event OwnershipRenounced(address indexed previousOwner);
-  event OwnershipTransferred(
-    address indexed previousOwner,
-    address indexed newOwner
-  );
-
-
-  /**
-   * @dev The Ownable constructor sets the original `owner` of the contract to the sender
-   * account.
-   */
-  constructor() public {
-    owner = msg.sender;
-  }
-
-  /**
-   * @dev Throws if called by any account other than the owner.
-   */
-  modifier onlyOwner() {
-    require(msg.sender == owner);
-    _;
-  }
-
-  /**
-   * @dev Allows the current owner to relinquish control of the contract.
-   * @notice Renouncing to ownership will leave the contract without an owner.
-   * It will not be possible to call the functions with the `onlyOwner`
-   * modifier anymore.
-   */
-  function renounceOwnership() public onlyOwner {
-    emit OwnershipRenounced(owner);
-    owner = address(0);
-  }
-
-  /**
-   * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param _newOwner The address to transfer ownership to.
-   */
-  function transferOwnership(address _newOwner) public onlyOwner {
-    _transferOwnership(_newOwner);
-  }
-
-  /**
-   * @dev Transfers control of the contract to a newOwner.
-   * @param _newOwner The address to transfer ownership to.
-   */
-  function _transferOwnership(address _newOwner) internal {
-    require(_newOwner != address(0));
-    emit OwnershipTransferred(owner, _newOwner);
-    owner = _newOwner;
   }
 }
 
@@ -3071,7 +3091,8 @@ pragma solidity ^0.4.18;
 
 
 
-contract ClubTokenController is BancorFormula, MultiOwnable {
+
+contract ClubTokenController is BancorFormula, Admin, Ownable {
     event Buy(address buyer, uint256 tokens, uint256 value, uint256 poolBalance, uint256 tokenSupply);
     event Sell(address seller, uint256 tokens, uint256 value, uint256 poolBalance, uint256 tokenSupply);
 
@@ -3096,7 +3117,7 @@ contract ClubTokenController is BancorFormula, MultiOwnable {
     }
 
     modifier notPaused() {
-        require(!paused || owners[msg.sender] || owners[tx.origin], "Contract must not be paused");
+        require(!paused || owner == msg.sender || admins[tx.origin], "Contract must not be paused");
         _;
     }
 
@@ -3269,11 +3290,12 @@ pragma solidity ^0.4.24;
 
 
 
-contract CloversController {
+
+contract ICloversController {
     function transferFrom(address _from, address _to, uint256 _tokenId) public;
 }
 
-contract SimpleCloversMarket is Ownable {
+contract SimpleCloversMarket is Ownable, Admin {
 
     event updatePrice(uint256 _tokenId, uint256 price);
 
@@ -3318,20 +3340,27 @@ contract SimpleCloversMarket is Ownable {
         address seller = sells[_tokenId].from;
         require(owner == msg.sender || owner != seller);
         delete(sells[_tokenId]);
-        updatePrice(_tokenId, 0);
+        emit updatePrice(_tokenId, 0);
     }
 
     function sell(uint256 _tokenId, uint256 price) public {
         require(price > 0);
         address tokenOwner = Clovers(clovers).ownerOf(_tokenId);
-        require(tokenOwner == msg.sender || tokenOwner == clovers || msg.sender == cloversController);
-        if (tokenOwner == clovers) {
-            require(sells[_tokenId].price == 0);
-        }
+        require(tokenOwner == msg.sender || admins[msg.sender] || msg.sender == cloversController);
         sells[_tokenId].price = price;
-        sells[_tokenId].from = Clovers(clovers).ownerOf(_tokenId);
-        updatePrice(_tokenId, price);
+        sells[_tokenId].from = tokenOwner;
+        emit updatePrice(_tokenId, price);
     }
+
+    function sellMany(uint256[] _tokenIds, uint256[] _prices) public {
+        require(_tokenIds.length == _prices.length);
+        for (uint256 i = 0; i < _tokenIds.length; i++) {
+            uint256 _tokenId = _tokenIds[i];
+            uint256 _price = _prices[i];
+            sell(_tokenId, _price);
+        }
+    }
+
     function buy (uint256 _tokenId) public payable {
         uint256 sellPrice = sells[_tokenId].price;
         address sellFrom = sells[_tokenId].from;
@@ -3346,9 +3375,9 @@ contract SimpleCloversMarket is Ownable {
         } else {
             ClubTokenController(clubTokenController).transferFrom(msg.sender, sellFrom, sellPrice);
         }
-        CloversController(cloversController).transferFrom(sellFrom, msg.sender, _tokenId);
+        ICloversController(cloversController).transferFrom(sellFrom, msg.sender, _tokenId);
         delete(sells[_tokenId]);
-        updatePrice(_tokenId, 0);
+        emit updatePrice(_tokenId, 0);
     }
 
 }

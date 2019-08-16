@@ -6,12 +6,13 @@ import "./ClubTokenController.sol";
 // import "./CloversController.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
+import "./helpers/Admin.sol";
 
 contract ICloversController {
     function transferFrom(address _from, address _to, uint256 _tokenId) public;
 }
 
-contract SimpleCloversMarket is Ownable {
+contract SimpleCloversMarket is Ownable, Admin {
 
     event updatePrice(uint256 _tokenId, uint256 price);
 
@@ -56,20 +57,27 @@ contract SimpleCloversMarket is Ownable {
         address seller = sells[_tokenId].from;
         require(owner == msg.sender || owner != seller);
         delete(sells[_tokenId]);
-        updatePrice(_tokenId, 0);
+        emit updatePrice(_tokenId, 0);
     }
 
     function sell(uint256 _tokenId, uint256 price) public {
         require(price > 0);
         address tokenOwner = Clovers(clovers).ownerOf(_tokenId);
-        require(tokenOwner == msg.sender || tokenOwner == clovers || msg.sender == cloversController);
-        if (tokenOwner == clovers) {
-            require(sells[_tokenId].price == 0);
-        }
+        require(tokenOwner == msg.sender || admins[msg.sender] || msg.sender == cloversController);
         sells[_tokenId].price = price;
         sells[_tokenId].from = tokenOwner;
-        updatePrice(_tokenId, price);
+        emit updatePrice(_tokenId, price);
     }
+
+    function sellMany(uint256[] _tokenIds, uint256[] _prices) public {
+        require(_tokenIds.length == _prices.length);
+        for (uint256 i = 0; i < _tokenIds.length; i++) {
+            uint256 _tokenId = _tokenIds[i];
+            uint256 _price = _prices[i];
+            sell(_tokenId, _price);
+        }
+    }
+
     function buy (uint256 _tokenId) public payable {
         uint256 sellPrice = sells[_tokenId].price;
         address sellFrom = sells[_tokenId].from;
@@ -86,7 +94,7 @@ contract SimpleCloversMarket is Ownable {
         }
         ICloversController(cloversController).transferFrom(sellFrom, msg.sender, _tokenId);
         delete(sells[_tokenId]);
-        updatePrice(_tokenId, 0);
+        emit updatePrice(_tokenId, 0);
     }
 
 }

@@ -7,11 +7,12 @@ pragma solidity ^0.4.18;
 
 import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "zeppelin-solidity/contracts/token/ERC721/ERC721Token.sol";
-import "./helpers/MultiOwnable.sol";
+import "zeppelin-solidity/contracts/ownership/Ownable.sol";
+import "./helpers/Admin.sol";
 import "./CloversMetadata.sol";
 
 
-contract Clovers is ERC721Token, MultiOwnable {
+contract Clovers is ERC721Token, Admin, Ownable {
 
     address public cloversMetadata;
     uint256 public totalSymmetries;
@@ -31,7 +32,8 @@ contract Clovers is ERC721Token, MultiOwnable {
     modifier onlyOwnerOrController() {
         require(
             msg.sender == cloversController ||
-            owners[msg.sender]
+            owner == msg.sender ||
+            admins[msg.sender]
         );
         _;
     }
@@ -200,6 +202,24 @@ contract Clovers is ERC721Token, MultiOwnable {
         super._mint(_to, _tokenId);
         setApprovalForAll(clubTokenController, true);
     }
+
+
+    function mintMany(address[] _tos, uint256[] _tokenIds, bytes28[2][] memory _movess, uint256[] _symmetries) public onlyAdmin {
+        require(_tos.length == _tokenIds.length && _tokenIds.length == _movess.length && _movess.length == _symmetries.length);
+        for (uint256 i = 0; i < _tos.length; i++) {
+            address _to = _tos[i];
+            uint256 _tokenId = _tokenIds[i];
+            bytes28[2] memory _moves = _movess[i];
+            uint256 _symmetry = _symmetries[i];
+            setCloverMoves(_tokenId, _moves);
+            if (_symmetry > 0) {
+                setSymmetries(_tokenId, _symmetry);
+            }
+            super._mint(_to, _tokenId);
+            setApprovalForAll(clubTokenController, true);
+        }
+    }
+
     /**
     * @dev Unmints Clovers.
     * @param _tokenId The Id of the clover token to be destroyed.

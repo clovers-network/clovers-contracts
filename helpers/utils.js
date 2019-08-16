@@ -48,9 +48,9 @@ var vals = (module.exports = {
     BigNumber.config({ DECIMAL_PLACES: 2, ROUNDING_MODE: 4 })
 
     if (typeof totalGas !== 'object') totalGas = new BigNumber(totalGas)
-    let lowGwei = oneGwei.mul(new BigNumber('8'))
-    let highGwei = oneGwei.mul(new BigNumber('20'))
-    let ethPrice = new BigNumber('250')
+    let lowGwei = oneGwei.mul(new BigNumber('1'))
+    let highGwei = oneGwei.mul(new BigNumber('10'))
+    let ethPrice = new BigNumber('200')
 
     console.log(
       _ +
@@ -59,7 +59,7 @@ var vals = (module.exports = {
         new BigNumber(utils.fromWei(totalGas.mul(lowGwei).toString()))
           .mul(ethPrice)
           .toFixed(2) +
-        ' @ 8 GWE & ' +
+        ' @ ' + utils.fromWei(lowGwei.toString(10)) + ' GWE & ' +
         ethPrice +
         '/USD'
     )
@@ -70,7 +70,7 @@ var vals = (module.exports = {
         new BigNumber(utils.fromWei(totalGas.mul(highGwei).toString()))
           .mul(ethPrice)
           .toFixed(2) +
-        ' @ 20 GWE & ' +
+        ' @ ' + utils.fromWei(highGwei.toString(10)) + ' GWE & ' +
         ethPrice +
         '/USD'
     )

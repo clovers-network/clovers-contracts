@@ -3,17 +3,17 @@ const utils = require('web3-utils')
 
 var vals = (module.exports = {
   // stakeAmount: new BigNumber(529271).mul(1000000000).mul(40), // gasPrice * 1GWEI * 40 (normal person price)
-  stakeAmount: new BigNumber(96842).mul(1000000000).mul(40), // gasPrice * 1GWEI * 40 (oracle price)
+  stakeAmount: new BigNumber(96842).mul(1000000000).mul(10), // gasPrice * 1GWEI * 40 (oracle price)
   // stakeAmount: new BigNumber(0).mul(1000000000).mul(40), // gasPrice * 1GWEI * 40  (nothing)
-  ethPrice: new BigNumber('400'),
+  ethPrice: new BigNumber('200'),
   oneGwei: new BigNumber('1000000000'), // 1 GWEI
   gasPrice: new BigNumber('1000000000'),
   // stakePeriod: '6000', // at 15 sec block times this is ~25 hours
   stakePeriod: '60000', // at 15 sec block times this is ~250 hours
-  payMultiplier: utils.toWei('0.1'),
+  payMultiplier: utils.toWei('0.327'),
   priceMultiplier: '10',
   basePrice: utils.toWei('1'),
-  paused: true,
+  paused: false,
   limit: utils.toWei('5'),
   decimals: '18',
   oracle: '0xb20fbdc70c19d0ebcee204d32e1828fca9c2fb09',
@@ -24,7 +24,8 @@ var vals = (module.exports = {
   virtualSupplyCM: utils.toWei('100000'),
   updateCloversController,
   updateClubTokenController,
-  deployCloversController
+  deployCloversController,
+  addAsAdmin
 })
 
 async function deployCloversController({
@@ -52,6 +53,7 @@ async function deployCloversController({
 async function updateCloversController({
   cloversController,
   // curationMarket,
+  clubTokenController,
   simpleCloversMarket
 }) {
   // Update CloversController.sol
@@ -63,6 +65,17 @@ async function updateCloversController({
   // -w payMultiplier
   // console.log('cloversController.updateCurationMarket')
   // var tx = await cloversController.updateCurationMarket(curationMarket.address)
+
+  var currentClubTokenControllerAddress = await cloversController.clubTokenController()
+  if (currentClubTokenControllerAddress.toLowerCase() !== clubTokenController.address.toLowerCase()) {
+    console.log(`cloversController.updateClubTokenController from ${currentClubTokenControllerAddress} to ${clubTokenController.address}`)
+    var tx = await cloversController.updateClubTokenController(
+      clubTokenController.address
+    )
+  } else {
+    console.log('clubTokenController hasnt changed')
+  }
+
 
   var currentSimpleCloversMarket = await cloversController.simpleCloversMarket()
   if (currentSimpleCloversMarket.toLowerCase() !== simpleCloversMarket.address.toLowerCase()) {
@@ -210,41 +223,47 @@ async function updateClubTokenController({
     console.log('support hasnt changed')
   }
 
+  console.log('add as admins to clubTokenController')
+  await addAsAdmin(clubTokenController, accounts)
 
 
-  var secondOwner = await clubTokenController.isOwner(accounts[1])
+
+}
+
+
+
+
+async function addAsAdmin(contract, accounts) {
+
+  var secondOwner = await contract.isAdmin(accounts[1])
   if (!secondOwner) {
-    console.log(`adding ${accounts[1]} as owner`)
-    await clubTokenController.transferOwnership(accounts[1])
+    console.log(`adding ${accounts[1]} as owner in contract`)
+    await contract.transferAdminship(accounts[1])
   } else {
-    console.log(`${accounts[1]} is already an owner`)
+    console.log(`${accounts[1]} is already an owner in contract`)
   }
 
-  var secondOwner = await clubTokenController.isOwner(accounts[2])
+  var secondOwner = await contract.isAdmin(accounts[2])
   if (!secondOwner) {
-    console.log(`adding ${accounts[2]} as owner`)
-    await clubTokenController.transferOwnership(accounts[2])
+    console.log(`adding ${accounts[2]} as owner in contract`)
+    await contract.transferAdminship(accounts[2])
   } else {
-    console.log(`${accounts[2]} is already an owner`)
+    console.log(`${accounts[2]} is already an owner in contract`)
   }
 
-  var secondOwner = await clubTokenController.isOwner(accounts[3])
+  var secondOwner = await contract.isAdmin(accounts[3])
   if (!secondOwner) {
-    console.log(`adding ${accounts[3]} as owner`)
-    await clubTokenController.transferOwnership(accounts[3])
+    console.log(`adding ${accounts[3]} as owner in contract`)
+    await contract.transferAdminship(accounts[3])
   } else {
-    console.log(`${accounts[3]} is already an owner`)
+    console.log(`${accounts[3]} is already an owner in contract`)
   }
 
-  var secondOwner = await clubTokenController.isOwner(accounts[4])
+  var secondOwner = await contract.isAdmin(accounts[4])
   if (!secondOwner) {
-    console.log(`adding ${accounts[4]} as owner`)
-    await clubTokenController.transferOwnership(accounts[4])
+    console.log(`adding ${accounts[4]} as owner in contract`)
+    await contract.transferAdminship(accounts[4])
   } else {
-    console.log(`${accounts[4]} is already an owner`)
+    console.log(`${accounts[4]} is already an owner in contract`)
   }
-
-
-
-
 }
