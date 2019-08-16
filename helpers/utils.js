@@ -41,8 +41,22 @@ async function getLowestPrice(
   )
 }
 
+
+function getFlag(flag, value = true) {
+  var argIndex = process.argv.indexOf('--' + flag)
+  if (argIndex > -1) {
+    if (value && process.argv.length > argIndex) {
+      return process.argv[argIndex + 1]
+    } else {
+      return true
+    } 
+  }
+  return false
+}
+
 var vals = (module.exports = {
   getLowestPrice,
+  getFlag,
   _,
   gasToCash: function(totalGas, web3) {
     BigNumber.config({ DECIMAL_PLACES: 2, ROUNDING_MODE: 4 })

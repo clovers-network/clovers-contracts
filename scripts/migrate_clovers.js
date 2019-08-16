@@ -2,52 +2,38 @@ var Clovers = artifacts.require('./Clovers.sol')
 // var CloversController = artifacts.require('./CloversController.sol')
 var SimpleCloversMarket = artifacts.require('./SimpleCloversMarket.sol')
 // var ethers = require('ethers')
-var increments = [0, 750, 1500, 2250, 3000, false]
-var chunkSize = 5
 
 // var Reversi = require('../app/src/assets/reversi.js')
 var Reversi = require('clovers-reversi').default
-// var Web3 = require('web3')
 var fs = require('fs');
 const gasToCash = require('../helpers/utils').gasToCash
 const _ = require('../helpers/utils')._
+const getFlag = require('../helpers/utils').getFlag
 var BigNumber = require('bignumber.js')
+const goodOwner = '0x45e25795A72881a4D80C59B5c60120655215a053' // clovers "goodPlayer" account
 
-const oldMarketAddress = '0xcde232e835330dafa2ebc629219bbf4fc92cfa24'
-const oldCloversAddress = '0x8A0011ccb1850e18A9D2D4b15bd7F9E9E423c11b'
+const oldCloversAddresses = ['0x8A0011ccb1850e18A9D2D4b15bd7F9E9E423c11b', '0xe312398f2741E2Ab4C0C985c8d91AdcC4a995a59']
 let clovers
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 module.exports = async function(callback) {
 
+
+
   // add flag --account with index of account afterwards
-  var run = 0
-  var argIndex = process.argv.indexOf('--account')
-  if (argIndex > -1 && process.argv.length > argIndex) {
-    run = parseInt(process.argv[argIndex + 1])
-  }
+  var run = getFlag('account') || 0
 
   // add flag --filter with "minted" to only filter and check for minting clovers
   // add "market" (or anything else) to filter for simpleMarket clovers
-  var filterBy = 'minted'
-  argIndex = process.argv.indexOf('--filter')
-  if (argIndex > -1 && process.argv.length > argIndex) {
-    filterBy = process.argv[argIndex + 1]
-  } 
+  var filterBy = getFlag('filter') || 'none' // 'minted', 'sell'
 
   // add flag --setSymmetries if the command should setAllSymmetries
-  var setAllSymmetries = false
-  argIndex = process.argv.indexOf('--setSymmetries')
-  if (argIndex > -1) {
-    setAllSymmetries = true
-  } 
-
+  var setAllSymmetries = getFlag('setSymmetries', false) || false
 
   // from account determined by --account flag or default 0
   var from = web3.currentProvider.addresses[run]
 
-  // range of clovers to check
-  var start = increments[run]
-  var getCloversCount = increments[run + 1]
+  var limit = getFlag('limit') || 500
+  var chunkSize = getFlag('chunk') || 50
 
   console.log({run, from})
   try {
@@ -66,15 +52,22 @@ module.exports = async function(callback) {
     var totalGas = new web3.BigNumber('0')
 
     // read all previously recorded clovers from JSON files and combine them into allClovers
+    var cloversDir = __dirname + '/../clovers/'
+    var cloverFiles = fs.readdirSync(cloversDir)
     var allClovers = []
-    for(var i = 1; i < 5; i++) {
-      const cloverPath = __dirname + `/../clovers/raw-${i}.json`
-      var allCloversString = fs.readFileSync(cloverPath).toString()
-      allClovers.push(...JSON.parse(allCloversString))
+    cloverFiles.forEach((file) => {
+      if (file.indexOf('.json') < 0) continue
+      allClovers.push(...JSON.parse(fs.readFileSync(file).toString()))
+    })
+
+    var start = limit * run
+    var end = start + limit
+    if (allClovers.length < end) {
+        end = allClovers.length
     }
 
     // filter allClovers by those needing to be minted or those needing to be listed as for sale
-    var filteredClovers = await filterClovers(filterBy, allClovers, start, getCloversCount)
+    var filteredClovers = await filterClovers(filterBy, allClovers, start, end)
 
     // break the filtered Clovers into chunks that will be deployed as groups
     var chunkedClovers = [];
@@ -104,13 +97,8 @@ module.exports = async function(callback) {
             var {owner, keep, blockMinted, cloverMoves, reward, symmetries, hash, price, tokenId} = clover
             price = new BigNumber(price)
 
-            // replace some old account that is probably lost
-            if (owner.toLowerCase() === '0xcde232e835330dafa2ebc629219bbf4fc92cfa24'.toLowerCase()) {
-              owner = '0x45e25795A72881a4D80C59B5c60120655215a053'
-            }
-
             // if the owner is the clovers contract (new or old) make sure the new one owns it
-            if (owner == clovers.address || owner.toLowerCase() === oldCloversAddress.toLowerCase()) {
+            if (owner == clovers.address || oldCloversAddresses.findIndex(a => owner.toLowerCase() === a.toLowerCase()) > -1) {
               owner = clovers.address
               if (price.eq("0")) {
                 price = web3.toWei("10")
@@ -146,7 +134,7 @@ module.exports = async function(callback) {
  
 
           // if there are some tokens to mint and filterBy is set to minted, mint them
-          if (_tos.length > 0 && filterBy === 'minted') {
+          if (_tos.length > 0 && filterBy !== 'sell') {
             // Confirm it is an admin running these commands
             var isAdmin = await clovers.isAdmin(from)
             if (!isAdmin) {
@@ -219,9 +207,7 @@ module.exports = async function(callback) {
 }
 
 
-async function filterClovers(filterFor, allClovers, start, end, i = 0, unregisteredClovers = []) {
-  end = end || allClovers.length
-
+async function filterClovers(filterBy, allClovers, start, end, i = 0, unregisteredClovers = []) {
   if ((start + i) === end) {
     return unregisteredClovers
   }
@@ -229,24 +215,25 @@ async function filterClovers(filterFor, allClovers, start, end, i = 0, unregiste
   let clover = allClovers[start + i]
   let tokenId = clover.tokenId
   console.log(`${tokenId} - ${start} + ${i}/ ${end}`)
-  // if (clover.price !== "0") {
-  //   console.log(`${clover.tokenId} has a price of ${clover.price}`)
-  // }
-  if (filterFor === 'minted') {
 
+  if (filterBy === 'minted') {
+    // if clover doesnt exist it needs to be minted
     if (!(await clovers.exists('0x' + tokenId))) {
       unregisteredClovers.push(clover)
     } else {
       console.log(`clover ${clover.tokenId} already registered`)
     }
-  }else {
-    if (clover.owner.toLowerCase() === oldMarketAddress.toLowerCase()) {
+  } else if (filterBy === 'sell') {
+    // if this clover is owned by the clovers.contract it needs to be set for sale
+    if (oldCloversAddresses.findIndex(a => clover.owner.toLowerCase() === a.toLowerCase()) > -1) {
       unregisteredClovers.push(clover)
     }else {
       console.log(`clover ${clover.tokenId} not for sale`)
     }
+  } else {
+    unregisteredClovers.push(clover)
   }
-  return filterClovers(filterFor, allClovers, start, end, i + 1, unregisteredClovers)
+  return filterClovers(filterBy, allClovers, start, end, i + 1, unregisteredClovers)
 }
 
 
@@ -276,3 +263,4 @@ var doFors = (n, i = 0, func) => {
     }
   })
 }
+

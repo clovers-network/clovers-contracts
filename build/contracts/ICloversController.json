@@ -29,9 +29,9 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.4.24;\n\nimport \"./Clovers.sol\";\nimport \"./ClubToken.sol\";\nimport \"./ClubTokenController.sol\";\n// import \"./CloversController.sol\";\nimport \"zeppelin-solidity/contracts/ownership/Ownable.sol\";\nimport \"zeppelin-solidity/contracts/math/SafeMath.sol\";\nimport \"./helpers/Admin.sol\";\n\ncontract ICloversController {\n    function transferFrom(address _from, address _to, uint256 _tokenId) public;\n}\n\ncontract SimpleCloversMarket is Ownable, Admin {\n\n    event updatePrice(uint256 _tokenId, uint256 price);\n\n\n    using SafeMath for uint256;\n\n    address public clovers;\n    address public clubToken;\n    address public clubTokenController;\n    address public cloversController;\n    struct Sell {\n        address from;\n        uint256 price;\n    }\n    mapping(uint256 => Sell) sells;\n    constructor(address _clovers, address _clubToken, address _clubTokenController, address _cloversController) public {\n        updateClovers(_clovers);\n        updateClubToken(_clubToken);\n        updateClubTokenController(_clubTokenController);\n        updateCloversController(_cloversController);\n    }\n    function sellFrom(uint256 _tokenId) public view returns(address) {\n        return sells[_tokenId].from;\n    }\n    function sellPrice(uint256 _tokenId) public view returns(uint256){\n        return sells[_tokenId].price;\n    }\n    function updateClubTokenController(address _clubTokenController) public onlyOwner {\n        clubTokenController = _clubTokenController;\n    }\n    function updateCloversController(address _cloversController) public onlyOwner {\n        cloversController = _cloversController;\n    }\n    function updateClubToken(address _clubToken) public onlyOwner {\n        clubToken = _clubToken;\n    }\n    function updateClovers(address _clovers) public onlyOwner {\n        clovers = _clovers;\n    }\n    function removeSell(uint256 _tokenId) public {\n        address owner = Clovers(clovers).ownerOf(_tokenId);\n        address seller = sells[_tokenId].from;\n        require(owner == msg.sender || owner != seller);\n        delete(sells[_tokenId]);\n        emit updatePrice(_tokenId, 0);\n    }\n\n    function sell(uint256 _tokenId, uint256 price) public {\n        require(price > 0);\n        address tokenOwner = Clovers(clovers).ownerOf(_tokenId);\n        require(tokenOwner == msg.sender || admins[msg.sender] || msg.sender == cloversController);\n        sells[_tokenId].price = price;\n        sells[_tokenId].from = tokenOwner;\n        emit updatePrice(_tokenId, price);\n    }\n\n    function sellMany(uint256[] _tokenIds, uint256[] _prices) public {\n        require(_tokenIds.length == _prices.length);\n        for (uint256 i = 0; i < _tokenIds.length; i++) {\n            uint256 _tokenId = _tokenIds[i];\n            uint256 _price = _prices[i];\n            sell(_tokenId, _price);\n        }\n    }\n\n    function buy (uint256 _tokenId) public payable {\n        uint256 sellPrice = sells[_tokenId].price;\n        address sellFrom = sells[_tokenId].from;\n        require(sellPrice > 0);\n        require(Clovers(clovers).ownerOf(_tokenId) == sellFrom);\n        if(ClubToken(clubToken).balanceOf(msg.sender) < sellPrice) {\n            ClubTokenController(clubTokenController).buy.value(msg.value)(msg.sender);\n        }\n        // if seller is Clovers Contract, burn the money\n        if (sellFrom == clovers) {\n            ClubTokenController(clubTokenController).burn(msg.sender, sellPrice);\n        } else {\n            ClubTokenController(clubTokenController).transferFrom(msg.sender, sellFrom, sellPrice);\n        }\n        ICloversController(cloversController).transferFrom(sellFrom, msg.sender, _tokenId);\n        delete(sells[_tokenId]);\n        emit updatePrice(_tokenId, 0);\n    }\n\n}\n",
-  "sourcePath": "/home/billyrennekamp/GitHub.com/clovers-network/clovers-contracts/contracts/SimpleCloversMarket.sol",
+  "sourcePath": "/home/billy/GitHub.com/clovers-network/clovers-contracts/contracts/SimpleCloversMarket.sol",
   "ast": {
-    "absolutePath": "/home/billyrennekamp/GitHub.com/clovers-network/clovers-contracts/contracts/SimpleCloversMarket.sol",
+    "absolutePath": "/home/billy/GitHub.com/clovers-network/clovers-contracts/contracts/SimpleCloversMarket.sol",
     "exportedSymbols": {
       "ICloversController": [
         5186
@@ -55,7 +55,7 @@
         "src": "0:24:7"
       },
       {
-        "absolutePath": "/home/billyrennekamp/GitHub.com/clovers-network/clovers-contracts/contracts/Clovers.sol",
+        "absolutePath": "/home/billy/GitHub.com/clovers-network/clovers-contracts/contracts/Clovers.sol",
         "file": "./Clovers.sol",
         "id": 5171,
         "nodeType": "ImportDirective",
@@ -66,7 +66,7 @@
         "unitAlias": ""
       },
       {
-        "absolutePath": "/home/billyrennekamp/GitHub.com/clovers-network/clovers-contracts/contracts/ClubToken.sol",
+        "absolutePath": "/home/billy/GitHub.com/clovers-network/clovers-contracts/contracts/ClubToken.sol",
         "file": "./ClubToken.sol",
         "id": 5172,
         "nodeType": "ImportDirective",
@@ -77,7 +77,7 @@
         "unitAlias": ""
       },
       {
-        "absolutePath": "/home/billyrennekamp/GitHub.com/clovers-network/clovers-contracts/contracts/ClubTokenController.sol",
+        "absolutePath": "/home/billy/GitHub.com/clovers-network/clovers-contracts/contracts/ClubTokenController.sol",
         "file": "./ClubTokenController.sol",
         "id": 5173,
         "nodeType": "ImportDirective",
@@ -110,7 +110,7 @@
         "unitAlias": ""
       },
       {
-        "absolutePath": "/home/billyrennekamp/GitHub.com/clovers-network/clovers-contracts/contracts/helpers/Admin.sol",
+        "absolutePath": "/home/billy/GitHub.com/clovers-network/clovers-contracts/contracts/helpers/Admin.sol",
         "file": "./helpers/Admin.sol",
         "id": 5176,
         "nodeType": "ImportDirective",
@@ -5381,7 +5381,7 @@
     "src": "0:3704:7"
   },
   "legacyAST": {
-    "absolutePath": "/home/billyrennekamp/GitHub.com/clovers-network/clovers-contracts/contracts/SimpleCloversMarket.sol",
+    "absolutePath": "/home/billy/GitHub.com/clovers-network/clovers-contracts/contracts/SimpleCloversMarket.sol",
     "exportedSymbols": {
       "ICloversController": [
         5186
@@ -5405,7 +5405,7 @@
         "src": "0:24:7"
       },
       {
-        "absolutePath": "/home/billyrennekamp/GitHub.com/clovers-network/clovers-contracts/contracts/Clovers.sol",
+        "absolutePath": "/home/billy/GitHub.com/clovers-network/clovers-contracts/contracts/Clovers.sol",
         "file": "./Clovers.sol",
         "id": 5171,
         "nodeType": "ImportDirective",
@@ -5416,7 +5416,7 @@
         "unitAlias": ""
       },
       {
-        "absolutePath": "/home/billyrennekamp/GitHub.com/clovers-network/clovers-contracts/contracts/ClubToken.sol",
+        "absolutePath": "/home/billy/GitHub.com/clovers-network/clovers-contracts/contracts/ClubToken.sol",
         "file": "./ClubToken.sol",
         "id": 5172,
         "nodeType": "ImportDirective",
@@ -5427,7 +5427,7 @@
         "unitAlias": ""
       },
       {
-        "absolutePath": "/home/billyrennekamp/GitHub.com/clovers-network/clovers-contracts/contracts/ClubTokenController.sol",
+        "absolutePath": "/home/billy/GitHub.com/clovers-network/clovers-contracts/contracts/ClubTokenController.sol",
         "file": "./ClubTokenController.sol",
         "id": 5173,
         "nodeType": "ImportDirective",
@@ -5460,7 +5460,7 @@
         "unitAlias": ""
       },
       {
-        "absolutePath": "/home/billyrennekamp/GitHub.com/clovers-network/clovers-contracts/contracts/helpers/Admin.sol",
+        "absolutePath": "/home/billy/GitHub.com/clovers-network/clovers-contracts/contracts/helpers/Admin.sol",
         "file": "./helpers/Admin.sol",
         "id": 5176,
         "nodeType": "ImportDirective",
@@ -10736,5 +10736,5 @@
   },
   "networks": {},
   "schemaVersion": "2.0.1",
-  "updatedAt": "2019-08-14T19:39:30.698Z"
+  "updatedAt": "2019-08-16T18:39:34.836Z"
 }
