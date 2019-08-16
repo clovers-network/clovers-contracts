@@ -38,12 +38,12 @@ Support = {
 //   networks: CurationMarket.networks
 // }
 let printable = `module.exports = {
-  Clovers: ${JSON.stringify(Clovers)},
-  CloversController: ${JSON.stringify(CloversController)},
-  ClubToken: ${JSON.stringify(ClubToken)},
-  ClubTokenController: ${JSON.stringify(ClubTokenController)},
-  SimpleCloversMarket: ${JSON.stringify(SimpleCloversMarket)},
-  Support: ${JSON.stringify(Support)}
+  Clovers: ${JSON.stringify(Clovers, null, 1)},
+  CloversController: ${JSON.stringify(CloversController, null, 1)},
+  ClubToken: ${JSON.stringify(ClubToken, null, 1)},
+  ClubTokenController: ${JSON.stringify(ClubTokenController, null, 1)},
+  SimpleCloversMarket: ${JSON.stringify(SimpleCloversMarket, null, 1)},
+  Support: ${JSON.stringify(Support, null, 1)}
 };`
 
 fs.writeFile('index.js', printable, function (err) {
