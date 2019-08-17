@@ -1150,6 +1150,137 @@ module.exports = {
   }
  ],
  "networks": {
+  "1": {
+   "events": {
+    "0xf8df31144d9c2f0f6b59d69b8b98abd5459d07f2742c4df920b25aae33c64820": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": true,
+       "name": "previousOwner",
+       "type": "address"
+      }
+     ],
+     "name": "OwnershipRenounced",
+     "type": "event"
+    },
+    "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": true,
+       "name": "previousOwner",
+       "type": "address"
+      },
+      {
+       "indexed": true,
+       "name": "newOwner",
+       "type": "address"
+      }
+     ],
+     "name": "OwnershipTransferred",
+     "type": "event"
+    },
+    "0x1a2dbeec1a0714342f862f53c671a69a6cb438bf5aa44fc01a7ccff6fbde85ef": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": true,
+       "name": "previousAdmin",
+       "type": "address"
+      }
+     ],
+     "name": "AdminshipRenounced",
+     "type": "event"
+    },
+    "0x2931ebb3d190545dcf6801c37aa686b74f2e1000e753d0fac6e471a2aa5a6213": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": true,
+       "name": "previousAdmin",
+       "type": "address"
+      },
+      {
+       "indexed": true,
+       "name": "newAdmin",
+       "type": "address"
+      }
+     ],
+     "name": "AdminshipTransferred",
+     "type": "event"
+    },
+    "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": true,
+       "name": "_from",
+       "type": "address"
+      },
+      {
+       "indexed": true,
+       "name": "_to",
+       "type": "address"
+      },
+      {
+       "indexed": true,
+       "name": "_tokenId",
+       "type": "uint256"
+      }
+     ],
+     "name": "Transfer",
+     "type": "event"
+    },
+    "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": true,
+       "name": "_owner",
+       "type": "address"
+      },
+      {
+       "indexed": true,
+       "name": "_approved",
+       "type": "address"
+      },
+      {
+       "indexed": true,
+       "name": "_tokenId",
+       "type": "uint256"
+      }
+     ],
+     "name": "Approval",
+     "type": "event"
+    },
+    "0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": true,
+       "name": "_owner",
+       "type": "address"
+      },
+      {
+       "indexed": true,
+       "name": "_operator",
+       "type": "address"
+      },
+      {
+       "indexed": false,
+       "name": "_approved",
+       "type": "bool"
+      }
+     ],
+     "name": "ApprovalForAll",
+     "type": "event"
+    }
+   },
+   "links": {},
+   "address": "0xb55c5cac5014c662fdbf21a2c59cd45403c482fd",
+   "transactionHash": null
+  },
   "4": {
    "events": {
     "0xf8df31144d9c2f0f6b59d69b8b98abd5459d07f2742c4df920b25aae33c64820": {
@@ -1409,8 +1540,8 @@ module.exports = {
     }
    },
    "links": {},
-   "address": "0xb55c5cac5014c662fdbf21a2c59cd45403c482fd",
-   "transactionHash": "0x2e7e7c75a1b2daeac6b12763bba15762184c8de84c8d31b1e22e4ac20f877fec"
+   "address": "0xe05e2bdc5a003515b8b4f4901dd0da495b6f6c96",
+   "transactionHash": null
   }
  }
 },
@@ -2285,6 +2416,14 @@ module.exports = {
   }
  ],
  "networks": {
+  "1": {
+   "events": {},
+   "links": {
+    "Reversi": "0xd6e4737118f6d12468edb0746755281e223eaaaa"
+   },
+   "address": "0x521d32f3d23f1fc82b1dbe306edc3ef668e5d973",
+   "transactionHash": null
+  },
   "4": {
    "events": {},
    "links": {
@@ -2296,10 +2435,10 @@ module.exports = {
   "42": {
    "events": {},
    "links": {
-    "Reversi": "0xd6e4737118f6d12468edb0746755281e223eaaaa"
+    "Reversi": "0xad82a0cd12c8d7a632190eae388b2c00cd3c58e9"
    },
-   "address": "0x521d32f3d23f1fc82b1dbe306edc3ef668e5d973",
-   "transactionHash": "0x8bf3004852b0d82d65005342b11be8c47875e76f132ea638b2914b861b9c0599"
+   "address": "0xf0c6d63656e012dbd3bc017176c75d08360dcd55",
+   "transactionHash": null
   }
  }
 },
@@ -2909,6 +3048,12 @@ module.exports = {
   }
  ],
  "networks": {
+  "1": {
+   "events": {},
+   "links": {},
+   "address": "0x1a94656a6245379bc0d9c64c402197528edb2bd1",
+   "transactionHash": null
+  },
   "4": {
    "events": {},
    "links": {},
@@ -2918,8 +3063,8 @@ module.exports = {
   "42": {
    "events": {},
    "links": {},
-   "address": "0x1a94656a6245379bc0d9c64c402197528edb2bd1",
-   "transactionHash": "0xc79f2330054d60eb3ad86adc2f52e911f301111bca00f944a999dd5893401c61"
+   "address": "0x3cba2b53e6c90e99192e9ff2ed9f81ac969efac1",
+   "transactionHash": null
   }
  }
 },
@@ -3658,6 +3803,135 @@ module.exports = {
   }
  ],
  "networks": {
+  "1": {
+   "events": {
+    "0x064fb1933e186be0b289a87e98518dc18cc9856ecbc9f1353d1a138ddf733ec5": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": false,
+       "name": "buyer",
+       "type": "address"
+      },
+      {
+       "indexed": false,
+       "name": "tokens",
+       "type": "uint256"
+      },
+      {
+       "indexed": false,
+       "name": "value",
+       "type": "uint256"
+      },
+      {
+       "indexed": false,
+       "name": "poolBalance",
+       "type": "uint256"
+      },
+      {
+       "indexed": false,
+       "name": "tokenSupply",
+       "type": "uint256"
+      }
+     ],
+     "name": "Buy",
+     "type": "event"
+    },
+    "0x483f8aec0fd892ac72ad1ba8d0e9c9e73db59c12d263fd71de480b5b3deeae3c": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": false,
+       "name": "seller",
+       "type": "address"
+      },
+      {
+       "indexed": false,
+       "name": "tokens",
+       "type": "uint256"
+      },
+      {
+       "indexed": false,
+       "name": "value",
+       "type": "uint256"
+      },
+      {
+       "indexed": false,
+       "name": "poolBalance",
+       "type": "uint256"
+      },
+      {
+       "indexed": false,
+       "name": "tokenSupply",
+       "type": "uint256"
+      }
+     ],
+     "name": "Sell",
+     "type": "event"
+    },
+    "0xf8df31144d9c2f0f6b59d69b8b98abd5459d07f2742c4df920b25aae33c64820": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": true,
+       "name": "previousOwner",
+       "type": "address"
+      }
+     ],
+     "name": "OwnershipRenounced",
+     "type": "event"
+    },
+    "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": true,
+       "name": "previousOwner",
+       "type": "address"
+      },
+      {
+       "indexed": true,
+       "name": "newOwner",
+       "type": "address"
+      }
+     ],
+     "name": "OwnershipTransferred",
+     "type": "event"
+    },
+    "0x1a2dbeec1a0714342f862f53c671a69a6cb438bf5aa44fc01a7ccff6fbde85ef": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": true,
+       "name": "previousAdmin",
+       "type": "address"
+      }
+     ],
+     "name": "AdminshipRenounced",
+     "type": "event"
+    },
+    "0x2931ebb3d190545dcf6801c37aa686b74f2e1000e753d0fac6e471a2aa5a6213": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": true,
+       "name": "previousAdmin",
+       "type": "address"
+      },
+      {
+       "indexed": true,
+       "name": "newAdmin",
+       "type": "address"
+      }
+     ],
+     "name": "AdminshipTransferred",
+     "type": "event"
+    }
+   },
+   "links": {},
+   "address": "0x1754a612ca578f72d678196bcc16710f01db7655",
+   "transactionHash": null
+  },
   "4": {
    "events": {
     "0x064fb1933e186be0b289a87e98518dc18cc9856ecbc9f1353d1a138ddf733ec5": {
@@ -3913,8 +4187,8 @@ module.exports = {
     }
    },
    "links": {},
-   "address": "0x1754a612ca578f72d678196bcc16710f01db7655",
-   "transactionHash": "0xce7a59ff2d32d6f76442867c56e67f12401eb3bcdfd9b3b8ef60f8eac14aa31e"
+   "address": "0xa1c6a75cac4f25660e58be05ac4cdc69d9c680fd",
+   "transactionHash": null
   }
  }
 },
@@ -4337,6 +4611,88 @@ module.exports = {
   }
  ],
  "networks": {
+  "1": {
+   "events": {
+    "0x82367b2d6e4540d07b2a6e64ecb6a2f8130985e6a17e157c3e556591c6b54f69": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": false,
+       "name": "_tokenId",
+       "type": "uint256"
+      },
+      {
+       "indexed": false,
+       "name": "price",
+       "type": "uint256"
+      }
+     ],
+     "name": "updatePrice",
+     "type": "event"
+    },
+    "0x1a2dbeec1a0714342f862f53c671a69a6cb438bf5aa44fc01a7ccff6fbde85ef": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": true,
+       "name": "previousAdmin",
+       "type": "address"
+      }
+     ],
+     "name": "AdminshipRenounced",
+     "type": "event"
+    },
+    "0x2931ebb3d190545dcf6801c37aa686b74f2e1000e753d0fac6e471a2aa5a6213": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": true,
+       "name": "previousAdmin",
+       "type": "address"
+      },
+      {
+       "indexed": true,
+       "name": "newAdmin",
+       "type": "address"
+      }
+     ],
+     "name": "AdminshipTransferred",
+     "type": "event"
+    },
+    "0xf8df31144d9c2f0f6b59d69b8b98abd5459d07f2742c4df920b25aae33c64820": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": true,
+       "name": "previousOwner",
+       "type": "address"
+      }
+     ],
+     "name": "OwnershipRenounced",
+     "type": "event"
+    },
+    "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": true,
+       "name": "previousOwner",
+       "type": "address"
+      },
+      {
+       "indexed": true,
+       "name": "newOwner",
+       "type": "address"
+      }
+     ],
+     "name": "OwnershipTransferred",
+     "type": "event"
+    }
+   },
+   "links": {},
+   "address": "0x6ebd97252d34645263c1d074f202f1d7546ce06b",
+   "transactionHash": null
+  },
   "4": {
    "events": {
     "0x82367b2d6e4540d07b2a6e64ecb6a2f8130985e6a17e157c3e556591c6b54f69": {
@@ -4498,8 +4854,8 @@ module.exports = {
     }
    },
    "links": {},
-   "address": "0x6ebd97252d34645263c1d074f202f1d7546ce06b",
-   "transactionHash": "0x2bd5a47b20f779f21045155cc8252bbc3fa52b3e95dbbc3e5d2fe0b53a2d5118"
+   "address": "0x845f0297348a37c28d849b99d7bfa5c285dc8dd6",
+   "transactionHash": null
   }
  }
 },
@@ -4836,6 +5192,12 @@ module.exports = {
   }
  ],
  "networks": {
+  "1": {
+   "events": {},
+   "links": {},
+   "address": "0x7f5426690350db17415a719a417335c0ae33e477",
+   "transactionHash": null
+  },
   "4": {
    "events": {},
    "links": {},
@@ -4845,8 +5207,8 @@ module.exports = {
   "42": {
    "events": {},
    "links": {},
-   "address": "0x7f5426690350db17415a719a417335c0ae33e477",
-   "transactionHash": "0x31cbe36b793a4fb96780d29654646ec55b3cbd61a82063c876dade21d35e434a"
+   "address": "0xaf12b28b96ff4e047a4d318d87d74fdd131350f8",
+   "transactionHash": null
   }
  }
 }

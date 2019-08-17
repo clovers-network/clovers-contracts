@@ -27,7 +27,8 @@ var {
   oracle,
   updateCloversController,
   updateClubTokenController,
-  addAsAdmin
+  addAsAdmin,
+  removeAsAdmin
 } = require('../helpers/migVals')
 
 module.exports = (deployer, network, accounts) => {
@@ -73,8 +74,9 @@ module.exports = (deployer, network, accounts) => {
 
 
 
-      console.log('add admins for clovers')
-      await addAsAdmin(clovers, accounts);
+      console.log('remove admins for clovers')
+      // await addAsAdmin(clovers, accounts);
+      await removeAsAdmin(clovers, accounts);
 
 
 
@@ -119,8 +121,9 @@ module.exports = (deployer, network, accounts) => {
         accounts
       })
 
-      console.log('add admins for simpleCloversMarket')
-      await addAsAdmin(simpleCloversMarket, accounts);
+      console.log('remove admins for simpleCloversMarket')
+      // await addAsAdmin(simpleCloversMarket, accounts);
+      await removeAsAdmin(simpleCloversMarket, accounts);
 
     } catch (error) {
       console.log(error)

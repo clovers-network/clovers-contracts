@@ -15,7 +15,9 @@ const goodOwner = '0x45e25795A72881a4D80C59B5c60120655215a053' // clovers "goodP
 const oldCloversAddresses = ['0x8A0011ccb1850e18A9D2D4b15bd7F9E9E423c11b', '0xe312398f2741E2Ab4C0C985c8d91AdcC4a995a59']
 let clovers
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
-module.exports = async function(callback) {
+module.exports = migrate
+
+async function migrate(callback) {
 
 
 
@@ -32,11 +34,14 @@ module.exports = async function(callback) {
   // from account determined by --account flag or default 0
   var from = web3.currentProvider.addresses[run]
 
-  var limit = getFlag('limit') || 500
-  var chunkSize = getFlag('chunk') || 50
+  var limit = parseInt(getFlag('limit') || 500)
+  var chunkSize = parseInt(getFlag('chunk') || 50)
 
-  console.log({run, from})
+  console.log({run, filterBy, setAllSymmetries, from, limit, chunkSize})
   try {
+
+    const nonce = await getNonce(from)
+    console.log({nonce})
 
     // deploy the new Clovers contract
     clovers = await Clovers.deployed()
@@ -56,8 +61,10 @@ module.exports = async function(callback) {
     var cloverFiles = fs.readdirSync(cloversDir)
     var allClovers = []
     cloverFiles.forEach((file) => {
-      if (file.indexOf('.json') < 0) continue
-      allClovers.push(...JSON.parse(fs.readFileSync(file).toString()))
+      if (file.indexOf('.json') < 0) {
+        console.log(file)
+      }
+      allClovers.push(...JSON.parse(fs.readFileSync(cloversDir + file).toString()))
     })
 
     var start = limit * run
@@ -95,6 +102,7 @@ module.exports = async function(callback) {
 
             var clover = filteredClovers[(i * chunkSize) + j]
             var {owner, keep, blockMinted, cloverMoves, reward, symmetries, hash, price, tokenId} = clover
+            tokenId = '0x' + tokenId
             price = new BigNumber(price)
 
             // if the owner is the clovers contract (new or old) make sure the new one owns it
@@ -118,10 +126,9 @@ module.exports = async function(callback) {
               console.log('Invalid game!!!')
               continue
             }
-
             // check tokenIds match
             if (tokenId !== '0x' + reversi.byteBoard) {
-              console.log(`Inconsistent tokenIds: ${tokenId} 0x${reversi.byteBoard}`)
+              console.log(`Inconsistent tokenIds: ${tokenId} ${reversi.byteBoard}`)
             }
 
             // add clovers to grouped parameters for minting
@@ -131,15 +138,18 @@ module.exports = async function(callback) {
             _symmetries.push(symmetries)
           }
 
- 
+          
 
           // if there are some tokens to mint and filterBy is set to minted, mint them
           if (_tos.length > 0 && filterBy !== 'sell') {
             // Confirm it is an admin running these commands
             var isAdmin = await clovers.isAdmin(from)
+            var owner =await clovers.owner()
             if (!isAdmin) {
-              throw new Error(from + ' is not admin on clovers')
+              reject(new Error(from + ' is not admin on clovers'))
+              return
             }
+            // console.log({_tos, _tokenIds, _movess, _symmetries, from})
             var {receipt} = await clovers.mintMany(_tos, _tokenIds, _movess, _symmetries, {from})
             console.log(_ + `mintMany - ${_tos.length} ` + receipt.gasUsed)
             gasToCash(receipt.gasUsed)
@@ -150,8 +160,10 @@ module.exports = async function(callback) {
           if (_sellTokensIds.length > 0 && filterBy !== 'minted') {
             // Confirm it is an admin running these commands
             var isAdmin = await simpleCloversMarket.isAdmin(from)
-            if (!isAdmin) {
-              throw new Error(from + ' is not admin on simpleCloversMarket')
+            var owner =await simpleCloversMarket.owner()
+            if (!isAdmin  && owner.toLowerCase() !== from.toLowerCase()) {
+              reject(new Error(from + ' is not admin or owner on simpleCloversMarket'))
+              return
             }
             var {receipt} = await simpleCloversMarket.sellMany(_sellTokensIds, _sellTokenPrices, {from})
             console.log(_ + `sellMany - ${_sellTokensIds.length} ` + receipt.gasUsed)
@@ -159,6 +171,7 @@ module.exports = async function(callback) {
             totalGas = totalGas.plus(receipt.gasUsed)
           }
         } catch (err) {
+          console.log("error spot 1")
           console.log(err)
         }
         resolve()
@@ -202,7 +215,12 @@ module.exports = async function(callback) {
     callback()
   } catch (error) {
     console.log(error)
-    callback(error)
+    console.log("error spot 2")
+    // callback(error)
+    setTimeout(() => {
+      console.log('try again')
+      migrate()
+    }, 20 * 60 * 1000)
   }
 }
 
@@ -213,11 +231,13 @@ async function filterClovers(filterBy, allClovers, start, end, i = 0, unregister
   }
 
   let clover = allClovers[start + i]
-  let tokenId = clover.tokenId
+  let tokenId = 
+  clover.tokenId
   console.log(`${tokenId} - ${start} + ${i}/ ${end}`)
 
   if (filterBy === 'minted') {
     // if clover doesnt exist it needs to be minted
+    console.log('check: ' + '0x' + tokenId)
     if (!(await clovers.exists('0x' + tokenId))) {
       unregisteredClovers.push(clover)
     } else {
@@ -252,15 +272,31 @@ var doFors = (n, i = 0, func) => {
           })
           .catch(error => {
             console.log(error)
+            console.log('error spot 3')
           })
         })
         .catch(error => {
           console.log(error)
+          console.log('error spot 4')
         })
       }
     } catch (error) {
+      console.log('error spot 5')
       reject(error)
     }
   })
 }
 
+
+
+async function getNonce(from) {
+  return new Promise((resolve, reject) => {
+    web3.eth.getTransactionCount(from, (err, res) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(res)
+      }
+    })
+  })
+}

@@ -13,7 +13,7 @@ var vals = (module.exports = {
   payMultiplier: utils.toWei('0.327'),
   priceMultiplier: '10',
   basePrice: utils.toWei('1'),
-  paused: true,
+  paused: false,
   limit: utils.toWei('5'),
   decimals: '18',
   oracle: '0xb20fbdc70c19d0ebcee204d32e1828fca9c2fb09',
@@ -25,7 +25,8 @@ var vals = (module.exports = {
   updateCloversController,
   updateClubTokenController,
   deployCloversController,
-  addAsAdmin
+  addAsAdmin,
+  removeAsAdmin
 })
 
 async function deployCloversController({
@@ -223,8 +224,9 @@ async function updateClubTokenController({
     console.log('support hasnt changed')
   }
 
-  console.log('add as admins to clubTokenController')
-  await addAsAdmin(clubTokenController, accounts)
+  console.log('remove as admins to clubTokenController')
+  // await addAsAdmin(clubTokenController, accounts)
+  await removeAsAdmin(clubTokenController, accounts)
 
 
 
@@ -235,35 +237,90 @@ async function updateClubTokenController({
 
 async function addAsAdmin(contract, accounts) {
 
+  var secondOwner = await contract.isAdmin(accounts[0])
+  if (!secondOwner) {
+    console.log(`adding ${accounts[0]} as admin in contract`)
+    await contract.transferAdminship(accounts[0])
+  } else {
+    console.log(`${accounts[0]} is already an admin in contract`)
+  }
+
+
   var secondOwner = await contract.isAdmin(accounts[1])
   if (!secondOwner) {
-    console.log(`adding ${accounts[1]} as owner in contract`)
+    console.log(`adding ${accounts[1]} as admin in contract`)
     await contract.transferAdminship(accounts[1])
   } else {
-    console.log(`${accounts[1]} is already an owner in contract`)
+    console.log(`${accounts[1]} is already an admin in contract`)
   }
 
   var secondOwner = await contract.isAdmin(accounts[2])
   if (!secondOwner) {
-    console.log(`adding ${accounts[2]} as owner in contract`)
+    console.log(`adding ${accounts[2]} as admin in contract`)
     await contract.transferAdminship(accounts[2])
   } else {
-    console.log(`${accounts[2]} is already an owner in contract`)
+    console.log(`${accounts[2]} is already an admin in contract`)
   }
 
   var secondOwner = await contract.isAdmin(accounts[3])
   if (!secondOwner) {
-    console.log(`adding ${accounts[3]} as owner in contract`)
+    console.log(`adding ${accounts[3]} as admin in contract`)
     await contract.transferAdminship(accounts[3])
   } else {
-    console.log(`${accounts[3]} is already an owner in contract`)
+    console.log(`${accounts[3]} is already an admin in contract`)
   }
 
   var secondOwner = await contract.isAdmin(accounts[4])
   if (!secondOwner) {
-    console.log(`adding ${accounts[4]} as owner in contract`)
+    console.log(`adding ${accounts[4]} as admin in contract`)
     await contract.transferAdminship(accounts[4])
   } else {
-    console.log(`${accounts[4]} is already an owner in contract`)
+    console.log(`${accounts[4]} is already an admin in contract`)
+  }
+}
+
+async function removeAsAdmin(contract, accounts) {
+
+
+
+
+  var secondOwner = await contract.isAdmin(accounts[1])
+  if (secondOwner) {
+    console.log(`removing ${accounts[1]} as admin in contract`)
+    await contract.renounceAdminship(accounts[1])
+  } else {
+    console.log(`${accounts[1]} is already an admin in contract`)
+  }
+
+  var secondOwner = await contract.isAdmin(accounts[2])
+  if (secondOwner) {
+    console.log(`removing ${accounts[2]} as admin in contract`)
+    await contract.renounceAdminship(accounts[2])
+  } else {
+    console.log(`${accounts[2]} is already an admin in contract`)
+  }
+
+  var secondOwner = await contract.isAdmin(accounts[3])
+  if (secondOwner) {
+    console.log(`removing ${accounts[3]} as admin in contract`)
+    await contract.renounceAdminship(accounts[3])
+  } else {
+    console.log(`${accounts[3]} is already an admin in contract`)
+  }
+
+  var secondOwner = await contract.isAdmin(accounts[4])
+  if (secondOwner) {
+    console.log(`removing ${accounts[4]} as admin in contract`)
+    await contract.renounceAdminship(accounts[4])
+  } else {
+    console.log(`${accounts[4]} is already an admin in contract`)
+  }
+
+  var secondOwner = await contract.isAdmin(accounts[0])
+  if (secondOwner) {
+    console.log(`removing ${accounts[0]} as admin in contract`)
+    await contract.renounceAdminship(accounts[0])
+  } else {
+    console.log(`${accounts[0]} is already an admin in contract`)
   }
 }

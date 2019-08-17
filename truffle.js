@@ -16,7 +16,7 @@ module.exports = {
     // test: {
     //   provider() {
     //     return new HDWalletProvider(
-    //       process.env.TEST_MNEMONIC,
+    //       process.env.TESTNET_MNEMONIC,
     //       "http://localhost:9545",
     //       0,
     //       10
@@ -44,7 +44,7 @@ module.exports = {
     ganache: {
       provider() {
         return new HDWalletProvider(
-          process.env.TEST_MNEMONIC,
+          process.env.TESTNET_MNEMONIC,
           "http://localhost:7545",
           0,
           10
@@ -66,16 +66,16 @@ module.exports = {
           10
         );
       },
-      network_id: 42,
+      network_id: 1,
       // gas: 5561260
-      gasPrice: 1000000000 // 1 GWEI
+      gasPrice: 2000000000 // 1 GWEI
 
     },
     kovan: {
       provider() {
         // using wallet at index 1 ----------------------------------------------------------------------------------------v
         return new HDWalletProvider(
-          process.env.TEST_MNEMONIC,
+          process.env.TESTNET_MNEMONIC,
           "https://kovan.infura.io/v3/" + process.env.INFURA_API_KEY,
           0,
           10
@@ -89,7 +89,7 @@ module.exports = {
     rinkeby: {
       provider() {
         return new HDWalletProvider(
-          process.env.TEST_MNEMONIC,
+          process.env.TESTNET_MNEMONIC,
           "https://rinkeby.infura.io/v3/" + process.env.INFURA_API_KEY,
           0,
           10
@@ -102,7 +102,7 @@ module.exports = {
     ropsten: {
       provider() {
         return new HDWalletProvider(
-          process.env.TEST_MNEMONIC,
+          process.env.TESTNET_MNEMONIC,
           "https://ropsten.infura.io/v3/" + process.env.INFURA_API_KEY,
           0,
           10

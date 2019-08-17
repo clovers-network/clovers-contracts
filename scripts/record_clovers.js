@@ -40,10 +40,8 @@ module.exports = async function(callback) {
     var filename = getFlag('filename') || `raw-${run}.json`
     const filePath = __dirname + `/../clovers/${filename}`
     console.log(filePath)
-    if (!fs.existsSync(filePath)) {
-        fs.writeFileSync(filePath, '[]')
-    }
-    
+    fs.writeFileSync(filePath, '[]')
+
     try {
         // var getCloversCount = await clovers.totalSupply()
         await doFors(end, start, i => {

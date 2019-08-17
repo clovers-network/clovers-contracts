@@ -9,15 +9,15 @@ var ClubToken = artifacts.require('./ClubToken.sol')
 var Support = artifacts.require('./Support.sol')
 
 const overwrites = {
-  Reversi: true,
-  Support: true,
-  Clovers: true,
-  CloversMetadata: true,
-  CloversController: true,
-  ClubTokenController: true,
-  SimpleCloversMarket: true,
-  // CurationMarket: true,
-  ClubToken: true
+  Reversi: false,
+  Support: false,
+  Clovers: false,
+  CloversMetadata: false,
+  CloversController: false,
+  ClubTokenController: false,
+  SimpleCloversMarket: false,
+  // CurationMarket: false,
+  ClubToken: false
 }
 
 const gasToCash = require('../helpers/utils').gasToCash
@@ -46,6 +46,7 @@ module.exports = (deployer, network, accounts) => {
   if (network === 'test') return
   deployer.then(async () => {
     try {
+      console.log(`running script as ${accounts[0]}`)
       var totalGas = new web3.BigNumber('0')
 
       // Deploy Clovers.sol (NFT)
