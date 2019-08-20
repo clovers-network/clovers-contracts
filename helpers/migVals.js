@@ -12,7 +12,7 @@ var vals = (module.exports = {
   stakePeriod: '60000', // at 15 sec block times this is ~250 hours
   payMultiplier: utils.toWei('0.327'),
   priceMultiplier: '3',
-  basePrice: utils.toWei('2'),
+  basePrice: utils.toWei('4'),
   paused: false,
   limit: utils.toWei('5'),
   decimals: '18',
