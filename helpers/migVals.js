@@ -3,7 +3,7 @@ const utils = require('web3-utils')
 
 var vals = (module.exports = {
   // stakeAmount: new BigNumber(529271).mul(1000000000).mul(40), // gasPrice * 1GWEI * 40 (normal person price)
-  stakeAmount: new BigNumber(190621).mul(1000000000).mul(1), // gasPrice * 10GWEI (oracle price)
+  stakeAmount: new BigNumber(190621).mul(5000000000).mul(1), // gasPrice * 10GWEI (oracle price)
   // stakeAmount: new BigNumber(0).mul(1000000000).mul(40), // gasPrice * 1GWEI * 40  (nothing)
   ethPrice: new BigNumber('200'),
   oneGwei: new BigNumber('1000000000'), // 1 GWEI
@@ -11,12 +11,12 @@ var vals = (module.exports = {
   // stakePeriod: '6000', // at 15 sec block times this is ~25 hours
   stakePeriod: '60000', // at 15 sec block times this is ~250 hours
   payMultiplier: utils.toWei('0.327'),
-  priceMultiplier: '10',
-  basePrice: utils.toWei('1'),
+  priceMultiplier: '3',
+  basePrice: utils.toWei('2'),
   paused: false,
   limit: utils.toWei('5'),
   decimals: '18',
-  oracle: '0xb20fbdc70c19d0ebcee204d32e1828fca9c2fb09',
+  oracle: '0xaB0F3326F7F32988963D446543A0b3bbC21B8b92',
   reserveRatio: '750000', // parts per million 500000 / 1000000 = 1/2
   virtualBalance: utils.toWei('10'),
   virtualSupply: utils.toWei('10000'),
@@ -289,7 +289,7 @@ async function removeAsAdmin(contract, accounts) {
     console.log(`removing ${accounts[1]} as admin in contract`)
     await contract.renounceAdminship(accounts[1])
   } else {
-    console.log(`${accounts[1]} is already an admin in contract`)
+    console.log(`${accounts[1]} is already removed as an admin in contract`)
   }
 
   var secondOwner = await contract.isAdmin(accounts[2])
@@ -297,7 +297,7 @@ async function removeAsAdmin(contract, accounts) {
     console.log(`removing ${accounts[2]} as admin in contract`)
     await contract.renounceAdminship(accounts[2])
   } else {
-    console.log(`${accounts[2]} is already an admin in contract`)
+    console.log(`${accounts[2]} is already removed as an admin in contract`)
   }
 
   var secondOwner = await contract.isAdmin(accounts[3])
@@ -305,7 +305,7 @@ async function removeAsAdmin(contract, accounts) {
     console.log(`removing ${accounts[3]} as admin in contract`)
     await contract.renounceAdminship(accounts[3])
   } else {
-    console.log(`${accounts[3]} is already an admin in contract`)
+    console.log(`${accounts[3]} is already removed as an admin in contract`)
   }
 
   var secondOwner = await contract.isAdmin(accounts[4])
@@ -313,7 +313,7 @@ async function removeAsAdmin(contract, accounts) {
     console.log(`removing ${accounts[4]} as admin in contract`)
     await contract.renounceAdminship(accounts[4])
   } else {
-    console.log(`${accounts[4]} is already an admin in contract`)
+    console.log(`${accounts[4]} is already removed as an admin in contract`)
   }
 
   var secondOwner = await contract.isAdmin(accounts[0])
@@ -321,6 +321,6 @@ async function removeAsAdmin(contract, accounts) {
     console.log(`removing ${accounts[0]} as admin in contract`)
     await contract.renounceAdminship(accounts[0])
   } else {
-    console.log(`${accounts[0]} is already an admin in contract`)
+    console.log(`${accounts[0]} is already removed as an admin in contract`)
   }
 }

@@ -11,7 +11,7 @@ contract CloversMetadata {
     using strings for *;
 
     function tokenURI(uint _tokenId) public view returns (string _infoUrl) {
-        string memory base = "https://api2.clovers.network/clovers/metadata/0x";
+        string memory base = "https://api.clovers.network/clovers/metadata/0x";
         string memory id = uint2hexstr(_tokenId);
         string memory suffix = "";
         return base.toSlice().concat(id.toSlice()).toSlice().concat(suffix.toSlice());
