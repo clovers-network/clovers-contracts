@@ -34,7 +34,7 @@ contract CloversController is HasNoEther, HasNoTokens {
 
     uint256 public fastGasPrice;
     uint256 public averageGasPrice;
-    uint256 public slowGasPrice;
+    uint256 public slowSafeGasPrice;
 
     uint256 public basePrice;
     uint256 public priceMultiplier;
@@ -194,10 +194,10 @@ contract CloversController is HasNoEther, HasNoTokens {
         return basePrice.add(calculateReward(_symmetries));
     }
 
-    function setGasPrices(uint256 _slowGasPrice, uint256 _averageGasPrice, uint256 _fastGasPrice) public onlyOwnerOrOracle {
+    function setGasPrices(uint256 _slowSafeGasPrice, uint256 _averageGasPrice, uint256 _fastGasPrice) public onlyOwnerOrOracle {
         fastGasPrice = _fastGasPrice;
         averageGasPrice = _averageGasPrice;
-        slowGasPrice = _slowGasPrice;
+        slowSafeGasPrice = _slowSafeGasPrice;
     }
 
     /**
@@ -318,7 +318,7 @@ contract CloversController is HasNoEther, HasNoTokens {
     * @param _tokenId The board which holds the stake.
     * @return A boolean representing whether or not the retrieval was successful.
     */
-    function retrieveStake(uint256 _tokenId, uint256 _fastGasPrice, uint256 _averageGasPrice, uint256 _slowGasPrice) public payable returns (bool) {
+    function retrieveStake(uint256 _tokenId, uint256 _fastGasPrice, uint256 _averageGasPrice, uint256 _slowSafeGasPrice) public payable returns (bool) {
         bytes28[2] memory moves = Clovers(clovers).getCloverMoves(_tokenId);
         bytes32 movesHash = keccak256(moves);
 
@@ -354,7 +354,7 @@ contract CloversController is HasNoEther, HasNoTokens {
         emit stakeRetrieved(_tokenId, msg.sender, stake);
 
         if (msg.sender == owner || msg.sender == oracle) {
-            setGasPrices(_fastGasPrice, _averageGasPrice, _slowGasPrice);
+            setGasPrices(_fastGasPrice, _averageGasPrice, _slowSafeGasPrice);
         }
 
         return true;
@@ -377,7 +377,7 @@ contract CloversController is HasNoEther, HasNoTokens {
     * @param _tokenId The board being challenged.
     * @return A boolean representing whether or not the challenge was successful.
     */
-    function challengeClover(uint256 _tokenId, uint256 _fastGasPrice, uint256 _averageGasPrice, uint256 _slowGasPrice) public returns (bool) {
+    function challengeClover(uint256 _tokenId, uint256 _fastGasPrice, uint256 _averageGasPrice, uint256 _slowSafeGasPrice) public returns (bool) {
         bool valid = true;
         bytes28[2] memory moves = Clovers(clovers).getCloverMoves(_tokenId);
 
@@ -413,7 +413,7 @@ contract CloversController is HasNoEther, HasNoTokens {
         Clovers(clovers).deleteClover(_tokenId);
         deleteCommit(movesHash);
         if (msg.sender == owner || msg.sender == oracle) {
-            setGasPrices(_fastGasPrice, _averageGasPrice, _slowGasPrice);
+            setGasPrices(_fastGasPrice, _averageGasPrice, _slowSafeGasPrice);
         }
         return true;
     }
