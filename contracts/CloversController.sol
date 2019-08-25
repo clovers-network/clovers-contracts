@@ -32,6 +32,10 @@ contract CloversController is HasNoEther, HasNoTokens {
     address public simpleCloversMarket;
     address public curationMarket;
 
+    uint256 public fastGasPrice;
+    uint256 public averageGasPrice;
+    uint256 public slowGasPrice;
+
     uint256 public basePrice;
     uint256 public priceMultiplier;
     uint256 public payMultiplier;
@@ -48,6 +52,11 @@ contract CloversController is HasNoEther, HasNoTokens {
 
     modifier notPaused() {
         require(!paused, "Must not be paused");
+        _;
+    }
+
+    modifier onlyOwnerOrOracle () {
+        require(msg.sender == owner || msg.sender == oracle);
         _;
     }
 
@@ -185,6 +194,12 @@ contract CloversController is HasNoEther, HasNoTokens {
         return basePrice.add(calculateReward(_symmetries));
     }
 
+    function setGasPrices(uint256 _slowGasPrice, uint256 _averageGasPrice, uint256 _fastGasPrice) public onlyOwnerOrOracle {
+        fastGasPrice = _fastGasPrice;
+        averageGasPrice = _averageGasPrice;
+        slowGasPrice = _slowGasPrice;
+    }
+
     /**
     * @dev Claim the Clover without a commit or reveal. Payable so you can attach enough for the stake,
     * as well as enough to buy tokens if needed to keep the Clover.
@@ -199,13 +214,14 @@ contract CloversController is HasNoEther, HasNoTokens {
 
         bytes32 movesHash = keccak256(moves);
 
-        require(msg.value >= stakeAmount);
+        uint256 stakeWithGas = stakeAmount.mul(fastGasPrice);
+        require(msg.value >= stakeWithGas);
         require(getCommit(movesHash) == 0);
 
         setCommit(movesHash, msg.sender);
-        if (stakeAmount > 0) {
-            setStake(movesHash, stakeAmount);
-            clovers.transfer(stakeAmount);
+        if (stakeWithGas > 0) {
+            setStake(movesHash, stakeWithGas);
+            clovers.transfer(stakeWithGas);
         }
 
         emit cloverCommitted(movesHash, msg.sender);
@@ -228,13 +244,13 @@ contract CloversController is HasNoEther, HasNoTokens {
             // If the user decides to keep the Clover, they must
             // pay for it in club tokens according to the reward price.
             if (ClubToken(clubToken).balanceOf(msg.sender) < price) {
-                ClubTokenController(clubTokenController).buy.value(msg.value.sub(stakeAmount))(msg.sender);
+                ClubTokenController(clubTokenController).buy.value(msg.value.sub(stakeWithGas))(msg.sender);
             }
-            require(ClubToken(clubToken).transferFrom(msg.sender, clovers, price));
-            // ClubToken(clubToken).burn(committer, price);
+            // require(ClubToken(clubToken).transferFrom(msg.sender, clovers, price));
+            ClubToken(clubToken).burn(msg.sender, price);
         }
         Clovers(clovers).mint(clovers, _tokenId);
-        emit cloverClaimed(moves, _tokenId, msg.sender, stakeAmount, reward, _symmetries, _keep);
+        emit cloverClaimed(moves, _tokenId, msg.sender, stakeWithGas, reward, _symmetries, _keep);
         return true;
     }
 
@@ -302,9 +318,10 @@ contract CloversController is HasNoEther, HasNoTokens {
     * @param _tokenId The board which holds the stake.
     * @return A boolean representing whether or not the retrieval was successful.
     */
-    function retrieveStake(uint256 _tokenId) public payable returns (bool) {
+    function retrieveStake(uint256 _tokenId, uint256 _fastGasPrice, uint256 _averageGasPrice, uint256 _slowGasPrice) public payable returns (bool) {
         bytes28[2] memory moves = Clovers(clovers).getCloverMoves(_tokenId);
         bytes32 movesHash = keccak256(moves);
+
 
         require(!commits[movesHash].collected);
         commits[movesHash].collected = true;
@@ -335,6 +352,11 @@ contract CloversController is HasNoEther, HasNoTokens {
             Clovers(clovers).moveEth(msg.sender, stake);
         }
         emit stakeRetrieved(_tokenId, msg.sender, stake);
+
+        if (msg.sender == owner || msg.sender == oracle) {
+            setGasPrices(_fastGasPrice, _averageGasPrice, _slowGasPrice);
+        }
+
         return true;
     }
 
@@ -355,7 +377,7 @@ contract CloversController is HasNoEther, HasNoTokens {
     * @param _tokenId The board being challenged.
     * @return A boolean representing whether or not the challenge was successful.
     */
-    function challengeClover(uint256 _tokenId) public returns (bool) {
+    function challengeClover(uint256 _tokenId, uint256 _fastGasPrice, uint256 _averageGasPrice, uint256 _slowGasPrice) public returns (bool) {
         bool valid = true;
         bytes28[2] memory moves = Clovers(clovers).getCloverMoves(_tokenId);
 
@@ -390,6 +412,9 @@ contract CloversController is HasNoEther, HasNoTokens {
 
         Clovers(clovers).deleteClover(_tokenId);
         deleteCommit(movesHash);
+        if (msg.sender == owner || msg.sender == oracle) {
+            setGasPrices(_fastGasPrice, _averageGasPrice, _slowGasPrice);
+        }
         return true;
     }
 
