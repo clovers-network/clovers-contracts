@@ -1,9 +1,12 @@
 const BigNumber = require('bignumber.js')
 const utils = require('web3-utils')
-
+const oneGwei = 1000000000
 var vals = (module.exports = {
   // stakeAmount: new BigNumber(529271).mul(1000000000).mul(40), // gasPrice * 1GWEI * 40 (normal person price)
   stakeAmount: new BigNumber(190621).mul(5000000000).mul(1), // gasPrice * 10GWEI (oracle price)
+  fastGasPrice: new BigNumber(10).mul(oneGwei),
+  averageGasPrice: new BigNumber(5).mul(oneGwei),
+  safeLowGasPrice: new BigNumber(1).mul(oneGwei),
   // stakeAmount: new BigNumber(0).mul(1000000000).mul(40), // gasPrice * 1GWEI * 40  (nothing)
   ethPrice: new BigNumber('200'),
   oneGwei: new BigNumber('1000000000'), // 1 GWEI
@@ -147,6 +150,18 @@ async function updateCloversController({
     var tx = await cloversController.updatePaused(vals.paused)
   } else {
     console.log('paused hasnt changed')
+  }
+
+
+  var fastGasPrice = await cloversController.fastGasPrice()
+  var averageGasPrice = await cloversController.averageGasPrice()
+  var safeLowGasPrice = await cloversController.safeLowGasPrice()
+
+  if (!fastGasPrice.eq(vals.fastGasPrice) || !averageGasPrice.eq(vals.averageGasPrice) || !safeLowGasPrice.eq(vals.safeLowGasPrice)) {
+    console.log(`cloversController.updateGasPrices from ${fastGasPrice}, ${averageGasPrice}, ${safeLowGasPrice} to ${vals.fastGasPrice}, ${vals.averageGasPrice}, ${vals.safeLowGasPrice}`)
+    var tx = await cloversController.updateGasPrices(vals.fastGasPrice, vals.averageGasPrice, vals.safeLowGasPrice)
+  } else {
+    console.log(`gas prices haven't changed`)
   }
 
 

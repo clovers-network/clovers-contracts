@@ -320,6 +320,17 @@ contract('Clovers', async function(accounts) {
           _ + 'cloversController.updateBasePrice - ' + tx.receipt.gasUsed
         )
         gasToCash(tx.receipt.gasUsed)
+        totalGas = totalGas.plus(tx.receipt.gasUsed)
+
+        var fastGasPrice =  new BigNumber(10).mul(oneGwei)
+        var averageGasPrice =  new BigNumber(5).mul(oneGwei)
+        var safeLowGasPrice = new BigNumber(1).mul(oneGwei)
+        var tx = await cloversController.updateGasPrices(fastGasPrice, averageGasPrice, safeLowGasPrice)
+        console.log(
+          _ + 'cloversController.updateBasePrice - ' + tx.receipt.gasUsed
+        )
+        gasToCash(tx.receipt.gasUsed)
+
 
         totalGas = totalGas.plus(tx.receipt.gasUsed)
 
@@ -959,6 +970,8 @@ contract('Clovers', async function(accounts) {
     })
 
     it('should make sure claimClover (_keep = false) is successful using valid game w/ invalid symmetries', async function() {
+      var gasPrice = await cloversController.fastGasPrice()
+      var stakeWithGas = gasPrice.mul(stakeAmount) 
       try {
         let options = [
           _moves,
@@ -966,7 +979,7 @@ contract('Clovers', async function(accounts) {
           new web3.BigNumber('0x1F', 16), // invalid symmetries
           false,
           {
-            value: new web3.BigNumber(stakeAmount),
+            value: stakeWithGas.toString(10),
             gasPrice
           }
         ]
@@ -992,19 +1005,21 @@ contract('Clovers', async function(accounts) {
     it('should make sure stake amount was removed from your account', async function() {
       let gasCost = gasSpent * parseInt(gasPrice)
       _balance = web3.eth.getBalance(accounts[0])
+      var gasPrice = await cloversController.fastGasPrice()
+      var stakeWithGas = gasPrice.mul(stakeAmount)
       assert(
         balance
           .sub(_balance)
           .sub(gasCost)
-          .eq(stakeAmount),
+          .eq(stakeWithGas),
         'original balance ' +
           web3.fromWei(balance).toString() +
           ' minus new balance ' +
           web3.fromWei(_balance).toString() +
           ' minus gas ' +
           web3.fromWei(gasCost).toString() +
-          ' did not equal stakeAmount ' +
-          web3.fromWei(stakeAmount).toString()
+          ' did not equal stakeWithGas ' +
+          web3.fromWei(stakeWithGas).toString()
       )
     })
 
@@ -1171,7 +1186,8 @@ contract('Clovers', async function(accounts) {
 
     let symmetries = rev.returnSymmetriesAsBN()
     let stakeAmount = await cloversController.stakeAmount()
-
+    let gasPrice = await cloversController.fastGasPrice()
+    let stakeWithGas = gasPrice.mul(stakeAmount)
     let reward
     try {
       reward = await cloversController.calculateReward(symmetries.toString(10))
@@ -1202,7 +1218,7 @@ contract('Clovers', async function(accounts) {
       await clubTokenController.buy(user, { value: costOfTokens.div(2) })
       costOfTokens = costOfTokens.div(2)
     }
-    let value = costOfTokens.add(stakeAmount)
+    let value = costOfTokens.add(stakeWithGas)
 
     let keep = true
     try {

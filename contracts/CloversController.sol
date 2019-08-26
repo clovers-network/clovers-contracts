@@ -34,7 +34,7 @@ contract CloversController is HasNoEther, HasNoTokens {
 
     uint256 public fastGasPrice;
     uint256 public averageGasPrice;
-    uint256 public slowSafeGasPrice;
+    uint256 public safeLowGasPrice;
 
     uint256 public basePrice;
     uint256 public priceMultiplier;
@@ -194,10 +194,10 @@ contract CloversController is HasNoEther, HasNoTokens {
         return basePrice.add(calculateReward(_symmetries));
     }
 
-    function setGasPrices(uint256 _slowSafeGasPrice, uint256 _averageGasPrice, uint256 _fastGasPrice) public onlyOwnerOrOracle {
+    function updateGasPrices(uint256 _safeLowGasPrice, uint256 _averageGasPrice, uint256 _fastGasPrice) public onlyOwnerOrOracle {
         fastGasPrice = _fastGasPrice;
         averageGasPrice = _averageGasPrice;
-        slowSafeGasPrice = _slowSafeGasPrice;
+        safeLowGasPrice = _safeLowGasPrice;
     }
 
     /**
@@ -206,6 +206,7 @@ contract CloversController is HasNoEther, HasNoTokens {
     * @param moves The moves that make up the Clover reversi game.
     * @param _tokenId The board that results from the moves.
     * @param _symmetries symmetries saved as a uint256 value like 00010101 where bits represent symmetry
+    * @param _keep symmetries saved as a uint256 value like 00010101 where bits represent symmetry
     * types.
     * @return A boolean representing whether or not the claim was successful.
     */
@@ -313,12 +314,28 @@ contract CloversController is HasNoEther, HasNoTokens {
         return true;
     } */
 
+
+    /**
+    * @dev Retrieve the stake from a Clover claim after the stake period has ended, or with the authority of the oracle.
+    * @param _tokenId The board which holds the stake.
+    * @param _fastGasPrice The current fast gas price.
+    * @param _averageGasPrice The current average gas price.
+    * @param _safeLowGasPrice The current slow safe gas price
+    * @return A boolean representing whether or not the retrieval was successful.
+    */
+    function retrieveStake(uint256 _tokenId, uint256 _fastGasPrice, uint256 _averageGasPrice, uint256 _safeLowGasPrice) public payable returns (bool) {
+        require(retrieveStake(_tokenId));
+        if (msg.sender == owner || msg.sender == oracle) {
+            updateGasPrices(_fastGasPrice, _averageGasPrice, _safeLowGasPrice);
+        }
+    }
+
     /**
     * @dev Retrieve the stake from a Clover claim after the stake period has ended, or with the authority of the oracle.
     * @param _tokenId The board which holds the stake.
     * @return A boolean representing whether or not the retrieval was successful.
     */
-    function retrieveStake(uint256 _tokenId, uint256 _fastGasPrice, uint256 _averageGasPrice, uint256 _slowSafeGasPrice) public payable returns (bool) {
+    function retrieveStake(uint256 _tokenId) public payable returns (bool) {
         bytes28[2] memory moves = Clovers(clovers).getCloverMoves(_tokenId);
         bytes32 movesHash = keccak256(moves);
 
@@ -353,10 +370,6 @@ contract CloversController is HasNoEther, HasNoTokens {
         }
         emit stakeRetrieved(_tokenId, msg.sender, stake);
 
-        if (msg.sender == owner || msg.sender == oracle) {
-            setGasPrices(_fastGasPrice, _averageGasPrice, _slowSafeGasPrice);
-        }
-
         return true;
     }
 
@@ -372,12 +385,28 @@ contract CloversController is HasNoEther, HasNoTokens {
         }
     }
 
+
+    /**
+    * @dev Challenge a staked Clover for being invalid.
+    * @param _tokenId The board being challenged.
+    * @param _fastGasPrice The current fast gas price.
+    * @param _averageGasPrice The current average gas price.
+    * @param _safeLowGasPrice The current slow safe gas price
+    * @return A boolean representing whether or not the challenge was successful.
+    */
+    function challengeClover(uint256 _tokenId, uint256 _fastGasPrice, uint256 _averageGasPrice, uint256 _safeLowGasPrice) public returns (bool) {
+        require(challengeClover(_tokenId));
+        if (msg.sender == owner || msg.sender == oracle) {
+            updateGasPrices(_fastGasPrice, _averageGasPrice, _safeLowGasPrice);
+        }
+        return true;
+    }
     /**
     * @dev Challenge a staked Clover for being invalid.
     * @param _tokenId The board being challenged.
     * @return A boolean representing whether or not the challenge was successful.
     */
-    function challengeClover(uint256 _tokenId, uint256 _fastGasPrice, uint256 _averageGasPrice, uint256 _slowSafeGasPrice) public returns (bool) {
+    function challengeClover(uint256 _tokenId) public returns (bool) {
         bool valid = true;
         bytes28[2] memory moves = Clovers(clovers).getCloverMoves(_tokenId);
 
@@ -412,9 +441,6 @@ contract CloversController is HasNoEther, HasNoTokens {
 
         Clovers(clovers).deleteClover(_tokenId);
         deleteCommit(movesHash);
-        if (msg.sender == owner || msg.sender == oracle) {
-            setGasPrices(_fastGasPrice, _averageGasPrice, _slowSafeGasPrice);
-        }
         return true;
     }
 
@@ -523,7 +549,7 @@ contract CloversController is HasNoEther, HasNoTokens {
         commits[movesHash].committer = committer;
     }
 
-    function _setCommit(bytes32 movesHash, address committer) onlyOwner {
+    function _setCommit(bytes32 movesHash, address committer) public onlyOwner {
         setCommit(movesHash, committer);
     }
     function deleteCommit(bytes32 movesHash) private {
