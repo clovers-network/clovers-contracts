@@ -8,6 +8,7 @@
  - [Clovers Controller](https://etherscan.io/address/0x521d32f3d23f1fc82b1dbe306edc3ef668e5d973#code)
  - [Clovers Coin](https://etherscan.io/address/0x1a94656a6245379bc0d9c64c402197528edb2bd1#code)
  - [Clovers Coin Controller](https://etherscan.io/address/0x1754a612ca578f72d678196bcc16710f01db7655#code)
+ - [Clovers Simple Market](https://etherscan.io/address/0x6ebd97252d34645263c1d074f202f1d7546ce06b#code)
 
 
 
