@@ -201,18 +201,15 @@ contract CloversController is HasNoEther, HasNoTokens {
         uint256 fastGasPrice = _fastGasPrice << 128;
         uint256 averageGasPrice = _averageGasPrice << 64;
         uint256 safeLowGasPrice = _safeLowGasPrice;
-        gasLastUpdated_fastGasPrice_averageGasPrice_safeLowGasPrice = gasLastUpdated & fastGasPrice & averageGasPrice & safeLowGasPrice;
+        gasLastUpdated_fastGasPrice_averageGasPrice_safeLowGasPrice = gasLastUpdated | fastGasPrice | averageGasPrice | safeLowGasPrice;
     }
 
     function gasLastUpdated() public view returns(uint256) {
-        uint64 blocker = 0;
-        blocker = blocker - 1;
-        return uint256((gasLastUpdated_fastGasPrice_averageGasPrice_safeLowGasPrice >> 192) & blocker);
+
+        return uint256(uint64(gasLastUpdated_fastGasPrice_averageGasPrice_safeLowGasPrice >> 192));
     }
     function fastGasPrice() public view returns(uint256) {
-        uint64 blocker = 0;
-        blocker = blocker - 1;
-        return uint256((gasLastUpdated_fastGasPrice_averageGasPrice_safeLowGasPrice >> 128) & blocker);
+        return uint256(uint64(gasLastUpdated_fastGasPrice_averageGasPrice_safeLowGasPrice >> 128));
     }
     function averageGasPrice() public view returns(uint256) {
         return uint256(uint64(gasLastUpdated_fastGasPrice_averageGasPrice_safeLowGasPrice >> 64));
