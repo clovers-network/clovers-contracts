@@ -13,7 +13,7 @@ const overwrites = {
   Support: false,
   Clovers: false,
   CloversMetadata: false,
-  CloversController: false,
+  CloversController: true,
   ClubTokenController: false,
   SimpleCloversMarket: false,
   // CurationMarket: false,

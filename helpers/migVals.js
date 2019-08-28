@@ -3,7 +3,7 @@ const utils = require('web3-utils')
 const oneGwei = 1000000000
 var vals = (module.exports = {
   // stakeAmount: new BigNumber(529271).mul(1000000000).mul(40), // gasPrice * 1GWEI * 40 (normal person price)
-  stakeAmount: new BigNumber(190621).mul(5000000000).mul(1), // gasPrice * 10GWEI (oracle price)
+  stakeAmount: new BigNumber(190621), // gasPrice * 10GWEI (oracle price)
   fastGasPrice: new BigNumber(10).mul(oneGwei),
   averageGasPrice: new BigNumber(5).mul(oneGwei),
   safeLowGasPrice: new BigNumber(1).mul(oneGwei),

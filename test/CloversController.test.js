@@ -981,7 +981,7 @@ contract('Clovers', async function(accounts) {
     })
 
     it('should make sure claimClover (_keep = false) is successful using valid game w/ invalid symmetries', async function() {
-      var gasPrice = await cloversController.fastGasPrice()
+      var gasPrice = await cloversController.getGasPriceForApp()
       var stakeWithGas = gasPrice.mul(stakeAmount) 
       try {
         let options = [
@@ -1016,7 +1016,7 @@ contract('Clovers', async function(accounts) {
     it('should make sure stake amount was removed from your account', async function() {
       let gasCost = gasSpent * parseInt(globalGasPrice)
       _balance = web3.eth.getBalance(accounts[0])
-      var gasPrice = await cloversController.fastGasPrice()
+      var gasPrice = await cloversController.getGasPriceForApp()
       var stakeWithGas = gasPrice.mul(stakeAmount)
       assert(
         balance
@@ -1202,7 +1202,7 @@ contract('Clovers', async function(accounts) {
 
     let symmetries = rev.returnSymmetriesAsBN()
     let stakeAmount = await cloversController.stakeAmount()
-    let gasPrice = await cloversController.fastGasPrice()
+    let gasPrice = await cloversController.getGasPriceForApp()
     console.log(`fastGasPrice = ${utils.fromWei(gasPrice.toString(10))} (${gasPrice.toString(10)} wei)`)
     console.log(`stakeAmount = ${utils.fromWei(stakeAmount.toString(10))} (${stakeAmount.toString(10)} wei)`) 
    

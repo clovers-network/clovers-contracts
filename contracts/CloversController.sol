@@ -33,16 +33,14 @@ contract CloversController is HasNoEther, HasNoTokens {
     address public curationMarket;
 
     uint256 public gasLastUpdated_fastGasPrice_averageGasPrice_safeLowGasPrice;
-    // uint256 memory public gasLastUpdated;
-    // uint256 memory public fastGasPrice;
-    // uint256 memory public averageGasPrice;
-    // uint256 memory public safeLowGasPrice;
 
     uint256 public basePrice;
     uint256 public priceMultiplier;
     uint256 public payMultiplier;
     uint256 public stakeAmount;
     uint256 public stakePeriod;
+    uint256 public constant oneGwei = 1000000000;
+    uint256 public gasBlockMargin = 240; // ~1 hour at 15 second blocks
 
     struct Commit {
         bool collected;
@@ -196,6 +194,10 @@ contract CloversController is HasNoEther, HasNoTokens {
         return basePrice.add(calculateReward(_symmetries));
     }
 
+    function updateGasBlockMargin(uint256 _gasBlockMargin) public onlyOwnerOrOracle {
+        gasBlockMargin = _gasBlockMargin;
+    }
+
     function updateGasPrices(uint256 _fastGasPrice, uint256 _averageGasPrice, uint256 _safeLowGasPrice) public onlyOwnerOrOracle {
         uint256 gasLastUpdated = block.number << 192;
         uint256 fastGasPrice = _fastGasPrice << 128;
@@ -205,7 +207,6 @@ contract CloversController is HasNoEther, HasNoTokens {
     }
 
     function gasLastUpdated() public view returns(uint256) {
-
         return uint256(uint64(gasLastUpdated_fastGasPrice_averageGasPrice_safeLowGasPrice >> 192));
     }
     function fastGasPrice() public view returns(uint256) {
@@ -216,6 +217,13 @@ contract CloversController is HasNoEther, HasNoTokens {
     }
     function safeLowGasPrice() public view returns(uint256) {
         return uint256(uint64(gasLastUpdated_fastGasPrice_averageGasPrice_safeLowGasPrice));
+    }
+    function getGasPriceForApp() public view returns(uint256) {
+        if (block.number.sub(gasLastUpdated()) > gasBlockMargin) {
+            return oneGwei.mul(10);
+        } else {
+            return fastGasPrice();
+        }
     }
 
     /**
@@ -233,8 +241,7 @@ contract CloversController is HasNoEther, HasNoTokens {
 
         bytes32 movesHash = keccak256(moves);
 
-        uint256 fastGasPrice = uint256(uint64(gasLastUpdated_fastGasPrice_averageGasPrice_safeLowGasPrice >> 128));
-        uint256 stakeWithGas = stakeAmount.mul(fastGasPrice);
+        uint256 stakeWithGas = stakeAmount.mul(getGasPriceForApp());
         require(msg.value >= stakeWithGas);
         require(getCommit(movesHash) == 0);
 
