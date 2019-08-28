@@ -32,9 +32,11 @@ contract CloversController is HasNoEther, HasNoTokens {
     address public simpleCloversMarket;
     address public curationMarket;
 
-    uint256 public fastGasPrice;
-    uint256 public averageGasPrice;
-    uint256 public safeLowGasPrice;
+    uint256 public gasLastUpdated_fastGasPrice_averageGasPrice_safeLowGasPrice;
+    // uint256 memory public gasLastUpdated;
+    // uint256 memory public fastGasPrice;
+    // uint256 memory public averageGasPrice;
+    // uint256 memory public safeLowGasPrice;
 
     uint256 public basePrice;
     uint256 public priceMultiplier;
@@ -194,10 +196,29 @@ contract CloversController is HasNoEther, HasNoTokens {
         return basePrice.add(calculateReward(_symmetries));
     }
 
-    function updateGasPrices(uint256 _safeLowGasPrice, uint256 _averageGasPrice, uint256 _fastGasPrice) public onlyOwnerOrOracle {
-        fastGasPrice = _fastGasPrice;
-        averageGasPrice = _averageGasPrice;
-        safeLowGasPrice = _safeLowGasPrice;
+    function updateGasPrices(uint256 _fastGasPrice, uint256 _averageGasPrice, uint256 _safeLowGasPrice) public onlyOwnerOrOracle {
+        uint256 gasLastUpdated = block.number << 192;
+        uint256 fastGasPrice = _fastGasPrice << 128;
+        uint256 averageGasPrice = _averageGasPrice << 64;
+        uint256 safeLowGasPrice = _safeLowGasPrice;
+        gasLastUpdated_fastGasPrice_averageGasPrice_safeLowGasPrice = gasLastUpdated & fastGasPrice & averageGasPrice & safeLowGasPrice;
+    }
+
+    function gasLastUpdated() public view returns(uint256) {
+        uint64 blocker = 0;
+        blocker = blocker - 1;
+        return uint256((gasLastUpdated_fastGasPrice_averageGasPrice_safeLowGasPrice >> 192) & blocker);
+    }
+    function fastGasPrice() public view returns(uint256) {
+        uint64 blocker = 0;
+        blocker = blocker - 1;
+        return uint256((gasLastUpdated_fastGasPrice_averageGasPrice_safeLowGasPrice >> 128) & blocker);
+    }
+    function averageGasPrice() public view returns(uint256) {
+        return uint256(uint64(gasLastUpdated_fastGasPrice_averageGasPrice_safeLowGasPrice >> 64));
+    }
+    function safeLowGasPrice() public view returns(uint256) {
+        return uint256(uint64(gasLastUpdated_fastGasPrice_averageGasPrice_safeLowGasPrice));
     }
 
     /**
@@ -215,6 +236,7 @@ contract CloversController is HasNoEther, HasNoTokens {
 
         bytes32 movesHash = keccak256(moves);
 
+        uint256 fastGasPrice = uint256(uint64(gasLastUpdated_fastGasPrice_averageGasPrice_safeLowGasPrice >> 128));
         uint256 stakeWithGas = stakeAmount.mul(fastGasPrice);
         require(msg.value >= stakeWithGas);
         require(getCommit(movesHash) == 0);
@@ -323,7 +345,7 @@ contract CloversController is HasNoEther, HasNoTokens {
     * @param _safeLowGasPrice The current slow safe gas price
     * @return A boolean representing whether or not the retrieval was successful.
     */
-    function retrieveStake(uint256 _tokenId, uint256 _fastGasPrice, uint256 _averageGasPrice, uint256 _safeLowGasPrice) public payable returns (bool) {
+    function retrieveStakeWithGas(uint256 _tokenId, uint256 _fastGasPrice, uint256 _averageGasPrice, uint256 _safeLowGasPrice) public payable returns (bool) {
         require(retrieveStake(_tokenId));
         if (msg.sender == owner || msg.sender == oracle) {
             updateGasPrices(_fastGasPrice, _averageGasPrice, _safeLowGasPrice);
@@ -394,7 +416,7 @@ contract CloversController is HasNoEther, HasNoTokens {
     * @param _safeLowGasPrice The current slow safe gas price
     * @return A boolean representing whether or not the challenge was successful.
     */
-    function challengeClover(uint256 _tokenId, uint256 _fastGasPrice, uint256 _averageGasPrice, uint256 _safeLowGasPrice) public returns (bool) {
+    function challengeCloverWithGas(uint256 _tokenId, uint256 _fastGasPrice, uint256 _averageGasPrice, uint256 _safeLowGasPrice) public returns (bool) {
         require(challengeClover(_tokenId));
         if (msg.sender == owner || msg.sender == oracle) {
             updateGasPrices(_fastGasPrice, _averageGasPrice, _safeLowGasPrice);
@@ -444,6 +466,9 @@ contract CloversController is HasNoEther, HasNoTokens {
         return true;
     }
 
+    function fixSalePrice(uint256 _tokenId, uint256 _price) public onlyOwnerOrOracle {
+        ISimpleCloversMarket(simpleCloversMarket).sell(_tokenId, _price);
+    }
 
     /**
     * @dev Moves clovers without explicit allow permission for use by simpleCloversMarket

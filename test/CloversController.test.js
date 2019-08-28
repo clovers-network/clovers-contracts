@@ -16,9 +16,9 @@ const _ = require('../helpers/utils')._
 var { getLowestPrice } = require('../helpers/utils')
 const ethPrice = new web3.BigNumber('440')
 const oneGwei = new web3.BigNumber('1000000000') // 1 GWEI
-let gasPrice = oneGwei.toString(10)
+let globalGasPrice = oneGwei.toString(10)
 
-let stakeAmount = utils.toWei('0.1')
+let stakeAmount = '280280'
 // let stakePeriod = "6000"; // at 15 sec block times this is ~25 hours
 let stakePeriod = '10' // make 10 for speed of tests
 let payMultiplier = utils.toWei('.327')
@@ -32,6 +32,10 @@ let virtualBalance = utils.toWei('10')
 let virtualSupply = utils.toWei('10000')
 let limit = utils.toWei('5')
 
+
+var fastGasPrice =  new web3.BigNumber(10).mul(oneGwei)
+var averageGasPrice =  new web3.BigNumber(5).mul(oneGwei)
+var safeLowGasPrice = new web3.BigNumber(1).mul(oneGwei)
 
 contract('Clovers', async function(accounts) {
   let oracle = accounts[8]
@@ -322,9 +326,6 @@ contract('Clovers', async function(accounts) {
         gasToCash(tx.receipt.gasUsed)
         totalGas = totalGas.plus(tx.receipt.gasUsed)
 
-        var fastGasPrice =  new BigNumber(10).mul(oneGwei)
-        var averageGasPrice =  new BigNumber(5).mul(oneGwei)
-        var safeLowGasPrice = new BigNumber(1).mul(oneGwei)
         var tx = await cloversController.updateGasPrices(fastGasPrice, averageGasPrice, safeLowGasPrice)
         console.log(
           _ + 'cloversController.updateBasePrice - ' + tx.receipt.gasUsed
@@ -746,7 +747,7 @@ contract('Clovers', async function(accounts) {
       try {
         var tx = await clubTokenController.sell(_sellAmount, {
           from: buyer,
-          gasPrice
+          gasPrice: globalGasPrice
         })
         console.log(
           _ + 'clubTokenController.sell - ' + tx.receipt.cumulativeGasUsed
@@ -758,7 +759,7 @@ contract('Clovers', async function(accounts) {
         assert(false, 'sell tx receipt should not have thrown an error')
       }
       gasSpent = tx.receipt.cumulativeGasUsed
-      let gasCost = gasSpent * parseInt(gasPrice)
+      let gasCost = gasSpent * parseInt(globalGasPrice)
 
       let balanceAfter = await web3.eth.getBalance(buyer)
 
@@ -951,6 +952,16 @@ contract('Clovers', async function(accounts) {
 
       let _basePrice = await cloversController.basePrice()
       assert(_basePrice.toString() === basePrice, 'basePrice not equal')
+
+      let _fastGasPrice = await cloversController.fastGasPrice()
+      assert(_fastGasPrice.toString() === fastGasPrice.toString(10), 'fastGasPrice not equal')
+
+      let _averageGasPrice = await cloversController.averageGasPrice()
+      assert(_averageGasPrice.toString() === averageGasPrice.toString(10), 'averageGasPrice not equal')
+
+      let _safeLowGasPrice = await cloversController.safeLowGasPrice()
+      assert(_safeLowGasPrice.toString(10) === safeLowGasPrice.toString(10), 'safeLowGasPrice not equal')
+
     })
 
     it("should make sure token doesn't exist", async function() {
@@ -980,7 +991,7 @@ contract('Clovers', async function(accounts) {
           false,
           {
             value: stakeWithGas.toString(10),
-            gasPrice
+            gasPrice: globalGasPrice
           }
         ]
 
@@ -1003,7 +1014,7 @@ contract('Clovers', async function(accounts) {
     })
 
     it('should make sure stake amount was removed from your account', async function() {
-      let gasCost = gasSpent * parseInt(gasPrice)
+      let gasCost = gasSpent * parseInt(globalGasPrice)
       _balance = web3.eth.getBalance(accounts[0])
       var gasPrice = await cloversController.fastGasPrice()
       var stakeWithGas = gasPrice.mul(stakeAmount)
@@ -1032,8 +1043,11 @@ contract('Clovers', async function(accounts) {
 
     it('should check the cost of challenging this clover w invalid symmetries', async function() {
       try {
-        gasEstimate = await cloversController.challengeClover.estimateGas(
+        gasEstimate = await cloversController.challengeCloverWithGas.estimateGas(
           _tokenId,
+          fastGasPrice,
+          averageGasPrice,
+          safeLowGasPrice,
           {
             from: oracle
           }
@@ -1047,11 +1061,11 @@ contract('Clovers', async function(accounts) {
       }
     })
 
-    it('should update the stake amount with the gas Estimate from challengeClover', async function() {
+    it.skip('should update the stake amount with the gas Estimate from challengeClover', async function() {
       try {
-        newStakeAmount = new web3.BigNumber(gasEstimate).mul(gasPrice).mul(40)
+        newStakeAmount = new web3.BigNumber(gasEstimate).mul(globalGasPrice).mul(40)
         tx = await cloversController.updateStakeAmount(newStakeAmount, {
-          gasPrice
+          gasPrice: globalGasPrice
         })
 
         console.log(
@@ -1077,12 +1091,13 @@ contract('Clovers', async function(accounts) {
     it('should check the stake amount for the token in question', async function() {
       let _movesHashSol = await cloversController.getMovesHash(_tokenId)
       let currentStake = await cloversController.getStake(_movesHashSol)
+      let stakeWithGas = stakeAmount * fastGasPrice
       assert(
-        currentStake.toString() === stakeAmount,
+        currentStake.toString() === stakeWithGas.toString(),
         'currentStake ' +
           currentStake.toString() +
-          ' doest not equal stakeAmount ' +
-          stakeAmount
+          ' doest not equal stakeWithGas ' +
+          stakeWithGas
       )
     })
 
@@ -1100,7 +1115,8 @@ contract('Clovers', async function(accounts) {
 
     it('should make sure retrieveStake tx was successful', async function() {
       try {
-        tx = await cloversController.retrieveStake(_tokenId, { gasPrice })
+        // tx = await cloversController.retrieveStake(_tokenId, { gasPrice: globalGasPrice })
+        tx = await cloversController.retrieveStakeWithGas(_tokenId, fastGasPrice, averageGasPrice, safeLowGasPrice, { gasPrice: globalGasPrice })
 
         console.log(
           _ +
@@ -1151,7 +1167,7 @@ contract('Clovers', async function(accounts) {
     })
 
     it('should make sure stake amount was retured to your account', async function() {
-      gasCost = gasSpent * gasPrice
+      gasCost = gasSpent * globalGasPrice
       _balance = web3.eth.getBalance(accounts[0])
       let result = balance.minus(gasCost)
       assert(
@@ -1187,6 +1203,16 @@ contract('Clovers', async function(accounts) {
     let symmetries = rev.returnSymmetriesAsBN()
     let stakeAmount = await cloversController.stakeAmount()
     let gasPrice = await cloversController.fastGasPrice()
+    console.log(`fastGasPrice = ${utils.fromWei(gasPrice.toString(10))} (${gasPrice.toString(10)} wei)`)
+    console.log(`stakeAmount = ${utils.fromWei(stakeAmount.toString(10))} (${stakeAmount.toString(10)} wei)`) 
+   
+    // let gasPriceInEth =  new web3.BigNumber(utils.fromWei(gasPrice.toString(10)))
+    // console.log(`gasPriceInEth is ${gasPriceInEth.toString(10)}`)
+
+    // let stakeWithGasInEth = gasPriceInEth.mul(stakeAmount)
+    // console.log(`stakeWithGasInEth is ${stakeWithGasInEth.toString(10)}`)
+
+    // let stakeWithGas = utils.toWei(stakeWithGasInEth.toString(10))
     let stakeWithGas = gasPrice.mul(stakeAmount)
     let reward
     try {
