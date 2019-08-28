@@ -230,8 +230,8 @@ contract CloversController is HasNoEther, HasNoTokens {
             if (ClubToken(clubToken).balanceOf(msg.sender) < price) {
                 ClubTokenController(clubTokenController).buy.value(msg.value.sub(stakeAmount))(msg.sender);
             }
-            require(ClubToken(clubToken).transferFrom(msg.sender, clovers, price));
-            // ClubToken(clubToken).burn(committer, price);
+            // require(ClubToken(clubToken).transferFrom(msg.sender, clovers, price));
+            ClubToken(clubToken).burn(msg.sender, price);
         }
         Clovers(clovers).mint(clovers, _tokenId);
         emit cloverClaimed(moves, _tokenId, msg.sender, stakeAmount, reward, _symmetries, _keep);
