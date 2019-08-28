@@ -7,6 +7,7 @@ var vals = (module.exports = {
   fastGasPrice: new BigNumber(10).mul(oneGwei),
   averageGasPrice: new BigNumber(5).mul(oneGwei),
   safeLowGasPrice: new BigNumber(1).mul(oneGwei),
+  gasBlockMargin: new BigNumber(240), // ~1 hour at 15 second block times
   // stakeAmount: new BigNumber(0).mul(1000000000).mul(40), // gasPrice * 1GWEI * 40  (nothing)
   ethPrice: new BigNumber('200'),
   oneGwei: new BigNumber('1000000000'), // 1 GWEI
@@ -114,6 +115,15 @@ async function updateCloversController({
     var tx = await cloversController.updateStakePeriod(vals.stakePeriod) 
   } else {
     console.log('stakePeriod hasnt changed')
+  }
+
+
+  var gasBlockMargin = await cloversController.gasBlockMargin()
+  if (!gasBlockMargin.eq(vals.gasBlockMargin)) {
+    console.log(`cloversController.updategasBlockMargin from ${gasBlockMargin} to ${vals.gasBlockMargin}`)
+    var tx = await cloversController.updategasBlockMargin(vals.gasBlockMargin) 
+  } else {
+    console.log('gasBlockMargin hasnt changed')
   }
 
 
@@ -295,7 +305,6 @@ async function addAsAdmin(contract, accounts) {
 }
 
 async function removeAsAdmin(contract, accounts) {
-
 
 
 

@@ -33,6 +33,7 @@ contract CloversController is HasNoEther, HasNoTokens {
     address public curationMarket;
 
     uint256 public gasLastUpdated_fastGasPrice_averageGasPrice_safeLowGasPrice;
+    uint256 public gasBlockMargin = 240; // ~1 hour at 15 second blocks
 
     uint256 public basePrice;
     uint256 public priceMultiplier;
@@ -40,7 +41,6 @@ contract CloversController is HasNoEther, HasNoTokens {
     uint256 public stakeAmount;
     uint256 public stakePeriod;
     uint256 public constant oneGwei = 1000000000;
-    uint256 public gasBlockMargin = 240; // ~1 hour at 15 second blocks
 
     struct Commit {
         bool collected;
