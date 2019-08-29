@@ -121,9 +121,28 @@ module.exports = (deployer, network, accounts) => {
         accounts
       })
 
+
+      // update simpleCloversMarket
+
       console.log('remove admins for simpleCloversMarket')
       // await addAsAdmin(simpleCloversMarket, accounts);
       await removeAsAdmin(simpleCloversMarket, accounts);
+
+      var currentCloversControllerAddress = await simpleCloversMarket.cloversController()
+      if (currentCloversControllerAddress.toLowerCase() !== cloversController.address.toLowerCase()) {
+        console.log(`updating simpleCloversMarket with cloversControllerAddress from ${currentCloversControllerAddress} to ${cloversController.address}`)
+        await simpleCloversMarket.updateCloversController(cloversController.address)
+      } else {
+        console.log(`simpleCloversMarket has correct cloversController`)
+      }
+
+      var currentClubTokenControllerAddress = await simpleCloversMarket.clubTokenController()
+      if (currentClubTokenControllerAddress.toLowerCase() !== clubTokenController.address.toLowerCase()) {
+        console.log(`updating simpleCloversMarket with clubTokenControllerAddress from ${currentClubTokenControllerAddress} to ${clubTokenController.address}`)
+        await simpleCloversMarket.updateClubTokenController(clubTokenController.address)
+      } else {
+        console.log(`simpleCloversMarket has correct clubTokenController`)
+      }
 
     } catch (error) {
       console.log(error)
