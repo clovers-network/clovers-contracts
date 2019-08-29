@@ -1578,6 +1578,20 @@ module.exports = {
   {
    "constant": true,
    "inputs": [],
+   "name": "marginOfError",
+   "outputs": [
+    {
+     "name": "",
+     "type": "uint256"
+    }
+   ],
+   "payable": false,
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "constant": true,
+   "inputs": [],
    "name": "payMultiplier",
    "outputs": [
     {
@@ -1670,6 +1684,20 @@ module.exports = {
   {
    "constant": true,
    "inputs": [],
+   "name": "gasLastUpdated_fastGasPrice_averageGasPrice_safeLowGasPrice",
+   "outputs": [
+    {
+     "name": "",
+     "type": "uint256"
+    }
+   ],
+   "payable": false,
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "constant": true,
+   "inputs": [],
    "name": "oracle",
    "outputs": [
     {
@@ -1698,6 +1726,20 @@ module.exports = {
   {
    "constant": true,
    "inputs": [],
+   "name": "oneGwei",
+   "outputs": [
+    {
+     "name": "",
+     "type": "uint256"
+    }
+   ],
+   "payable": false,
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "constant": true,
+   "inputs": [],
    "name": "simpleCloversMarket",
    "outputs": [
     {
@@ -1716,6 +1758,20 @@ module.exports = {
    "outputs": [],
    "payable": false,
    "stateMutability": "nonpayable",
+   "type": "function"
+  },
+  {
+   "constant": true,
+   "inputs": [],
+   "name": "gasBlockMargin",
+   "outputs": [
+    {
+     "name": "",
+     "type": "uint256"
+    }
+   ],
+   "payable": false,
+   "stateMutability": "view",
    "type": "function"
   },
   {
@@ -2150,6 +2206,126 @@ module.exports = {
    "constant": false,
    "inputs": [
     {
+     "name": "_gasBlockMargin",
+     "type": "uint256"
+    }
+   ],
+   "name": "updateGasBlockMargin",
+   "outputs": [],
+   "payable": false,
+   "stateMutability": "nonpayable",
+   "type": "function"
+  },
+  {
+   "constant": false,
+   "inputs": [
+    {
+     "name": "_marginOfError",
+     "type": "uint256"
+    }
+   ],
+   "name": "updateMarginOfError",
+   "outputs": [],
+   "payable": false,
+   "stateMutability": "nonpayable",
+   "type": "function"
+  },
+  {
+   "constant": false,
+   "inputs": [
+    {
+     "name": "_fastGasPrice",
+     "type": "uint256"
+    },
+    {
+     "name": "_averageGasPrice",
+     "type": "uint256"
+    },
+    {
+     "name": "_safeLowGasPrice",
+     "type": "uint256"
+    }
+   ],
+   "name": "updateGasPrices",
+   "outputs": [],
+   "payable": false,
+   "stateMutability": "nonpayable",
+   "type": "function"
+  },
+  {
+   "constant": true,
+   "inputs": [],
+   "name": "gasLastUpdated",
+   "outputs": [
+    {
+     "name": "",
+     "type": "uint256"
+    }
+   ],
+   "payable": false,
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "constant": true,
+   "inputs": [],
+   "name": "fastGasPrice",
+   "outputs": [
+    {
+     "name": "",
+     "type": "uint256"
+    }
+   ],
+   "payable": false,
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "constant": true,
+   "inputs": [],
+   "name": "averageGasPrice",
+   "outputs": [
+    {
+     "name": "",
+     "type": "uint256"
+    }
+   ],
+   "payable": false,
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "constant": true,
+   "inputs": [],
+   "name": "safeLowGasPrice",
+   "outputs": [
+    {
+     "name": "",
+     "type": "uint256"
+    }
+   ],
+   "payable": false,
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "constant": true,
+   "inputs": [],
+   "name": "getGasPriceForApp",
+   "outputs": [
+    {
+     "name": "",
+     "type": "uint256"
+    }
+   ],
+   "payable": false,
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "constant": false,
+   "inputs": [
+    {
      "name": "moves",
      "type": "bytes28[2]"
     },
@@ -2167,6 +2343,37 @@ module.exports = {
     }
    ],
    "name": "claimClover",
+   "outputs": [
+    {
+     "name": "",
+     "type": "bool"
+    }
+   ],
+   "payable": true,
+   "stateMutability": "payable",
+   "type": "function"
+  },
+  {
+   "constant": false,
+   "inputs": [
+    {
+     "name": "_tokenId",
+     "type": "uint256"
+    },
+    {
+     "name": "_fastGasPrice",
+     "type": "uint256"
+    },
+    {
+     "name": "_averageGasPrice",
+     "type": "uint256"
+    },
+    {
+     "name": "_safeLowGasPrice",
+     "type": "uint256"
+    }
+   ],
+   "name": "retrieveStakeWithGas",
    "outputs": [
     {
      "name": "",
@@ -2221,6 +2428,37 @@ module.exports = {
     {
      "name": "_tokenId",
      "type": "uint256"
+    },
+    {
+     "name": "_fastGasPrice",
+     "type": "uint256"
+    },
+    {
+     "name": "_averageGasPrice",
+     "type": "uint256"
+    },
+    {
+     "name": "_safeLowGasPrice",
+     "type": "uint256"
+    }
+   ],
+   "name": "challengeCloverWithGas",
+   "outputs": [
+    {
+     "name": "",
+     "type": "bool"
+    }
+   ],
+   "payable": false,
+   "stateMutability": "nonpayable",
+   "type": "function"
+  },
+  {
+   "constant": false,
+   "inputs": [
+    {
+     "name": "_tokenId",
+     "type": "uint256"
     }
    ],
    "name": "challengeClover",
@@ -2230,6 +2468,24 @@ module.exports = {
      "type": "bool"
     }
    ],
+   "payable": false,
+   "stateMutability": "nonpayable",
+   "type": "function"
+  },
+  {
+   "constant": false,
+   "inputs": [
+    {
+     "name": "_tokenId",
+     "type": "uint256"
+    },
+    {
+     "name": "_price",
+     "type": "uint256"
+    }
+   ],
+   "name": "fixSalePrice",
+   "outputs": [],
    "payable": false,
    "stateMutability": "nonpayable",
    "type": "function"
@@ -2421,16 +2677,16 @@ module.exports = {
    "links": {
     "Reversi": "0xd6e4737118f6d12468edb0746755281e223eaaaa"
    },
-   "address": "0x521d32f3d23f1fc82b1dbe306edc3ef668e5d973",
-   "transactionHash": null
+   "address": "0x1f2ca5623db46b2ecc693011eef8506e80f4328e",
+   "transactionHash": "0xdb0a5233e05aafafe4a89d2ae8ade4871aa78fb80715edc4e0c783b383941b24"
   },
   "4": {
    "events": {},
    "links": {
     "Reversi": "0xbff258e5c379ac4fe61ac005f4f341476a2ab180"
    },
-   "address": "0x6485744704ec0775e3f39d9e9544afaf8b7c7955",
-   "transactionHash": null
+   "address": "0x83550091623dbf42c9762cea09f74ee5f7f32686",
+   "transactionHash": "0x33828d5696099bea8d051581e73d1f27562a1f60f043b7d65b23b7bf7d4d5812"
   },
   "42": {
    "events": {},

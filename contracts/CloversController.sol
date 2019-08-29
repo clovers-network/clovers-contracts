@@ -41,7 +41,7 @@ contract CloversController is HasNoEther, HasNoTokens {
     uint256 public stakeAmount;
     uint256 public stakePeriod;
     uint256 public constant oneGwei = 1000000000;
-
+    uint256 public marginOfError = 3;
     struct Commit {
         bool collected;
         uint256 stake;
@@ -198,6 +198,10 @@ contract CloversController is HasNoEther, HasNoTokens {
         gasBlockMargin = _gasBlockMargin;
     }
 
+    function updateMarginOfError(uint256 _marginOfError) public onlyOwnerOrOracle {
+        marginOfError = _marginOfError;
+    }
+
     function updateGasPrices(uint256 _fastGasPrice, uint256 _averageGasPrice, uint256 _safeLowGasPrice) public onlyOwnerOrOracle {
         uint256 gasLastUpdated = block.number << 192;
         uint256 fastGasPrice = _fastGasPrice << 128;
@@ -242,7 +246,8 @@ contract CloversController is HasNoEther, HasNoTokens {
         bytes32 movesHash = keccak256(moves);
 
         uint256 stakeWithGas = stakeAmount.mul(getGasPriceForApp());
-        require(msg.value >= stakeWithGas);
+        uint256 _marginOfError = stakeAmount.mul(oneGwei).mul(marginOfError);
+        require(msg.value >= stakeWithGas.sub(_marginOfError));
         require(getCommit(movesHash) == 0);
 
         setCommit(movesHash, msg.sender);

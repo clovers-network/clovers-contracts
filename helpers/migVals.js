@@ -3,7 +3,7 @@ const utils = require('web3-utils')
 const oneGwei = 1000000000
 var vals = (module.exports = {
   // stakeAmount: new BigNumber(529271).mul(1000000000).mul(40), // gasPrice * 1GWEI * 40 (normal person price)
-  stakeAmount: new BigNumber(190621), // gasPrice * 10GWEI (oracle price)
+  stakeAmount: new BigNumber(286774), // gasPrice * 10GWEI (oracle price)
   fastGasPrice: new BigNumber(10).mul(oneGwei),
   averageGasPrice: new BigNumber(5).mul(oneGwei),
   safeLowGasPrice: new BigNumber(1).mul(oneGwei),
@@ -16,7 +16,8 @@ var vals = (module.exports = {
   stakePeriod: '60000', // at 15 sec block times this is ~250 hours
   payMultiplier: utils.toWei('0.327'),
   priceMultiplier: '3',
-  basePrice: utils.toWei('2'),
+  marginOferror: '3',
+  basePrice: utils.toWei('3'),
   paused: false,
   limit: utils.toWei('5'),
   decimals: '18',
