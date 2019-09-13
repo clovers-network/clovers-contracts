@@ -11,8 +11,9 @@ contract('Reversi', async function(accounts) {
     ;(async () => {
       try {
         reversi = await Reversi_.new()
-        reversiMock = await ReversiMock.new()
+        ReversiMock.setNetwork('develop')
         await ReversiMock.link('Reversi', reversi.address)
+        reversiMock = await ReversiMock.new()
         done()
       } catch (error) {
         console.error(error)
@@ -38,7 +39,6 @@ contract('Reversi', async function(accounts) {
 
     it('should get a game', async function() {
       let game = await reversi.getGame(_realMoves)
-      console.log({game})
     })
 
     it('should get cost to play a game', async function() {

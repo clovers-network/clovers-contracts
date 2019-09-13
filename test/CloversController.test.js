@@ -915,13 +915,9 @@ contract('Clovers', async function(accounts) {
     ]
 
     it('should convert correctly', async function() {
-      console.log({reversi})
-      console.log({_moves})
 
       let game = await reversi.getGame(_moves)
-      console.log({game})
       let boardUint = await cloversController.convertBytes16ToUint(game[3])
-      console.log({boardUint})
       assert(
         '0x' + boardUint.toString(16) === _tokenId,
         '_tokenId !== boardUint'

@@ -5,7 +5,7 @@ module.exports = {
 
   networks: {
     develop: {
-      gas: 6721975
+      gas: 6000000
     }
   },
 
@@ -25,6 +25,6 @@ module.exports = {
   },
 
   mocha: {
-    timeout: 10000
+    enableTimeouts: false
   }
 };
