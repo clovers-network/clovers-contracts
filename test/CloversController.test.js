@@ -3,7 +3,7 @@ var Reversi = artifacts.require('./Reversi.sol')
 var Support = artifacts.require('./Support.sol')
 var Clovers = artifacts.require('./Clovers.sol')
 var CloversMetadata = artifacts.require('./CloversMetadata.sol')
-var CloversController = artifacts.require('./CloversController.sol')
+var CloversController = artifacts.require('./CloversControllerV3.sol')
 var ClubTokenController = artifacts.require('./ClubTokenController.sol')
 var SimpleCloversMarket = artifacts.require('./SimpleCloversMarket.sol')
 var ClubToken = artifacts.require('./ClubToken.sol')
@@ -14,8 +14,8 @@ const gasToCash = require('../helpers/utils').gasToCash
 const _ = require('../helpers/utils')._
 
 var { getLowestPrice } = require('../helpers/utils')
-const ethPrice = new web3.BigNumber('440')
-const oneGwei = new web3.BigNumber('1000000000') // 1 GWEI
+const ethPrice = utils.toBN('440')
+const oneGwei = utils.toBN('1000000000') // 1 GWEI
 let globalGasPrice = oneGwei.toString(10)
 
 let stakeAmount = '280280'
@@ -33,9 +33,9 @@ let virtualSupply = utils.toWei('10000')
 let limit = utils.toWei('5')
 
 
-var fastGasPrice =  new web3.BigNumber(10).mul(oneGwei)
-var averageGasPrice =  new web3.BigNumber(5).mul(oneGwei)
-var safeLowGasPrice = new web3.BigNumber(1).mul(oneGwei)
+var fastGasPrice =  utils.toBN(10).mul(oneGwei)
+var averageGasPrice =  utils.toBN(5).mul(oneGwei)
+var safeLowGasPrice = utils.toBN(1).mul(oneGwei)
 
 contract('Clovers', async function(accounts) {
   let oracle = accounts[8]
@@ -52,24 +52,23 @@ contract('Clovers', async function(accounts) {
   before(done => {
     ;(async () => {
       try {
-        var totalGas = new web3.BigNumber('0')
+        var totalGas = utils.toBN('0')
 
         // Deploy Clovers.sol (NFT)
         clovers = await Clovers.new('Clovers', 'CLVR')
-        var tx = web3.eth.getTransactionReceipt(clovers.transactionHash)
-
+        var tx = await web3.eth.getTransactionReceipt(clovers.transactionHash)
         console.log(_ + 'Deploy clovers - ' + tx.gasUsed)
         gasToCash(tx.gasUsed)
-        totalGas = totalGas.plus(tx.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.gasUsed))
 
         // Deploy CloversMetadata.sol
         // -w Clovers address
         cloversMetadata = await CloversMetadata.new(clovers.address)
-        var tx = web3.eth.getTransactionReceipt(cloversMetadata.transactionHash)
+        var tx = await web3.eth.getTransactionReceipt(cloversMetadata.transactionHash)
         console.log(_ + 'Deploy cloversMetadata - ' + tx.gasUsed)
         gasToCash(tx.gasUsed)
 
-        totalGas = totalGas.plus(tx.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.gasUsed))
 
         // Update Clovers.sol
         // -w CloversMetadata address
@@ -80,40 +79,39 @@ contract('Clovers', async function(accounts) {
         console.log(_ + 'Update clovers - ' + tx.receipt.gasUsed)
         gasToCash(tx.receipt.gasUsed)
 
-        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
 
         // Deploy ClubToken.sol (ERC20)
         clubToken = await ClubToken.new('ClubToken', 'CLB', decimals)
-        var tx = web3.eth.getTransactionReceipt(clubToken.transactionHash)
+        var tx = await web3.eth.getTransactionReceipt(clubToken.transactionHash)
 
         console.log(_ + 'Deploy clubToken - ' + tx.gasUsed)
         gasToCash(tx.gasUsed)
 
-        totalGas = totalGas.plus(tx.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.gasUsed))
 
         // Deploy Reversi.sol
         // -link w cloversController
         reversi = await Reversi.new()
-        var tx = web3.eth.getTransactionReceipt(reversi.transactionHash)
+        var tx = await web3.eth.getTransactionReceipt(reversi.transactionHash)
 
         console.log(_ + 'Deploy reversi - ' + tx.gasUsed)
         gasToCash(tx.gasUsed)
 
-        totalGas = totalGas.plus(tx.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.gasUsed))
 
-        await CloversController.link('Reversi', reversi.address)
 
         // Deploy ClubTokenController.sol
         // -w ClubToken address
         clubTokenController = await ClubTokenController.new(clubToken.address)
-        var tx = web3.eth.getTransactionReceipt(
+        var tx = await web3.eth.getTransactionReceipt(
           clubTokenController.transactionHash
         )
 
         console.log(_ + 'Deploy clubTokenController - ' + tx.gasUsed)
         gasToCash(tx.gasUsed)
 
-        totalGas = totalGas.plus(tx.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.gasUsed))
 
         // Deploy CloversController.sol
         // -w Clovers address
@@ -124,7 +122,10 @@ contract('Clovers', async function(accounts) {
           clubToken.address,
           clubTokenController.address
         )
-        var tx = web3.eth.getTransactionReceipt(
+
+        await CloversController.link('Reversi', reversi.address)
+
+        var tx = await web3.eth.getTransactionReceipt(
           cloversController.transactionHash
         )
 
@@ -133,7 +134,7 @@ contract('Clovers', async function(accounts) {
 
         await cloversController.updatePaused(false)
 
-        totalGas = totalGas.plus(tx.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.gasUsed))
 
         // Deploy SimpleCloversMarket.sol
         // -w Clovers address
@@ -145,14 +146,14 @@ contract('Clovers', async function(accounts) {
           clubTokenController.address,
           cloversController.address
         )
-        var tx = web3.eth.getTransactionReceipt(
+        var tx = await web3.eth.getTransactionReceipt(
           simpleCloversMarket.transactionHash
         )
 
         console.log(_ + 'Deploy simpleCloversMarket - ' + tx.gasUsed)
         gasToCash(tx.gasUsed)
 
-        totalGas = totalGas.plus(tx.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.gasUsed))
 
         // Deploy Support.sol
         // -w limit
@@ -162,14 +163,14 @@ contract('Clovers', async function(accounts) {
           limit,
           clubTokenController.address
         )
-        var tx = web3.eth.getTransactionReceipt(
+        var tx = await web3.eth.getTransactionReceipt(
           support.transactionHash
         )
 
         console.log(_ + 'Deploy support - ' + tx.gasUsed)
         gasToCash(tx.gasUsed)
 
-        totalGas = totalGas.plus(tx.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.gasUsed))
 
         // Deploy CurationMarket.sol
         // -w virtualSupply
@@ -188,13 +189,13 @@ contract('Clovers', async function(accounts) {
         //   clubToken.address,
         //   clubTokenController.address
         // )
-        // var tx = web3.eth.getTransactionReceipt(
+        // var tx = await web3.eth.getTransactionReceipt(
         //   curationMarket.transactionHash
         // )
         // console.log(_ + 'Deploy curationMarket - ' + tx.gasUsed)
         // gasToCash(tx.gasUsed)
 
-        // totalGas = totalGas.plus(tx.gasUsed)
+        // totalGas = totalGas.add(tx.gasUsed)
 
         // Update Clovers.sol
         // -w ClubTokenController address
@@ -207,7 +208,7 @@ contract('Clovers', async function(accounts) {
         )
         gasToCash(tx.receipt.gasUsed)
 
-        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
 
         // Update Clovers.sol
         // -w CloversController address
@@ -220,7 +221,7 @@ contract('Clovers', async function(accounts) {
         )
         gasToCash(tx.receipt.gasUsed)
 
-        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
 
         // Update ClubToken.sol
         // -w CloversController address
@@ -233,7 +234,7 @@ contract('Clovers', async function(accounts) {
 
         gasToCash(tx.receipt.gasUsed)
 
-        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
 
         // Update ClubToken.sol
         // -w ClubTokenController address
@@ -248,7 +249,7 @@ contract('Clovers', async function(accounts) {
         )
         gasToCash(tx.receipt.gasUsed)
 
-        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
 
         // Update CloversController.sol
         // -w oracle
@@ -263,7 +264,7 @@ contract('Clovers', async function(accounts) {
         )
         gasToCash(tx.receipt.gasUsed)
 
-        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
 
         // var tx = await cloversController.updateCurationMarket(
         //   curationMarket.address
@@ -273,7 +274,7 @@ contract('Clovers', async function(accounts) {
         // )
         // gasToCash(tx.receipt.gasUsed)
 
-        // totalGas = totalGas.plus(tx.receipt.gasUsed)
+        // totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
 
         var tx = await cloversController.updateSimpleCloversMarket(
           simpleCloversMarket.address
@@ -285,7 +286,7 @@ contract('Clovers', async function(accounts) {
         )
         gasToCash(tx.receipt.gasUsed)
 
-        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
 
         var tx = await cloversController.updateStakeAmount(stakeAmount)
         console.log(
@@ -293,7 +294,7 @@ contract('Clovers', async function(accounts) {
         )
         gasToCash(tx.receipt.gasUsed)
 
-        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
 
         var tx = await cloversController.updateStakePeriod(stakePeriod)
         console.log(
@@ -301,7 +302,7 @@ contract('Clovers', async function(accounts) {
         )
         gasToCash(tx.receipt.gasUsed)
 
-        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
 
         var tx = await cloversController.updatePayMultipier(payMultiplier)
         console.log(
@@ -309,7 +310,7 @@ contract('Clovers', async function(accounts) {
         )
         gasToCash(tx.receipt.gasUsed)
 
-        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
 
         var tx = await cloversController.updatePriceMultipier(priceMultiplier)
         console.log(
@@ -317,14 +318,14 @@ contract('Clovers', async function(accounts) {
         )
         gasToCash(tx.receipt.gasUsed)
 
-        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
 
         var tx = await cloversController.updateBasePrice(basePrice)
         console.log(
           _ + 'cloversController.updateBasePrice - ' + tx.receipt.gasUsed
         )
         gasToCash(tx.receipt.gasUsed)
-        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
 
         var tx = await cloversController.updateGasPrices(fastGasPrice, averageGasPrice, safeLowGasPrice)
         console.log(
@@ -333,7 +334,7 @@ contract('Clovers', async function(accounts) {
         gasToCash(tx.receipt.gasUsed)
 
 
-        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
 
         // Update ClubTokenController.sol
         // -w curationMarket
@@ -351,7 +352,7 @@ contract('Clovers', async function(accounts) {
         )
         gasToCash(tx.receipt.gasUsed)
 
-        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
 
         var tx = await clubTokenController.updateSupport(
           support.address
@@ -361,7 +362,7 @@ contract('Clovers', async function(accounts) {
         )
         gasToCash(tx.receipt.gasUsed)
 
-        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
 
 
         // var tx = await clubTokenController.updateCurationMarket(
@@ -372,7 +373,7 @@ contract('Clovers', async function(accounts) {
         // )
         // gasToCash(tx.receipt.gasUsed)
 
-        // totalGas = totalGas.plus(tx.receipt.gasUsed)
+        // totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
 
         var tx = await clubTokenController.updateReserveRatio(reserveRatio)
         console.log(
@@ -380,7 +381,7 @@ contract('Clovers', async function(accounts) {
         )
         gasToCash(tx.receipt.gasUsed)
 
-        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
 
         var tx = await clubTokenController.updateVirtualSupply(virtualSupply)
         console.log(
@@ -388,7 +389,7 @@ contract('Clovers', async function(accounts) {
         )
         gasToCash(tx.receipt.gasUsed)
 
-        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
 
         var tx = await clubTokenController.updateVirtualBalance(virtualBalance)
         console.log(
@@ -396,7 +397,7 @@ contract('Clovers', async function(accounts) {
         )
         gasToCash(tx.receipt.gasUsed)
 
-        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
 
         var tx = await clubTokenController.updatePaused(false)
         console.log(
@@ -404,9 +405,9 @@ contract('Clovers', async function(accounts) {
         )
         gasToCash(tx.receipt.gasUsed)
 
-        totalGas = totalGas.plus(tx.receipt.gasUsed)
+        totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
 
-        console.log(_ + totalGas.toFormat(0) + ' - Total Gas')
+        console.log(_ + totalGas.toString(10) + ' - Total Gas')
         gasToCash(totalGas)
         done()
       } catch (error) {
@@ -505,10 +506,10 @@ contract('Clovers', async function(accounts) {
   // })
 
   describe('SimpleCloversMarket.sol', function() {
-    let _tokenId = '666'
+    let _tokenId = '0x666'
     let _seller = accounts[9]
     let _buyer = accounts[8]
-    let _price = new web3.BigNumber(utils.toWei('0.5'))
+    let _price = utils.toBN(utils.toWei('0.5'))
     it('should have correct contract addresses', async function() {
       let _clovers = await simpleCloversMarket.clovers()
       assert(
@@ -730,9 +731,9 @@ contract('Clovers', async function(accounts) {
         _sellAmount
       )
 
-      let difference = new web3.BigNumber(_depositAmount).sub(expectedReturn)
+      let difference = utils.toBN(_depositAmount).sub(expectedReturn)
       assert(
-        difference.lte(2),
+        difference.lte(utils.toBN(2)),
         'difference of expectedReturn (' +
           expectedReturn.toString(10) +
           ') and _depositAmount (' +
@@ -743,7 +744,6 @@ contract('Clovers', async function(accounts) {
       )
 
       let balanceBefore = await web3.eth.getBalance(buyer)
-
       try {
         var tx = await clubTokenController.sell(_sellAmount, {
           from: buyer,
@@ -762,11 +762,10 @@ contract('Clovers', async function(accounts) {
       let gasCost = gasSpent * parseInt(globalGasPrice)
 
       let balanceAfter = await web3.eth.getBalance(buyer)
-
       assert(
-        balanceBefore
-          .sub(gasCost.toString())
-          .add(expectedReturn.toString())
+        utils.toBN(balanceBefore)
+          .sub(utils.toBN(gasCost.toString()))
+          .add(utils.toBN(expectedReturn.toString()))
           .toString() === balanceAfter.toString(),
         'balanceBefore (' +
           utils.fromWei(balanceBefore.toString()) +
@@ -812,8 +811,8 @@ contract('Clovers', async function(accounts) {
       await support.setActive(true)
       await support.support({value: limit.toString(10), from: accounts[2]})
 
-      let currentContribution = await support.currentContribution(accounts[2])
-      assert(currentContribution.eq(limit), "Contributions dont match")
+      let currentContribution = utils.toBN(await support.currentContribution(accounts[2]))
+      assert(currentContribution.eq(utils.toBN(limit)), `Contributions dont match ${currentContribution} !== ${limit}`)
     })
 
     it('should fail when whitelist tries to add more than limit', async function () {
@@ -831,33 +830,33 @@ contract('Clovers', async function(accounts) {
       await support.support({value: utils.toWei('1'), from: accounts[1]})
       await support.sendTransaction({from: accounts[1], gas: 34000, value: utils.toWei('1')})
 
-      let currentContribution = await support.currentContribution(accounts[1])
-      assert(currentContribution.eq(utils.toWei("2")), "Contributions dont match: " + currentContribution.toString(10))
+      let currentContribution = utils.toBN(await support.currentContribution(accounts[1]))
+      assert(currentContribution.eq(utils.toBN(utils.toWei("2"))), `Contributions dont match: ${currentContribution} !== ${utils.toWei("2")}`)
     })
 
     it("should be able to make buy and withdraw after active = false", async function () {
 
-      var originalCurveBalance = await web3.eth.getBalance(clubToken.address)
+      var originalCurveBalance = utils.toBN(await web3.eth.getBalance(clubToken.address))
 
 
       await support.setActive(false)
       await support.makeBuy()
-      let tokens = await clubToken.balanceOf(support.address)
+      let tokens = utils.toBN(await clubToken.balanceOf(support.address))
 
+      let totalContributions = utils.toBN(await support.totalContributions())
+      assert(totalContributions.eq((utils.toBN(limit)).add(utils.toBN(utils.toWei("2")))), "totalContribution doenst match sum of contributions: " + totalContributions.toString(10))
 
-      let totalContributions = await support.totalContributions()
-      assert(totalContributions.eq((new web3.BigNumber(limit)).plus(utils.toWei("2"))), "totalContribution doenst match sum of contributions: " + totalContributions.toString(10))
-
-      let totalTokens = await support.totalTokens()
+      let totalTokens = utils.toBN(await support.totalTokens())
       assert(totalTokens.eq(tokens), "tokens should be same: " + totalTokens.toString(10))
 
       await support.withdraw({from: accounts[2]})
-      let supporterTokens = await clubToken.balanceOf(accounts[2])
-      assert(supporterTokens.sub(totalTokens.mul("5").div("7")).abs().lt("1"), `tokens (${totalTokens.mul("5").div("7").toString(10)}) did not equal supporter tokens ${supporterTokens.toString(10)}`)
+      let supporterTokens = utils.toBN(await clubToken.balanceOf(accounts[2]))
+      assert(supporterTokens.sub(totalTokens.mul(utils.toBN("5")).div(utils.toBN("7"))).abs().lt(utils.toBN("1")),
+          `tokens (${totalTokens.mul(utils.toBN("5")).div(utils.toBN("7")).toString(10)}) did not equal supporter tokens ${supporterTokens.toString(10)}`)
 
       await support.withdraw({from: accounts[1]})
-      supporterTokens = await clubToken.balanceOf(accounts[1])
-      assert(supporterTokens.sub(totalTokens.mul("2").div("7")).abs().lt("1"), "tokens did not equal supporter tokens")
+      supporterTokens = utils.toBN(await clubToken.balanceOf(accounts[1]))
+      assert(supporterTokens.sub(totalTokens.mul(utils.toBN("2")).div(utils.toBN("7"))).abs().lt(utils.toBN("1")), "tokens did not equal supporter tokens")
 
       try {
         await support.withdraw({from: accounts[3]})
@@ -875,11 +874,11 @@ contract('Clovers', async function(accounts) {
         assert(true, "should fail")
       }
 
-      contractBalance = await web3.eth.getBalance(support.address)
-      assert(contractBalance.eq(0), "contract balance didnt equal 0" + contractBalance.toString(10))
+      contractBalance = utils.toBN(await web3.eth.getBalance(support.address))
+      assert(contractBalance.eq(utils.toBN(0)), "contract balance didnt equal 0 but instead" + contractBalance.toString(10))
 
-      curveBalance = await web3.eth.getBalance(clubToken.address)
-      assert(curveBalance.sub(originalCurveBalance).eq(utils.toWei("7")), `clubToken has wrong balance of ${curveBalance.toString(10)} when it should have ${utils.toWei("7")}`)
+      curveBalance = utils.toBN(await web3.eth.getBalance(clubToken.address))
+      assert(curveBalance.sub(originalCurveBalance).eq(utils.toBN(utils.toWei("7"))), `clubToken has wrong balance of ${curveBalance.toString(10)} when it should have ${utils.toWei("7")}`)
      
       // dont forget to unpause the clubTokenController
       await clubTokenController.updatePaused(false)
@@ -898,11 +897,11 @@ contract('Clovers', async function(accounts) {
 
     let _invalidTokenId = '0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'
     let _invalidMoves = [
-      new web3.BigNumber(
+      utils.toBN(
         '0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
         16
       ),
-      new web3.BigNumber(
+      utils.toBN(
         '0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
         16
       )
@@ -911,19 +910,18 @@ contract('Clovers', async function(accounts) {
     let _tokenId = '0x55555aa5569955695569555955555555'
 
     let _moves = [
-      new web3.BigNumber(
         '0xb58b552a986549b132451cbcbd69d106af0e3ae6cead82cc297427c3',
-        16
-      ),
-      new web3.BigNumber(
-        '0xbb9af45dbeefd78f120678dd7ef4dfe69f3d9bbe7eeddfc7f0000000',
-        16
-      )
+        '0xbb9af45dbeefd78f120678dd7ef4dfe69f3d9bbe7eeddfc7f0000000'
     ]
 
     it('should convert correctly', async function() {
+      console.log({reversi})
+      console.log({_moves})
+
       let game = await reversi.getGame(_moves)
+      console.log({game})
       let boardUint = await cloversController.convertBytes16ToUint(game[3])
+      console.log({boardUint})
       assert(
         '0x' + boardUint.toString(16) === _tokenId,
         '_tokenId !== boardUint'
@@ -965,7 +963,7 @@ contract('Clovers', async function(accounts) {
     })
 
     it("should make sure token doesn't exist", async function() {
-      balance = web3.eth.getBalance(accounts[0])
+      balance = utils.toBN(await web3.eth.getBalance(accounts[0]))
       try {
         await clovers.ownerOf(_tokenId)
       } catch (error) {
@@ -981,13 +979,13 @@ contract('Clovers', async function(accounts) {
     })
 
     it('should make sure claimClover (_keep = false) is successful using valid game w/ invalid symmetries', async function() {
-      var gasPrice = await cloversController.getGasPriceForApp()
-      var stakeWithGas = gasPrice.mul(stakeAmount) 
+      var gasPrice = utils.toBN(await cloversController.getGasPriceForApp())
+      var stakeWithGas = gasPrice.mul(utils.toBN(stakeAmount)) 
       try {
         let options = [
           _moves,
-          new web3.BigNumber(_tokenId, 16),
-          new web3.BigNumber('0x1F', 16), // invalid symmetries
+          utils.toBN(_tokenId, 16),
+          utils.toBN('0x1F', 16), // invalid symmetries
           false,
           {
             value: stakeWithGas.toString(10),
@@ -1003,7 +1001,7 @@ contract('Clovers', async function(accounts) {
 
         gasSpent = tx.receipt.cumulativeGasUsed
         assert(
-          new web3.BigNumber(tx.receipt.status).eq(1),
+          tx.receipt.status,
           'claimClover tx receipt should have been 0x01 (successful) but was instead ' +
             tx.receipt.status
         )
@@ -1014,23 +1012,23 @@ contract('Clovers', async function(accounts) {
     })
 
     it('should make sure stake amount was removed from your account', async function() {
-      let gasCost = gasSpent * parseInt(globalGasPrice)
-      _balance = web3.eth.getBalance(accounts[0])
-      var gasPrice = await cloversController.getGasPriceForApp()
-      var stakeWithGas = gasPrice.mul(stakeAmount)
+      let gasCost = utils.toBN(gasSpent * parseInt(globalGasPrice))
+      _balance = utils.toBN(await web3.eth.getBalance(accounts[0]))
+      var gasPrice = utils.toBN(await cloversController.getGasPriceForApp())
+      var stakeWithGas = gasPrice.mul(utils.toBN(stakeAmount))
       assert(
         balance
           .sub(_balance)
           .sub(gasCost)
           .eq(stakeWithGas),
         'original balance ' +
-          web3.fromWei(balance).toString() +
+          utils.fromWei(balance).toString() +
           ' minus new balance ' +
-          web3.fromWei(_balance).toString() +
+          utils.fromWei(_balance).toString() +
           ' minus gas ' +
-          web3.fromWei(gasCost).toString() +
+          utils.fromWei(gasCost).toString() +
           ' did not equal stakeWithGas ' +
-          web3.fromWei(stakeWithGas).toString()
+          utils.fromWei(stakeWithGas).toString()
       )
     })
 
@@ -1063,7 +1061,7 @@ contract('Clovers', async function(accounts) {
 
     it.skip('should update the stake amount with the gas Estimate from challengeClover', async function() {
       try {
-        newStakeAmount = new web3.BigNumber(gasEstimate).mul(globalGasPrice).mul(40)
+        newStakeAmount = utils.toBN(gasEstimate).mul(globalGasPrice).mul(40)
         tx = await cloversController.updateStakeAmount(newStakeAmount, {
           gasPrice: globalGasPrice
         })
@@ -1077,7 +1075,7 @@ contract('Clovers', async function(accounts) {
 
         gasSpent += tx.receipt.cumulativeGasUsed
         assert(
-          new web3.BigNumber(tx.receipt.status).eq(1),
+          tx.receipt.status,
           'updateStakeAmount tx receipt should have been 0x01 (successful) but was instead ' +
             tx.receipt.status
         )
@@ -1127,7 +1125,7 @@ contract('Clovers', async function(accounts) {
 
         gasSpent += tx.receipt.cumulativeGasUsed
         assert(
-          new web3.BigNumber(tx.receipt.status).eq(1),
+          tx.receipt.status,
           'retrieveStake tx receipt should have been 0x01 (successful) but was instead ' +
             tx.receipt.status
         )
@@ -1167,17 +1165,17 @@ contract('Clovers', async function(accounts) {
     })
 
     it('should make sure stake amount was retured to your account', async function() {
-      gasCost = gasSpent * globalGasPrice
-      _balance = web3.eth.getBalance(accounts[0])
-      let result = balance.minus(gasCost)
+      gasCost = utils.toBN(gasSpent * globalGasPrice)
+      _balance = utils.toBN(await web3.eth.getBalance(accounts[0]))
+      let result = balance.sub(gasCost)
       assert(
         result.eq(_balance),
         'original balance ' +
-          web3.fromWei(balance).toString() +
+          utils.fromWei(balance).toString() +
           ' minus all gas costs ' +
-          web3.fromWei(gasCost).toString() +
+          utils.fromWei(gasCost).toString() +
           ' did not equal new balance ' +
-          web3.fromWei(_balance).toString() +
+          utils.fromWei(_balance).toString() +
           ' but rather ' +
           result.toString()
       )
@@ -1198,15 +1196,15 @@ contract('Clovers', async function(accounts) {
       '0x' + rev.byteFirst32Moves.padStart(56, '0'),
       '0x' + rev.byteLastMoves.padStart(56, '0')
     ]
-    tokenId = new web3.BigNumber(rev.byteBoard, 16)
+    tokenId = utils.toBN(rev.byteBoard, 16)
 
     let symmetries = rev.returnSymmetriesAsBN()
     let stakeAmount = await cloversController.stakeAmount()
     let gasPrice = await cloversController.getGasPriceForApp()
-    console.log(`fastGasPrice = ${utils.fromWei(gasPrice.toString(10))} (${gasPrice.toString(10)} wei)`)
-    console.log(`stakeAmount = ${utils.fromWei(stakeAmount.toString(10))} (${stakeAmount.toString(10)} wei)`) 
+    // console.log(`fastGasPrice = ${utils.fromWei(gasPrice.toString(10))} (${gasPrice.toString(10)} wei)`)
+    // console.log(`stakeAmount = ${utils.fromWei(stakeAmount.toString(10))} (${stakeAmount.toString(10)} wei)`) 
    
-    // let gasPriceInEth =  new web3.BigNumber(utils.fromWei(gasPrice.toString(10)))
+    // let gasPriceInEth =  utils.toBN(utils.fromWei(gasPrice.toString(10)))
     // console.log(`gasPriceInEth is ${gasPriceInEth.toString(10)}`)
 
     // let stakeWithGasInEth = gasPriceInEth.mul(stakeAmount)
@@ -1248,9 +1246,6 @@ contract('Clovers', async function(accounts) {
 
     let keep = true
     try {
-      if (tokenId.constructor.isBN) {
-        tokenId = web3.toBigNumber('0x' + tokenId.toString(16))
-      }
       var tx = await cloversController.claimClover(
         moves,
         tokenId.toString(10),
@@ -1281,9 +1276,9 @@ contract('Clovers', async function(accounts) {
       )
       let newOwner = await clovers.ownerOf(tokenId)
       assert(
-        newOwner.toLowerCase() === clovers.address,
+        newOwner.toLowerCase() === clovers.address.toLowerCase(),
         'clover ' +
-          tokenId +
+          tokenId.toString(16) +
           ' should be owned by ' +
           clovers.address +
           ' but is owned by ' +
@@ -1308,16 +1303,16 @@ contract('Clovers', async function(accounts) {
 // function gasToCash(totalGas) {
 //   BigNumber.config({ DECIMAL_PLACES: 2, ROUNDING_MODE: 4 });
 //
-//   if (typeof totalGas !== "object") totalGas = new web3.BigNumber(totalGas);
-//   let lowGwei = oneGwei.mul(new web3.BigNumber("8"));
-//   let highGwei = oneGwei.mul(new web3.BigNumber("20"));
-//   let ethPrice = new web3.BigNumber("450");
+//   if (typeof totalGas !== "object") totalGas = utils.toBN(totalGas);
+//   let lowGwei = oneGwei.mul(new utils.BN("8"));
+//   let highGwei = oneGwei.mul(new utils.BN("20"));
+//   let ethPrice = utils.toBN("450");
 //
 //   console.log(
 //     _ +
 //       _ +
 //       "$" +
-//       new web3.BigNumber(utils.fromWei(totalGas.mul(lowGwei).toString()))
+//       utils.toBN(utils.fromWei(totalGas.mul(lowGwei).toString()))
 //         .mul(ethPrice)
 //         .toFixed(2) +
 //       " @ 8 GWE & " +
@@ -1328,7 +1323,7 @@ contract('Clovers', async function(accounts) {
 //     _ +
 //       _ +
 //       "$" +
-//       new web3.BigNumber(utils.fromWei(totalGas.mul(highGwei).toString()))
+//       utils.toBN(utils.fromWei(totalGas.mul(highGwei).toString()))
 //         .mul(ethPrice)
 //         .toFixed(2) +
 //       " @ 20 GWE & " +
@@ -1381,7 +1376,7 @@ function increaseBlocks(blocks) {
 
 function increaseBlock() {
   return new Promise((resolve, reject) => {
-    web3.currentProvider.sendAsync(
+    web3.currentProvider.send(
       {
         jsonrpc: '2.0',
         method: 'evm_mine',

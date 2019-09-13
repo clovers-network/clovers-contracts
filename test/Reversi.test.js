@@ -11,8 +11,8 @@ contract('Reversi', async function(accounts) {
     ;(async () => {
       try {
         reversi = await Reversi_.new()
-        await ReversiMock.link('Reversi', reversi.address)
         reversiMock = await ReversiMock.new()
+        await ReversiMock.link('Reversi', reversi.address)
         done()
       } catch (error) {
         console.error(error)
@@ -24,23 +24,22 @@ contract('Reversi', async function(accounts) {
   describe('Reversi.sol', function() {
     let _realTokenId = '0x5555555565556955695566955aa55555'
     let _realMoves = [
-      new web3.BigNumber(
         '0xb58b552a986549b132451cbcbd69d106af0e3ae6cead82cc297427c3',
-        16
-      ),
-      new web3.BigNumber(
         '0xbb9af45dbeefd78f120678dd7ef4dfe69f3d9bbe7eeddfc7f0000000',
-        16
-      )
     ]
     let _emptyMoves = [
-      new web3.BigNumber('0x0', 16),
-      new web3.BigNumber('0x0', 16)
+      '0x0',
+      '0x0'
     ]
 
     let invalid_lastMove =
       'C4C5C6C3E3B5C2B2A4E2A2B3F5C7C8B6A6B1F3A7B7D6F2G2G3A5B4C1D2A3H2D1F4G5G4F1F6D8H4H3H1E1A1H5G1F7F8E7H6B8D3D7E6G6E8G8G7H7A8A2'
     let valid_emptySquares = 'C4C3C2C5E6F4C6F6G4D6G6E3E2'
+
+    it('should get a game', async function() {
+      let game = await reversi.getGame(_realMoves)
+      console.log({game})
+    })
 
     it('should get cost to play a game', async function() {
       let tx = await reversiMock.logGame(_realMoves)
@@ -56,8 +55,8 @@ contract('Reversi', async function(accounts) {
       var r = new Reversi()
       r.playGameMovesString(valid_emptySquares)
       let moves = [
-        new web3.BigNumber(r.byteFirst32Moves, 16),
-        new web3.BigNumber(r.byteLastMoves, 16)
+       '0x' + r.byteFirst32Moves,
+       '0x' + r.byteLastMoves
       ]
       let isValid = await reversi.isValid(moves)
       assert(isValid, 'Game was not valid')
@@ -70,8 +69,8 @@ contract('Reversi', async function(accounts) {
       var r = new Reversi()
       r.playGameMovesString(invalid_lastMove)
       let moves = [
-        new web3.BigNumber(r.byteFirst32Moves, 16),
-        new web3.BigNumber(r.byteLastMoves, 16)
+        '0x' + r.byteFirst32Moves,
+        '0x' + r.byteLastMoves
       ]
       let isValid = await reversi.isValid(moves)
       assert(!isValid, 'Game was in fact valid')
