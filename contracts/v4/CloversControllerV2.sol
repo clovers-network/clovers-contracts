@@ -17,7 +17,7 @@ contract ISimpleCloversMarket {
     function sell(uint256 _tokenId, uint256 price) public;
 } 
 
-contract CloversController is HasNoEther, HasNoTokens {
+contract CloversControllerV2 is HasNoEther, HasNoTokens {
     event cloverCommitted(bytes32 movesHash, address owner);
     event cloverClaimed(bytes28[2] moves, uint256 tokenId, address owner, uint stake, uint reward, uint256 symmetries, bool keep);
     event stakeRetrieved(uint256 tokenId, address owner, uint stake);

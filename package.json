@@ -1,42 +1,42 @@
-{
-  "name": "clovers-contracts",
-  "version": "1.0.21",
-  "description": "",
-  "main": "index.js",
-  "directories": {
-    "test": "test"
-  },
-  "scripts": {
-    "compile": "yarn compile-old && yarn compile-new",
-    "compile-old": "buidler compile --config configV4.js",
-    "compile-new": "buidler compile --config configV5.js",
-    "compileAndTest": "yarn compile && truffle test",
-    "test": "buidler test --no-compile --config configV5.js test/*.test.js",
-    "build": "build.js",
-    "patch": "npm version patch",
-    "pub": "npm publish",
-    "networks-extract": "node extract_network_info.js",
-    "networks-inject": "node inject_network_info.js",
-    "networks-reset": "mkdir -p build/contracts && npx truffle networks --clean && npm run networks-inject"
-  },
-  "author": "Billy Rennekamp <billy.rennekamp@gmail.com>",
-  "license": "MIT",
-  "devDependencies": {
-    "@gnosis.pm/util-contracts": "^2.0.1",
-    "@nomiclabs/buidler": "^1.0.0-beta.10",
-    "@nomiclabs/buidler-truffle5": "^1.0.0-beta.10",
-    "@nomiclabs/buidler-web3": "^1.0.0-beta.10",
-    "@openzeppelin/contracts": "v2.3.0",
-    "bancor-contracts": "github:bancorprotocol/contracts#973c9919e146a1b61297632f3253ee1c891462a9",
-    "clovers-reversi": "^1.0.16",
-    "dotenv": "^6.0.0",
-    "ganache-cli": "6.5.0",
-    "truffle": "^4.1.13",
-    "truffle-flattener": "^1.4.0",
-    "truffle-hdwallet-provider": "^0.0.6",
-    "web3": "^1.2.1",
-    "web3-utils": "^1.0.0-beta.33",
-    "zeppelin-solidity": "^1.8.0"
-  },
-  "dependencies": {}
-}
+  {
+    "name": "clovers-contracts",
+    "version": "1.0.21",
+    "description": "",
+    "main": "index.js",
+    "directories": {
+      "test": "test"
+    },
+    "scripts": {
+      "compile": "yarn compile-old && yarn compile-new",
+      "compile-old": "buidler compile --config configV4.js",
+      "compile-new": "buidler compile --config configV5.js",
+      "compileAndTest": "yarn compile && truffle test",
+      "test": "buidler test --no-compile --config configV5.js test/*.test.js",
+      "build": "build.js",
+      "patch": "npm version patch",
+      "pub": "npm publish",
+      "networks-extract": "node extract_network_info.js",
+      "networks-inject": "node inject_network_info.js",
+      "networks-reset": "mkdir -p build/contracts && npx truffle networks --clean && npm run networks-inject"
+    },
+    "author": "Billy Rennekamp <billy.rennekamp@gmail.com>",
+    "license": "MIT",
+    "devDependencies": {
+      "@gnosis.pm/util-contracts": "^2.0.1",
+      "@nomiclabs/buidler": "^1.0.0-beta.11",
+      "@nomiclabs/buidler-truffle5": "^1.0.0-beta.11",
+      "@nomiclabs/buidler-web3": "^1.0.0-beta.11",
+      "@openzeppelin/contracts": "v2.3.0",
+      "bancor-contracts": "github:bancorprotocol/contracts#973c9919e146a1b61297632f3253ee1c891462a9",
+      "clovers-reversi": "^1.0.16",
+      "dotenv": "^6.0.0",
+      "ganache-cli": "6.5.0",
+      "truffle": "^4.1.13",
+      "truffle-flattener": "^1.4.0",
+      "truffle-hdwallet-provider": "^0.0.6",
+      "web3": "^1.2.1",
+      "web3-utils": "^1.0.0-beta.33",
+      "zeppelin-solidity": "^1.8.0"
+    },
+    "dependencies": {}
+  }

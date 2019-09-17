@@ -11,11 +11,12 @@ module.exports = {
       version: "0.4.24",
       optimizer: {
         enabled: true,
-        runs: 200
+        runs: 10000
       }
     },
   
     paths: {
       sources: "./contracts/v4",
+      artifacts: "./build/contracts/"
     },
   };

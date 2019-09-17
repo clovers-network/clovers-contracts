@@ -34,28 +34,6 @@ var vals = (module.exports = {
   removeAsAdmin
 })
 
-async function deployCloversController({
-  deployer,
-  CloversController,
-  reversi,
-  clovers,
-  clubToken,
-  clubTokenController,
-  overwrite
-}) {
-  // -link w cloversController
-  await CloversController.link('Reversi', reversi.address)
-  // -w Clovers address
-  // -w ClubToken address
-  // -w ClubTokenController address
-  await deployer.deploy(
-    CloversController,
-    clovers.address,
-    clubToken.address,
-    clubTokenController.address,
-    { overwrite }
-  )
-}
 async function updateCloversController({
   cloversController,
   // curationMarket,
@@ -254,8 +232,6 @@ async function updateClubTokenController({
   // await addAsAdmin(clubTokenController, accounts)
   await removeAsAdmin(clubTokenController, accounts)
 
-
-
 }
 
 
@@ -306,8 +282,6 @@ async function addAsAdmin(contract, accounts) {
 }
 
 async function removeAsAdmin(contract, accounts) {
-
-
 
   var secondOwner = await contract.isAdmin(accounts[1])
   if (secondOwner) {

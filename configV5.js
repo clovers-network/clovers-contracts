@@ -1,11 +1,17 @@
-usePlugin("@nomiclabs/buidler-truffle5");
+require("dotenv").config();
 
+require('./tasks')
+ 
 module.exports = {
   defaultNetwork: "develop",
 
   networks: {
     develop: {
-      gas: 6000000
+      gas: 6000000,
+      timeout: 50000,
+      accounts: {
+        mnemonic: process.env.TRUFFLE_MNEMONIC
+      }
     }
   },
 
@@ -13,7 +19,7 @@ module.exports = {
     version: "0.5.9",
     optimizer: {
       enabled: true,
-      runs: 200
+      runs: 10000
     }
   },
 
@@ -21,10 +27,6 @@ module.exports = {
     sources: "./contracts/v5",
     tests: "./tests", 
     cache: "./cache",
-    artifacts: "./artifacts"
-  },
-
-  mocha: {
-    enableTimeouts: false
+    artifacts: "./build/contracts/"
   }
 };

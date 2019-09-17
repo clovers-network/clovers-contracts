@@ -1,13 +1,13 @@
 var fs = require('fs');
-var Clovers = require("./build/contracts/Clovers.json");
-var CloversController = require("./build/contracts/CloversController.json");
-// var CloversMetadata = require("./build/contracts/CloversMetadata.json");
-var ClubToken = require("./build/contracts/ClubToken.json");
-var ClubTokenController = require("./build/contracts/ClubTokenController.json");
-// var Reversi = require("./build/contracts/Reversi.json");
-var SimpleCloversMarket = require("./build/contracts/SimpleCloversMarket.json");
-var Support = require("./build/contracts/Support.json");
-// var CurationMarket = require("./build/contracts/CurationMarket.json");
+var Clovers = require("./artifacts/Clovers.json");
+var CloversController = require("./artifacts/CloversController.json");
+// var CloversMetadata = require("./artifacts/CloversMetadata.json");
+var ClubToken = require("./artifacts/ClubToken.json");
+var ClubTokenController = require("./artifacts/ClubTokenController.json");
+// var Reversi = require("./artifacts/Reversi.json");
+var SimpleCloversMarket = require("./artifacts/SimpleCloversMarket.json");
+var Support = require("./artifacts/Support.json");
+// var CurationMarket = require("./artifacts/CurationMarket.json");
 
 Clovers = {
   abi: Clovers.abi,
