@@ -2,13 +2,13 @@ const BigNumber = require('bignumber.js')
 const utils = require('web3-utils')
 const oneGwei = 1000000000
 var vals = (module.exports = {
-  // stakeAmount: new BigNumber(529271).mul(1000000000).mul(40), // gasPrice * 1GWEI * 40 (normal person price)
+  // stakeAmount: new BigNumber(529271).times(1000000000).times(40), // gasPrice * 1GWEI * 40 (normal person price)
   stakeAmount: new BigNumber(286774), // gasPrice * 10GWEI (oracle price)
-  fastGasPrice: new BigNumber(10).mul(oneGwei),
-  averageGasPrice: new BigNumber(5).mul(oneGwei),
-  safeLowGasPrice: new BigNumber(1).mul(oneGwei),
+  fastGasPrice: new BigNumber(10).times(oneGwei),
+  averageGasPrice: new BigNumber(5).times(oneGwei),
+  safeLowGasPrice: new BigNumber(1).times(oneGwei),
   gasBlockMargin: new BigNumber(240), // ~1 hour at 15 second block times
-  // stakeAmount: new BigNumber(0).mul(1000000000).mul(40), // gasPrice * 1GWEI * 40  (nothing)
+  // stakeAmount: new BigNumber(0).times(1000000000).times(40), // gasPrice * 1GWEI * 40  (nothing)
   ethPrice: new BigNumber('200'),
   oneGwei: new BigNumber('1000000000'), // 1 GWEI
   gasPrice: new BigNumber('1000000000'),
