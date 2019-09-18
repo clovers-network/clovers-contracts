@@ -29,7 +29,6 @@ var vals = (module.exports = {
   virtualSupplyCM: utils.toWei('100000'),
   updateCloversController,
   updateClubTokenController,
-  deployCloversController,
   addAsAdmin,
   removeAsAdmin
 })

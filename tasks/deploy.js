@@ -1,14 +1,5 @@
 usePlugin("@nomiclabs/buidler-truffle5");
 
-var Reversi = artifacts.require('./Reversi.sol')
-var Clovers = artifacts.require('./Clovers.sol')
-var CloversMetadata = artifacts.require('./CloversMetadata.sol')
-var CloversController = artifacts.require('./CloversController.sol')
-var ClubTokenController = artifacts.require('./ClubTokenController.sol')
-var SimpleCloversMarket = artifacts.require('./SimpleCloversMarket.sol')
-var ClubToken = artifacts.require('./ClubToken.sol')
-var Support = artifacts.require('./Support.sol')
-
 const overwrites = {
     Reversi: false,
     Support: false,
@@ -27,6 +18,16 @@ const overwrites = {
 
 task("deploy", "Deploys contracts")
  .setAction(async (taskArgs, env) => {
+
+    var Reversi = artifacts.require('./Reversi.sol')
+    var Clovers = artifacts.require('./Clovers.sol')
+    var CloversMetadata = artifacts.require('./CloversMetadata.sol')
+    var CloversController = artifacts.require('./CloversController.sol')
+    var ClubTokenController = artifacts.require('./ClubTokenController.sol')
+    var SimpleCloversMarket = artifacts.require('./SimpleCloversMarket.sol')
+    var ClubToken = artifacts.require('./ClubToken.sol')
+    var Support = artifacts.require('./Support.sol')
+
      console.log({taskArgs, env})
     try {
         console.log(`running task as ${accounts[0]}`)
