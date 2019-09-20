@@ -159,7 +159,6 @@ async function updateClubTokenController({
   clubTokenController,
   // curationMarket,
   simpleCloversMarket,
-  support,
   accounts
 }) {
   // Update ClubTokenController.sol
@@ -216,15 +215,6 @@ async function updateClubTokenController({
     var tx = await clubTokenController.updatePaused(vals.paused)
   } else {
     console.log('paused hasnt changed')
-  }
-
-
-  var currentSupport = await clubTokenController.support()
-  if (currentSupport.toLowerCase() !== support.address.toLowerCase()) {
-    console.log(`clubTokenController.updateSupport from ${currentSupport} to ${support.address}`)
-    var tx = await clubTokenController.updateSupport(support.address)
-  } else {
-    console.log('support hasnt changed')
   }
 
   console.log('remove as admins to clubTokenController')

@@ -1,4 +1,5 @@
 require("dotenv").config();
+usePlugin("@nomiclabs/buidler-solhint");
 
 require('./tasks')
  
@@ -7,11 +8,12 @@ module.exports = {
 
   networks: {
     develop: {
+      chainId: 1337,
       gas: 6000000,
       timeout: 50000,
-      accounts: {
-        mnemonic: process.env.TRUFFLE_MNEMONIC
-      }
+      // accounts: {
+      //   mnemonic: process.env.TRUFFLE_MNEMONIC
+      // }
     }
   },
 

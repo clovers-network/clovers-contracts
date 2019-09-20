@@ -7,6 +7,7 @@
     "test": "test"
   },
   "scripts": {
+    "testnet": "npx ganache-cli -i 420",
     "compile": "yarn compile-old && yarn compile-new",
     "compile-old": "buidler compile --config configV4.js",
     "compile-new": "buidler compile --config configV5.js",
@@ -23,9 +24,9 @@
   "license": "MIT",
   "devDependencies": {
     "@gnosis.pm/util-contracts": "^2.0.1",
-    "@nomiclabs/buidler": "^1.0.0-beta.12",
-    "@nomiclabs/buidler-truffle5": "^1.0.0-beta.12",
-    "@nomiclabs/buidler-web3": "^1.0.0-beta.12",
+    "@nomiclabs/buidler": "^1.0.0-beta.13",
+    "@nomiclabs/buidler-truffle5": "^1.0.0-beta.13",
+    "@nomiclabs/buidler-web3": "^1.0.0-beta.13",
     "@openzeppelin/contracts": "v2.3.0",
     "bancor-contracts": "github:bancorprotocol/contracts#973c9919e146a1b61297632f3253ee1c891462a9",
     "bignumber.js": "^9.0.0",
@@ -39,5 +40,7 @@
     "web3-utils": "^1.0.0-beta.33",
     "zeppelin-solidity": "^1.8.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@nomiclabs/buidler-solhint": "^1.0.0-beta.13"
+  }
 }

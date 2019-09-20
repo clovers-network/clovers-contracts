@@ -37,6 +37,7 @@ Support = {
 //   abi: CurationMarket.abi,
 //   networks: CurationMarket.networks
 // }
+
 let printable = `module.exports = {
   Clovers: ${JSON.stringify(Clovers, null, 1)},
   CloversController: ${JSON.stringify(CloversController, null, 1)},

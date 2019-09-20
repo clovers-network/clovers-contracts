@@ -1,4 +1,5 @@
 usePlugin("@nomiclabs/buidler-truffle5");
+var networks =require('../networks.json')
 
 const overwrites = {
     Reversi: false,
@@ -19,7 +20,10 @@ const overwrites = {
 task("deploy", "Deploys contracts")
  .setAction(async (taskArgs, env) => {
 
+    const accounts = await web3.eth.getAccounts(); 
+
     var Reversi = artifacts.require('./Reversi.sol')
+    console.log({Reversi})
     var Clovers = artifacts.require('./Clovers.sol')
     var CloversMetadata = artifacts.require('./CloversMetadata.sol')
     var CloversController = artifacts.require('./CloversController.sol')
@@ -27,21 +31,27 @@ task("deploy", "Deploys contracts")
     var SimpleCloversMarket = artifacts.require('./SimpleCloversMarket.sol')
     var ClubToken = artifacts.require('./ClubToken.sol')
     var Support = artifacts.require('./Support.sol')
+    const chainId = env.config.networks.chainId
 
-     console.log({taskArgs, env})
+    function alreadyDeployed(contractName) {
+        return networks[contractName] && networks[chainId] && networks[chainId].address
+    }
+
+    //  console.log({taskArgs}, {env}, env.config.networks.chainId, env.network.config)
     try {
         console.log(`running task as ${accounts[0]}`)
-    
+
+
         // Deploy Clovers.sol (NFT)
         // -w NFT name
         // -w NFT symbol
-        if (overwrites['Clovers'])
+        if (overwrites['Clovers'] || !alreadyDeployed('Clovers'))
             await Clovers.new('Clovers', 'CLVR')
         clovers = await Clovers.deployed()
     
         // Deploy CloversMetadata.sol
         // -w Clovers address
-        if (overwrites['CloversMetadata'])
+        if (overwrites['CloversMetadata'] || !alreadyDeployed('CloversMetadata'))
             await CloversMetadata.new(clovers.address)
         cloversMetadata = await CloversMetadata.deployed()
     
@@ -49,25 +59,29 @@ task("deploy", "Deploys contracts")
         // -w ERC20 name
         // -w ERC20 symbol
         // -w ERC20 decimals
-        if (overwrites['ClubToken'])
-            await ClubToken.new('CloverCoin', 'CLC', decimals)
-        clubToken = await ClubToken.deployed()
+        if (overwrites['ClubToken'] || !alreadyDeployed('ClubToken')) {
+            let {address} = await ClubToken.new('CloverCoin', 'CLC', decimals)
+            networks['ClubToken'][chainId] = {address}
+        } else {
+            clubToken = await ClubToken.at(alreadyDeployed['ClubToken'])
+        }
     
         // Deploy Reversi.sol
-        if (overwrites['Reversi'])
+        if (overwrites['Reversi'] || !alreadyDeployed('Reversi'))
             await Reversi.new()
         reversi = await Reversi.deployed()
     
         // Deploy ClubTokenController.sol
         // -w ClubToken address
-        if (overwrites['ClubTokenController'])
+        if (overwrites['ClubTokenController'] || !alreadyDeployed('ClubTokenController'))
             await ClubTokenController.new(clubToken.address)
         clubTokenController = await ClubTokenController.deployed()
     
         // Deploy CloversController.sol
-        if (overwrites['CloversController']) {
+        if (overwrites['CloversController'] || !alreadyDeployed('CloversController')) {
             // -link w cloversController
-            await CloversController.link('Reversi', reversi.address)
+            await CloversController.link(reversi); 
+            // await CloversController.link('Reversi', reversi.address)
             // -w Clovers address
             // -w ClubToken address
             // -w ClubTokenController address
@@ -84,7 +98,7 @@ task("deploy", "Deploys contracts")
         // -w ClubToken address
         // -w ClubTokenController address
         // -w CloversController address
-        if (overwrites['SimpleCloversMarket']){
+        if (overwrites['SimpleCloversMarket'] || !alreadyDeployed('SimpleCloversMarket')){
             await SimpleCloversMarket.new(
                 clovers.address,
                 clubToken.address,
@@ -93,17 +107,6 @@ task("deploy", "Deploys contracts")
             )
         }
         simpleCloversMarket = await SimpleCloversMarket.deployed()
-    
-        // Deploy Support.sol
-        // -w limit
-        // -w clubTokenController
-        if (overwrites['Support']){
-            await Support.new(
-                limit,
-                clubTokenController.address
-            )
-        }
-        support = await Support.deployed()
 
     } catch (error) {
         console.log(error)

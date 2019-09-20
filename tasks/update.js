@@ -1,7 +1,6 @@
 usePlugin("@nomiclabs/buidler-truffle5");
 
 var Reversi = artifacts.require('./Reversi.sol')
-var Support = artifacts.require('./Support.sol')
 var Clovers = artifacts.require('./Clovers.sol')
 var CloversMetadata = artifacts.require('./CloversMetadata.sol')
 var CloversController = artifacts.require('./CloversController.sol')
@@ -34,13 +33,12 @@ var {
 task('update', 'Updates contract values').
 setAction(async (taskArgs, env) => {
     let accounts = env.accounts
-    let clovers, cloversMetadata, clubToken, reversi, support, clubTokenController, cloversController, simpleCloversMarket
+    let clovers, cloversMetadata, clubToken, reversi, clubTokenController, cloversController, simpleCloversMarket
     try {
         clovers = await Clovers.deployed()
         cloversMetadata = await CloversMetadata.deployed()
         clubToken = await ClubToken.deployed()
         reversi = await Reversi.deployed()
-        support = await Support.deployed()
         clubTokenController = await ClubTokenController.deployed()
         cloversController = await CloversController.deployed()
         simpleCloversMarket = await SimpleCloversMarket.deployed()
@@ -124,7 +122,6 @@ setAction(async (taskArgs, env) => {
         await updateClubTokenController({
             clubTokenController,
             simpleCloversMarket,
-            support,
             accounts
         })
         
