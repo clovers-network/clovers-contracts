@@ -93,8 +93,8 @@ contract SimpleCloversMarket is Ownable, Admin {
             ClubTokenController(clubTokenController).transferFrom(msg.sender, sellFrom, sellPrice);
         }
         ICloversController(cloversController).transferFrom(sellFrom, msg.sender, _tokenId);
-        delete(sells[_tokenId]);
-        emit updatePrice(_tokenId, 0);
+        // delete(sells[_tokenId]);
+        // emit updatePrice(_tokenId, 0);
     }
 
 }

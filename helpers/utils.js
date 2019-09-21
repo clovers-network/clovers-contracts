@@ -16,15 +16,11 @@ async function getLowestPrice(
   let bigIncrement = new BigNumber(utils.toWei('0.1'))
   currentPrice = currentPrice.plus(useLittle ? littleIncrement : bigIncrement)
   let resultOfSpend
-  console.log('1111')
   if (tokenId) {
-    console.log('2222')
     resultOfSpend = await contract.getBuy(tokenId, currentPrice)
   } else {
-    console.log('3333')
     resultOfSpend = await contract.getBuy(currentPrice)
   }
-  console.log('4444')
   if (resultOfSpend.gt(targetAmount)) {
     return useLittle
       ? currentPrice
@@ -32,7 +28,7 @@ async function getLowestPrice(
           contract,
           targetAmount,
           tokenId,
-          currentPrice.sub(bigIncrement),
+          currentPrice.minus(bigIncrement),
           true
         )
   }
@@ -75,7 +71,7 @@ var vals = (module.exports = {
       _ +
         _ +
         '$' +
-        new BigNumber(utils.fromWei(totalGas.times(lowGwei).toString(10), 'Gwei'))
+        new BigNumber(utils.fromWei(totalGas.times(lowGwei).toString(10), 'ether'))
           .times(ethPrice)
           .toFixed(2) +
         ' @ ' + utils.fromWei(lowGwei.toString(10), 'Gwei') + ' GWE & ' +
@@ -86,7 +82,7 @@ var vals = (module.exports = {
       _ +
         _ +
         '$' +
-        new BigNumber(utils.fromWei(totalGas.times(highGwei).toString(10), 'Gwei'))
+        new BigNumber(utils.fromWei(totalGas.times(highGwei).toString(10), 'ether'))
           .times(ethPrice)
           .toFixed(2) +
         ' @ ' + utils.fromWei(highGwei.toString(10), 'Gwei') + ' GWE & ' +

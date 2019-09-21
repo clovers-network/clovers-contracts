@@ -23,5 +23,5 @@ task("deploy", "Deploys contracts")
         clubTokenController, 
         simpleCloversMarket, 
         clubToken
-    } = deployAllContracts({overwrites, accounts, artifacts, web3, chainId, networks})
+    } = await deployAllContracts({overwrites, accounts, artifacts, web3, chainId, networks})
  });

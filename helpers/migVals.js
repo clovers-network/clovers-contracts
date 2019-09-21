@@ -33,12 +33,17 @@ var vals = (module.exports = {
   removeAsAdmin
 })
 
+var { gasToCash, _ } = require('./utils')
+
 async function updateCloversController({
   cloversController,
   // curationMarket,
   clubTokenController,
   simpleCloversMarket
 }) {
+
+  var totalGas = utils.toBN('0')
+
   // Update CloversController.sol
   // -w curationMarket
   // -w simpleCloversMarket
@@ -46,96 +51,88 @@ async function updateCloversController({
   // -w stakeAmount
   // -w stakePeriod
   // -w payMultiplier
-  // console.log('cloversController.updateCurationMarket')
+  // console.log(_ + 'cloversController.updateCurationMarket')
   // var tx = await cloversController.updateCurationMarket(curationMarket.address)
 
   var currentClubTokenControllerAddress = await cloversController.clubTokenController()
   if (currentClubTokenControllerAddress.toLowerCase() !== clubTokenController.address.toLowerCase()) {
-    console.log(`cloversController.updateClubTokenController from ${currentClubTokenControllerAddress} to ${clubTokenController.address}`)
+    console.log(_ + `cloversController.updateClubTokenController from ${currentClubTokenControllerAddress} to ${clubTokenController.address}`)
     var tx = await cloversController.updateClubTokenController(
       clubTokenController.address
     )
+    gasToCash(tx.receipt.gasUsed)
+    totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
   } else {
-    console.log('clubTokenController hasnt changed')
+    console.log(_ + 'clubTokenController hasnt changed')
   }
 
 
   var currentSimpleCloversMarket = await cloversController.simpleCloversMarket()
   if (currentSimpleCloversMarket.toLowerCase() !== simpleCloversMarket.address.toLowerCase()) {
-    console.log(`cloversController.updateSimpleCloversMarket from ${currentSimpleCloversMarket} to ${simpleCloversMarket.address}`)
+    console.log(_ + `cloversController.updateSimpleCloversMarket from ${currentSimpleCloversMarket} to ${simpleCloversMarket.address}`)
     var tx = await cloversController.updateSimpleCloversMarket(
       simpleCloversMarket.address
     )
+    gasToCash(tx.receipt.gasUsed)
+    totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
   } else {
-    console.log('simpleCloversMarket hasnt changed')
+    console.log(_ + 'simpleCloversMarket hasnt changed')
   }
 
   var currentOracle = await cloversController.oracle()
   if (currentOracle.toLowerCase() !== vals.oracle.toLowerCase()) {
-    console.log(`cloversController.updateOracle from ${currentOracle} to ${vals.oracle}`)
+    console.log(_ + `cloversController.updateOracle from ${currentOracle} to ${vals.oracle}`)
     var tx = await cloversController.updateOracle(vals.oracle)
+    gasToCash(tx.receipt.gasUsed)
+    totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
   } else {
-    console.log('oracle hasnt changed')
+    console.log(_ + 'oracle hasnt changed')
   }
-
-  var currentStakeAmount = await cloversController.stakeAmount()
-  if (!currentStakeAmount.eq(vals.stakeAmount)) {
-    console.log(`cloversController.updateStakeAmount from ${currentStakeAmount} to ${vals.stakeAmount}`)
-    var tx = await cloversController.updateStakeAmount(vals.stakeAmount)
-  } else {
-    console.log('stakeAmount hasnt changed')
-  }
-
-
 
   var currentPayMultiplier = await cloversController.payMultiplier()
   if (!currentPayMultiplier.eq(vals.payMultiplier)) {
-    console.log(`cloversController.updatePayMultipier from ${currentPayMultiplier} to ${vals.payMultiplier}`)
+    console.log(_ + `cloversController.updatePayMultipier from ${currentPayMultiplier} to ${vals.payMultiplier}`)
     var tx = await cloversController.updatePayMultipier(vals.payMultiplier)  
+    gasToCash(tx.receipt.gasUsed)
+    totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
   } else {
-    console.log('payMultiplier hasnt changed')
+    console.log(_ + 'payMultiplier hasnt changed')
   }
 
 
   var currentPriceMultiplier = await cloversController.priceMultiplier()
   if (!currentPriceMultiplier.eq(vals.priceMultiplier)) {
-    console.log(`cloversController.updatePriceMultipier from ${currentPriceMultiplier} to ${vals.priceMultiplier}`)
+    console.log(_ + `cloversController.updatePriceMultipier from ${currentPriceMultiplier} to ${vals.priceMultiplier}`)
     var tx = await cloversController.updatePriceMultipier(vals.priceMultiplier)  
+    gasToCash(tx.receipt.gasUsed)
+    totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
   } else {
-    console.log('priceMultiplier hasnt changed')
+    console.log(_ + 'priceMultiplier hasnt changed')
   }
 
 
   var currentBasePrice = await cloversController.basePrice()
   if (!currentBasePrice.eq(vals.basePrice)) {
-    console.log(`cloversController.updateBasePrice from ${currentBasePrice} to ${vals.basePrice}`)
+    console.log(_ + `cloversController.updateBasePrice from ${currentBasePrice} to ${vals.basePrice}`)
     var tx = await cloversController.updateBasePrice(vals.basePrice)  
+    gasToCash(tx.receipt.gasUsed)
+    totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
   } else {
-    console.log('basePrice hasnt changed')
+    console.log(_ + 'basePrice hasnt changed')
   }
 
 
   var currentPaused = await cloversController.paused()
   if (currentPaused !== vals.paused) {
-    console.log(`cloversController.updatePaused from ${currentPaused} to ${vals.paused}`)
+    console.log(_ + `cloversController.updatePaused from ${currentPaused} to ${vals.paused}`)
     var tx = await cloversController.updatePaused(vals.paused)
+    gasToCash(tx.receipt.gasUsed)
+    totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
   } else {
-    console.log('paused hasnt changed')
+    console.log(_ + 'paused hasnt changed')
   }
 
-
-  var fastGasPrice = await cloversController.fastGasPrice()
-  var averageGasPrice = await cloversController.averageGasPrice()
-  var safeLowGasPrice = await cloversController.safeLowGasPrice()
-
-  if (!fastGasPrice.eq(vals.fastGasPrice) || !averageGasPrice.eq(vals.averageGasPrice) || !safeLowGasPrice.eq(vals.safeLowGasPrice)) {
-    console.log(`cloversController.updateGasPrices from ${fastGasPrice}, ${averageGasPrice}, ${safeLowGasPrice} to ${vals.fastGasPrice}, ${vals.averageGasPrice}, ${vals.safeLowGasPrice}`)
-    var tx = await cloversController.updateGasPrices(vals.fastGasPrice, vals.averageGasPrice, vals.safeLowGasPrice)
-  } else {
-    console.log(`gas prices haven't changed`)
-  }
-
-
+  return totalGas
 }
 
 async function updateClubTokenController({
@@ -144,6 +141,8 @@ async function updateClubTokenController({
   simpleCloversMarket,
   accounts
 }) {
+  var totalGas = utils.toBN('0')
+
   // Update ClubTokenController.sol
   // -w simpleCloversMarket
   // -w curationMarket
@@ -155,55 +154,66 @@ async function updateClubTokenController({
 
   var currentSimpleCloversMarket = await clubTokenController.simpleCloversMarket()
   if (currentSimpleCloversMarket.toLowerCase() !== simpleCloversMarket.address.toLowerCase()) {
-    console.log(`clubTokenController.updateSimpleCloversMarket from ${currentSimpleCloversMarket} to ${simpleCloversMarket.address}`)
+    console.log(_ + `clubTokenController.updateSimpleCloversMarket from ${currentSimpleCloversMarket} to ${simpleCloversMarket.address}`)
     var tx = await clubTokenController.updateSimpleCloversMarket(
       simpleCloversMarket.address
     )
+    gasToCash(tx.receipt.gasUsed)
+    totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
   } else {
-    console.log('simpleCloversMarket hasnt changed')
+    console.log(_ + 'simpleCloversMarket hasnt changed')
   }
 
-  // console.log('clubTokenController.updateCurationMarket')
+  // console.log(_ + 'clubTokenController.updateCurationMarket')
   // var tx = await clubTokenController.updateCurationMarket(
   //   curationMarket.address
   // )
 
   var currentReserveRatio = await clubTokenController.reserveRatio()
   if (!currentReserveRatio.eq(vals.reserveRatio)) {
-    console.log(`clubTokenController.updateReserveRatio from ${currentReserveRatio} to ${vals.reserveRatio}`)
+    console.log(_ + `clubTokenController.updateReserveRatio from ${currentReserveRatio} to ${vals.reserveRatio}`)
     var tx = await clubTokenController.updateReserveRatio(vals.reserveRatio)
+    gasToCash(tx.receipt.gasUsed)
+    totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
   } else {
-    console.log('reserveRatio hasnt changed')
+    console.log(_ + 'reserveRatio hasnt changed')
   }
 
   var currentVirtualSupply = await clubTokenController.virtualSupply()
   if (!currentVirtualSupply.eq(vals.virtualSupply)) {
-    console.log(`clubTokenController.updateVirtualSupply from ${currentVirtualSupply.toString()} to ${vals.virtualSupply.toString()}`)
+    console.log(_ + `clubTokenController.updateVirtualSupply from ${currentVirtualSupply.toString()} to ${vals.virtualSupply.toString()}`)
     var tx = await clubTokenController.updateVirtualSupply(vals.virtualSupply)
+    gasToCash(tx.receipt.gasUsed)
+    totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
   } else {
-    console.log('virtualSupply hasnt changed')
+    console.log(_ + 'virtualSupply hasnt changed')
   }
 
   var currentVirtualBalance = await clubTokenController.virtualBalance()
   if (!currentVirtualBalance.eq(vals.virtualBalance)) {
-    console.log(`clubTokenController.updateVirtualBalance from ${currentVirtualBalance.toString()} to ${vals.virtualBalance.toString()}`)
+    console.log(_ + `clubTokenController.updateVirtualBalance from ${currentVirtualBalance.toString()} to ${vals.virtualBalance.toString()}`)
     var tx = await clubTokenController.updateVirtualBalance(vals.virtualBalance)
+    gasToCash(tx.receipt.gasUsed)
+    totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
   } else {
-    console.log('virtualBalance hasnt changed')
+    console.log(_ + 'virtualBalance hasnt changed')
   }
 
   var currentPaused = await clubTokenController.paused()
   if (currentPaused !== vals.paused) {
-    console.log(`clubTokenController.updatePaused from ${currentPaused} to ${vals.paused}`)
+    console.log(_ + `clubTokenController.updatePaused from ${currentPaused} to ${vals.paused}`)
     var tx = await clubTokenController.updatePaused(vals.paused)
+    gasToCash(tx.receipt.gasUsed)
+    totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
   } else {
-    console.log('paused hasnt changed')
+    console.log(_ + 'paused hasnt changed')
   }
 
-  console.log('remove as admins to clubTokenController')
+  console.log(_ + 'remove as admins to clubTokenController')
   // await addAsAdmin(clubTokenController, accounts)
-  await removeAsAdmin(clubTokenController, accounts)
-
+  var gasUsed = await removeAsAdmin(clubTokenController, accounts)
+  totalGas = totalGas.add(gasUsed)
+  return totalGas
 }
 
 
@@ -213,85 +223,97 @@ async function addAsAdmin(contract, accounts) {
 
   var secondOwner = await contract.isAdmin(accounts[0])
   if (!secondOwner) {
-    console.log(`adding ${accounts[0]} as admin in contract`)
+    console.log(_ + `adding ${accounts[0]} as admin in contract`)
     await contract.transferAdminship(accounts[0])
   } else {
-    console.log(`${accounts[0]} is already an admin in contract`)
+    console.log(_ + `${accounts[0]} is already an admin in contract`)
   }
 
 
   var secondOwner = await contract.isAdmin(accounts[1])
   if (!secondOwner) {
-    console.log(`adding ${accounts[1]} as admin in contract`)
+    console.log(_ + `adding ${accounts[1]} as admin in contract`)
     await contract.transferAdminship(accounts[1])
   } else {
-    console.log(`${accounts[1]} is already an admin in contract`)
+    console.log(_ + `${accounts[1]} is already an admin in contract`)
   }
 
   var secondOwner = await contract.isAdmin(accounts[2])
   if (!secondOwner) {
-    console.log(`adding ${accounts[2]} as admin in contract`)
+    console.log(_ + `adding ${accounts[2]} as admin in contract`)
     await contract.transferAdminship(accounts[2])
   } else {
-    console.log(`${accounts[2]} is already an admin in contract`)
+    console.log(_ + `${accounts[2]} is already an admin in contract`)
   }
 
   var secondOwner = await contract.isAdmin(accounts[3])
   if (!secondOwner) {
-    console.log(`adding ${accounts[3]} as admin in contract`)
+    console.log(_ + `adding ${accounts[3]} as admin in contract`)
     await contract.transferAdminship(accounts[3])
   } else {
-    console.log(`${accounts[3]} is already an admin in contract`)
+    console.log(_ + `${accounts[3]} is already an admin in contract`)
   }
 
   var secondOwner = await contract.isAdmin(accounts[4])
   if (!secondOwner) {
-    console.log(`adding ${accounts[4]} as admin in contract`)
+    console.log(_ + `adding ${accounts[4]} as admin in contract`)
     await contract.transferAdminship(accounts[4])
   } else {
-    console.log(`${accounts[4]} is already an admin in contract`)
+    console.log(_ + `${accounts[4]} is already an admin in contract`)
   }
 }
 
 async function removeAsAdmin(contract, accounts) {
+  var totalGas = utils.toBN('0')
 
   var secondOwner = await contract.isAdmin(accounts[1])
   if (secondOwner) {
-    console.log(`removing ${accounts[1]} as admin in contract`)
-    await contract.renounceAdminship(accounts[1])
+    console.log(_ + `removing ${accounts[1]} as admin in contract`)
+    var tx = await contract.renounceAdminship(accounts[1])
+    gasToCash(tx.receipt.gasUsed)
+    totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
   } else {
-    console.log(`${accounts[1]} is already removed as an admin in contract`)
+    console.log(_ + `${accounts[1]} is already removed as an admin in contract`)
   }
 
   var secondOwner = await contract.isAdmin(accounts[2])
   if (secondOwner) {
-    console.log(`removing ${accounts[2]} as admin in contract`)
-    await contract.renounceAdminship(accounts[2])
+    console.log(_ + `removing ${accounts[2]} as admin in contract`)
+    var tx = await contract.renounceAdminship(accounts[2])
+    gasToCash(tx.receipt.gasUsed)
+    totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
   } else {
-    console.log(`${accounts[2]} is already removed as an admin in contract`)
+    console.log(_ + `${accounts[2]} is already removed as an admin in contract`)
   }
 
   var secondOwner = await contract.isAdmin(accounts[3])
   if (secondOwner) {
-    console.log(`removing ${accounts[3]} as admin in contract`)
-    await contract.renounceAdminship(accounts[3])
+    console.log(_ + `removing ${accounts[3]} as admin in contract`)
+    var tx = await contract.renounceAdminship(accounts[3])
+    gasToCash(tx.receipt.gasUsed)
+    totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
   } else {
-    console.log(`${accounts[3]} is already removed as an admin in contract`)
+    console.log(_ + `${accounts[3]} is already removed as an admin in contract`)
   }
 
   var secondOwner = await contract.isAdmin(accounts[4])
   if (secondOwner) {
-    console.log(`removing ${accounts[4]} as admin in contract`)
-    await contract.renounceAdminship(accounts[4])
+    console.log(_ + `removing ${accounts[4]} as admin in contract`)
+    var tx = await contract.renounceAdminship(accounts[4])
+    gasToCash(tx.receipt.gasUsed)
+    totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
   } else {
-    console.log(`${accounts[4]} is already removed as an admin in contract`)
+    console.log(_ + `${accounts[4]} is already removed as an admin in contract`)
   }
 
   var secondOwner = await contract.isAdmin(accounts[0])
   if (secondOwner) {
-    console.log(`removing ${accounts[0]} as admin in contract`)
-    await contract.renounceAdminship(accounts[0])
+    console.log(_ + `removing ${accounts[0]} as admin in contract`)
+    var tx = await contract.renounceAdminship(accounts[0])
+    gasToCash(tx.receipt.gasUsed)
+    totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
   } else {
-    console.log(`${accounts[0]} is already removed as an admin in contract`)
+    console.log(_ + `${accounts[0]} is already removed as an admin in contract`)
   }
+  return totalGas
 }

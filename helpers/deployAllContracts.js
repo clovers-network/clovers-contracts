@@ -3,7 +3,7 @@ var utils = require('web3-utils')
 const {
     gasToCash,
     _
-} = require('../helpers/utils')  
+} = require('./utils')  
 var {
     decimals,
 } = require('./migVals')
@@ -45,7 +45,6 @@ async function deployAllContracts({overwrites, accounts, artifacts, web3, chainI
     }
 
     try {
-        console.log(`running task as ${accounts[0]}`)
         var totalGas = utils.toBN('0')
       
         // Deploy Clovers.sol (NFT)
@@ -122,7 +121,8 @@ async function deployAllContracts({overwrites, accounts, artifacts, web3, chainI
 
             let network = await CloversController.detectNetwork()
             await CloversController.setNetwork(network)
-            await CloversController.link('Reversi', reversi.address)
+            await CloversController.link(`\\$5b17bcb97970e1ce5ed9096dcff7f451d7\\$`, reversi.address)
+            // await CloversController.link('IReversi', reversi.address)
 
             // -w Clovers address
             // -w ClubToken address
@@ -175,185 +175,3 @@ async function deployAllContracts({overwrites, accounts, artifacts, web3, chainI
         console.error(error)
     }
 }
-
-      //   // Update Clovers.sol
-      //   // -w ClubTokenController address
-      //   tx = await clovers.updateClubTokenController(
-      //     clubTokenController.address
-      //   )
-
-      //   console.log(
-      //     _ + 'clovers.updateClubTokenController - ' + tx.receipt.gasUsed
-      //   )
-      //   gasToCash(tx.receipt.gasUsed)
-
-      //   totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
-
-      //   // Update Clovers.sol
-      //   // -w CloversController address
-      //   tx = await clovers.updateCloversControllerAddress(
-      //     cloversController.address
-      //   )
-
-      //   console.log(
-      //     _ + 'clovers.updateCloversControllerAddress - ' + tx.receipt.gasUsed
-      //   )
-      //   gasToCash(tx.receipt.gasUsed)
-
-      //   totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
-
-      //   // Update ClubToken.sol
-      //   // -w CloversController address
-      //   tx = await clubToken.updateCloversControllerAddress(
-      //     cloversController.address
-      //   )
-      //   console.log(
-      //     _ + 'clubToken.updateCloversControllerAddress - ' + tx.receipt.gasUsed
-      //   )
-
-      //   gasToCash(tx.receipt.gasUsed)
-
-      //   totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
-
-      //   // Update ClubToken.sol
-      //   // -w ClubTokenController address
-      //   tx = await clubToken.updateClubTokenControllerAddress(
-      //     clubTokenController.address
-      //   )
-
-      //   console.log(
-      //     _ +
-      //       'clubToken.updateClubTokenControllerAddress - ' +
-      //       tx.receipt.gasUsed
-      //   )
-      //   gasToCash(tx.receipt.gasUsed)
-
-      //   totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
-
-      //   // Update CloversController.sol
-      //   // -w oracle
-      //   // -w simpleCloversMarket
-      //   // -w stakeAmount
-      //   // -w stakePeriod
-      //   // -w payMultiplier
-      //   tx = await cloversController.updateOracle(oracle)
-      //   console.log(
-      //     _ + 'cloversController.updateOracle - ' + tx.receipt.gasUsed
-      //   )
-      //   gasToCash(tx.receipt.gasUsed)
-
-      //   totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
-
-
-      //   tx = await cloversController.updateSimpleCloversMarket(
-      //     simpleCloversMarket.address
-      //   )
-      //   console.log(
-      //     _ +
-      //       'cloversController.updateSimpleCloversMarket - ' +
-      //       tx.receipt.gasUsed
-      //   )
-      //   gasToCash(tx.receipt.gasUsed)
-
-      //   totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
-
-      //   tx = await cloversController.updateStakeAmount(stakeAmount)
-      //   console.log(
-      //     _ + 'cloversController.updateStakeAmount - ' + tx.receipt.gasUsed
-      //   )
-      //   gasToCash(tx.receipt.gasUsed)
-
-      //   totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
-
-      //   tx = await cloversController.updateStakePeriod(stakePeriod)
-      //   console.log(
-      //     _ + 'cloversController.updateStakePeriod - ' + tx.receipt.gasUsed
-      //   )
-      //   gasToCash(tx.receipt.gasUsed)
-
-      //   totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
-
-      //   tx = await cloversController.updatePayMultipier(payMultiplier)
-      //   console.log(
-      //     _ + 'cloversController.updatePayMultipier - ' + tx.receipt.gasUsed
-      //   )
-      //   gasToCash(tx.receipt.gasUsed)
-
-      //   totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
-
-      //   tx = await cloversController.updatePriceMultipier(priceMultiplier)
-      //   console.log(
-      //     _ + 'cloversController.updatePriceMultipier - ' + tx.receipt.gasUsed
-      //   )
-      //   gasToCash(tx.receipt.gasUsed)
-
-      //   totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
-
-      //   tx = await cloversController.updateBasePrice(basePrice)
-      //   console.log(
-      //     _ + 'cloversController.updateBasePrice - ' + tx.receipt.gasUsed
-      //   )
-      //   gasToCash(tx.receipt.gasUsed)
-      //   totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
-
-      //   tx = await cloversController.updateGasPrices(fastGasPrice, averageGasPrice, safeLowGasPrice)
-      //   console.log(
-      //     _ + 'cloversController.updateBasePrice - ' + tx.receipt.gasUsed
-      //   )
-      //   gasToCash(tx.receipt.gasUsed)
-
-
-      //   totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
-
-      //   // Update ClubTokenController.sol
-      //   // -w simpleCloversMarket
-      //   // -w reserveRatio
-      //   // -w virtualSupply
-      //   // -w virtualBalance
-      //   tx = await clubTokenController.updateSimpleCloversMarket(
-      //     simpleCloversMarket.address
-      //   )
-      //   console.log(
-      //     _ +
-      //       'clubTokenController.updateSimpleCloversMarket - ' +
-      //       tx.receipt.gasUsed
-      //   )
-      //   gasToCash(tx.receipt.gasUsed)
-
-      //   totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
-
-
-      //   tx = await clubTokenController.updateReserveRatio(reserveRatio)
-      //   console.log(
-      //     _ + 'clubTokenController.updateReserveRatio - ' + tx.receipt.gasUsed
-      //   )
-      //   gasToCash(tx.receipt.gasUsed)
-
-      //   totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
-
-      //   tx = await clubTokenController.updateVirtualSupply(virtualSupply)
-      //   console.log(
-      //     _ + 'clubTokenController.updateVirtualSupply - ' + tx.receipt.gasUsed
-      //   )
-      //   gasToCash(tx.receipt.gasUsed)
-
-      //   totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
-
-      //   tx = await clubTokenController.updateVirtualBalance(virtualBalance)
-      //   console.log(
-      //     _ + 'clubTokenController.updateVirtualBalance - ' + tx.receipt.gasUsed
-      //   )
-      //   gasToCash(tx.receipt.gasUsed)
-
-      //   totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
-
-      //   tx = await clubTokenController.updatePaused(false)
-      //   console.log(
-      //     _ + 'clubTokenController.updatePaused - ' + tx.receipt.gasUsed
-      //   )
-      //   gasToCash(tx.receipt.gasUsed)
-
-      //   totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
-
-      //   console.log(_ + totalGas.toString(10) + ' - Total Gas')
-      //   gasToCash(totalGas)
