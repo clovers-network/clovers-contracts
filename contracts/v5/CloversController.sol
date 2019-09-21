@@ -153,10 +153,7 @@ contract CloversController is Ownable {
     function claimCloverWithSignature(bytes28[2] memory moves, uint256 tokenId, uint256 symmetries, bool keep, address recepient, bytes memory signature) public payable notPaused returns (bool) {
         require(!IClovers(clovers).exists(tokenId), "Clover already exists");
         require(!commits[getMovesHashByMoves(moves)], "Moves already committed");
-        bytes32 hash = toEthSignedMessageHash(getHash(tokenId, moves, symmetries, keep, recepient));
-        address result = recover(hash, signature);
-        require(result != address(0) && result == oracle, "Invalid signature");
-
+        require(checkSignature(tokenId, moves, symmetries, keep, recepient, signature, oracle), "Invalid Signature");
         require(_claimClover(moves, tokenId, symmetries, recepient, keep), "Claim must succeed");
 
         return true;
@@ -367,6 +364,20 @@ contract CloversController is Ownable {
         XYSym = XYSym.sub(uint256(symmetries >> 1 & 1));
         XnYSym = XnYSym.sub(uint256(symmetries & 1));
         IClovers(clovers).setAllSymmetries(Symmetricals, RotSym, Y0Sym, X0Sym, XYSym, XnYSym);
+    }
+
+    function checkSignature(
+        uint256 tokenId,
+        bytes28[2] memory moves,
+        uint256 symmetries,
+        bool keep,
+        address recepient,
+        bytes memory signature,
+        address signer
+    ) public pure returns (bool) {
+        bytes32 hash = toEthSignedMessageHash(getHash(tokenId, moves, symmetries, keep, recepient));
+        address result = recover(hash, signature);
+        return (result != address(0) && result == signer);
     }
 
     function getHash(uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, bool keep, address recepient) public pure returns (bytes32) {

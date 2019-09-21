@@ -55,6 +55,8 @@ function getFlag(flag, value = true) {
 }
 
 var vals = (module.exports = {
+  globalGasPrice: oneGwei.toString(10),
+  oneGwei,
   getLowestPrice,
   getFlag,
   _,
@@ -91,3 +93,79 @@ var vals = (module.exports = {
     )
   }
 })
+
+
+
+function getBlockNumber() {
+  return new Promise((resolve, reject) => {
+    web3.eth.getBlockNumber((error, result) => {
+      if (error) reject(error)
+      resolve(result)
+    })
+  })
+}
+
+async function increaseTime(amount) {
+  let currentBlock = await new Promise(resolve =>
+    web3.eth.getBlockNumber((err, result) => resolve(result))
+  )
+  let getBlock = await web3.eth.getBlock(currentBlock)
+  // console.log("timestamp", getBlock.timestamp);
+  await web3.currentProvider.send({
+    jsonrpc: '2.0',
+    method: 'evm_increaseTime',
+    params: [amount],
+    id: 0
+  })
+  await increaseBlock()
+  currentBlock = await new Promise(resolve =>
+    web3.eth.getBlockNumber((err, result) => resolve(result))
+  )
+  getBlock = await web3.eth.getBlock(currentBlock)
+  // console.log("timestamp", getBlock.timestamp);
+}
+
+function increaseBlocks(blocks) {
+  return new Promise((resolve, reject) => {
+    increaseBlock().then(() => {
+      blocks -= 1
+      if (blocks == 0) {
+        resolve()
+      } else {
+        increaseBlocks(blocks).then(resolve)
+      }
+    })
+  })
+}
+
+function increaseBlock() {
+  return new Promise((resolve, reject) => {
+    web3.currentProvider.send(
+      {
+        jsonrpc: '2.0',
+        method: 'evm_mine',
+        id: 12345
+      },
+      (err, result) => {
+        if (err) reject(err)
+        resolve(result)
+      }
+    )
+  })
+}
+
+function decodeEventString(hexVal) {
+  return hexVal
+    .match(/.{1,2}/g)
+    .map(a =>
+      a
+        .toLowerCase()
+        .split('')
+        .reduce(
+          (result, ch) => result * 16 + '0123456789abcdefgh'.indexOf(ch),
+          0
+        )
+    )
+    .map(a => String.fromCharCode(a))
+    .join('')
+}

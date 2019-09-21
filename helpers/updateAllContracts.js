@@ -20,7 +20,8 @@ async function updateAllContracts({
     clubTokenController, 
     simpleCloversMarket, 
     clubToken,
-    accounts
+    accounts,
+    verbose
 }) {
     var totalGas = utils.toBN('0')
 
@@ -34,41 +35,41 @@ async function updateAllContracts({
         // -w multiple owners        
         var currentMetadataAddress = await clovers.cloversMetadata()
         if (currentMetadataAddress.toLowerCase() !== cloversMetadata.address.toLowerCase()) {
-            console.log(_ + `update clovers with currentMetadataAddress from ${currentMetadataAddress} to ${cloversMetadata.address}`)
+            verbose && console.log(_ + `update clovers with currentMetadataAddress from ${currentMetadataAddress} to ${cloversMetadata.address}`)
             var tx = await clovers.updateCloversMetadataAddress(
                 cloversMetadata.address
             )
-            gasToCash(tx.receipt.gasUsed)
+            verbose && gasToCash(tx.receipt.gasUsed)
             totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
         } else {
-            console.log(_ + 'currentMetadataAddress didnt change in clovers') 
+            verbose && console.log(_ + 'currentMetadataAddress didnt change in clovers') 
         }
 
         var currentCloversControllerAddress = await clovers.cloversController()
         if (currentCloversControllerAddress.toLowerCase() !== cloversController.address.toLowerCase()) {
-            console.log(_ + `update clovers with cloversControllerAddress from ${currentCloversControllerAddress} to ${cloversController.address}`)
+            verbose && console.log(_ + `update clovers with cloversControllerAddress from ${currentCloversControllerAddress} to ${cloversController.address}`)
             var tx = await clovers.updateCloversControllerAddress(
                 cloversController.address
             )
-            gasToCash(tx.receipt.gasUsed)
+            verbose && gasToCash(tx.receipt.gasUsed)
             totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
         } else {
-            console.log(_ + 'cloversController didnt change in clovers')
+            verbose && console.log(_ + 'cloversController didnt change in clovers')
         }
         
         var currentClubTokenControllerAddress = await clovers.clubTokenController()
         if (currentClubTokenControllerAddress.toLowerCase() !== clubTokenController.address.toLowerCase()) {
-            console.log(_ + `update clovers with clubTokenControllerAddress from ${currentClubTokenControllerAddress} to ${clubTokenController.address}`)
+            verbose && console.log(_ + `update clovers with clubTokenControllerAddress from ${currentClubTokenControllerAddress} to ${clubTokenController.address}`)
             var tx = await clovers.updateClubTokenController(
                 clubTokenController.address
             )
-            gasToCash(tx.receipt.gasUsed)
+            verbose && gasToCash(tx.receipt.gasUsed)
             totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
         } else {
-            console.log(_ + 'clubTokenController didnt change in clovers')
+            verbose && console.log(_ + 'clubTokenController didnt change in clovers')
         }
   
-        console.log(_ + 'remove admins for clovers')
+        verbose && console.log(_ + 'remove admins for clovers')
         // await addAsAdmin(clovers, accounts);
         totalGas = await removeAsAdmin(clovers, accounts);
         
@@ -80,26 +81,26 @@ async function updateAllContracts({
         
         var currentCloversControllerAddress = await clubToken.cloversController()
         if (currentCloversControllerAddress.toLowerCase() !== cloversController.address.toLowerCase()) {
-            console.log(_ + `update clubToken with cloversController from ${currentCloversControllerAddress} to ${cloversController.address}`)
+            verbose && console.log(_ + `update clubToken with cloversController from ${currentCloversControllerAddress} to ${cloversController.address}`)
             var tx = await clubToken.updateCloversControllerAddress(
                 cloversController.address
             )
-            gasToCash(tx.receipt.gasUsed)
+            verbose && gasToCash(tx.receipt.gasUsed)
             totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
         } else {
-            console.log(_ + 'cloversController didnt change in clubToken')
+            verbose && console.log(_ + 'cloversController didnt change in clubToken')
         }
         
         var currentClubTokenControllerAddress = await clubToken.clubTokenController()
         if (currentClubTokenControllerAddress.toLowerCase() !== clubTokenController.address.toLowerCase()) {
-            console.log(_ + `update clubToken with clubTokenControllerAddress from ${currentClubTokenControllerAddress} to ${clubTokenController.address}`)
+            verbose && console.log(_ + `update clubToken with clubTokenControllerAddress from ${currentClubTokenControllerAddress} to ${clubTokenController.address}`)
             var tx = await clubToken.updateClubTokenControllerAddress(
                 clubTokenController.address
             )
-            gasToCash(tx.receipt.gasUsed)
+            verbose && gasToCash(tx.receipt.gasUsed)
             totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
         } else {
-            console.log(_ + `clubTokenController didnt change in clubToken`)
+            verbose && console.log(_ + `clubTokenController didnt change in clubToken`)
         }
 
         /* ----------------------------------------------------------------------------------------------------------- */
@@ -120,28 +121,28 @@ async function updateAllContracts({
         
         /* ----------------------------------------------------------------------------------------------------------- */
         // update simpleCloversMarket.sol
-        console.log(_ + 'remove admins for simpleCloversMarket')
+        verbose && console.log(_ + 'remove admins for simpleCloversMarket')
         // await addAsAdmin(simpleCloversMarket, accounts);
         totalGas = await removeAsAdmin(simpleCloversMarket, accounts);
         
         var currentCloversControllerAddress = await simpleCloversMarket.cloversController()
         if (currentCloversControllerAddress.toLowerCase() !== cloversController.address.toLowerCase()) {
-            console.log(_ + `updating simpleCloversMarket with cloversControllerAddress from ${currentCloversControllerAddress} to ${cloversController.address}`)
+            verbose && console.log(_ + `updating simpleCloversMarket with cloversControllerAddress from ${currentCloversControllerAddress} to ${cloversController.address}`)
             var tx = await simpleCloversMarket.updateCloversController(cloversController.address)
-            gasToCash(tx.receipt.gasUsed)
+            verbose && gasToCash(tx.receipt.gasUsed)
             totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
         } else {
-            console.log(_ + `simpleCloversMarket has correct cloversController`)
+            verbose && console.log(_ + `simpleCloversMarket has correct cloversController`)
         }
         
         var currentClubTokenControllerAddress = await simpleCloversMarket.clubTokenController()
         if (currentClubTokenControllerAddress.toLowerCase() !== clubTokenController.address.toLowerCase()) {
-            console.log(_ + `updating simpleCloversMarket with clubTokenControllerAddress from ${currentClubTokenControllerAddress} to ${clubTokenController.address}`)
+            verbose && console.log(_ + `updating simpleCloversMarket with clubTokenControllerAddress from ${currentClubTokenControllerAddress} to ${clubTokenController.address}`)
             var tx = await simpleCloversMarket.updateClubTokenController(clubTokenController.address)
-            gasToCash(tx.receipt.gasUsed)
+            verbose && gasToCash(tx.receipt.gasUsed)
             totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
         } else {
-            console.log(_ + `simpleCloversMarket has correct clubTokenController`)
+            verbose && console.log(_ + `simpleCloversMarket has correct clubTokenController`)
         }
         return { gasUsed: totalGas}
 
