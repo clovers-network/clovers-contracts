@@ -4,7 +4,7 @@ pragma solidity ^0.5.9;
  * The CloversController is a replaceable endpoint for minting and unminting Clovers.sol and ClubToken.sol
  */
 
-import "./IReversi.sol";
+import "./Reversi.sol";
 import "./IClovers.sol";
 import "./IClubToken.sol";
 import "./IClubTokenController.sol";
@@ -15,8 +15,8 @@ import "@openzeppelin/contracts/cryptography/ECDSA.sol";
 
 contract CloversController is Ownable {
     event cloverCommitted(bytes32 movesHash, address owner);
-    event cloverClaimed(bytes28[2] moves, uint256 tokenId, address sender, address recepient, uint reward, uint256 symmetries, bool keep);
-    event cloverChallenged(bytes28[2] moves, uint256 tokenId, address owner, address challenger);
+    event cloverClaimed(uint256 tokenId, bytes28[2] moves, address sender, address recepient, uint reward, uint256 symmetries, bool keep);
+    event cloverChallenged(uint256 tokenId, bytes28[2] moves, address owner, address challenger);
 
     using SafeMath for uint256;
     using ECDSA for bytes32;
@@ -35,7 +35,7 @@ contract CloversController is Ownable {
     uint256 public priceMultiplier;
     uint256 public payMultiplier;
 
-    mapping(bytes32=>bool) public commits;
+    mapping(bytes32=>address) public commits;
 
     modifier notPaused() {
         require(!paused, "Must not be paused");
@@ -48,18 +48,13 @@ contract CloversController is Ownable {
         clubTokenController = _clubTokenController;
         paused = true;
     }
-   
-    /**
-    * @dev Gets the current staking period needed to verify a Clover.
-    * @param tokenId The token Id of the clover.
-    * @return moves hash
-    */
-    function getMovesHashByClover(uint tokenId) public view returns (bytes32) {
-        return getMovesHashByMoves(IClovers(clovers).getCloverMoves(tokenId));
+
+    function getMovesHash(bytes28[2] memory moves) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(moves));
     }
 
-    function getMovesHashByMoves(bytes28[2] memory moves) public pure returns (bytes32) {
-        return keccak256(abi.encodePacked(moves));
+    function getMovesHashWithRecepient(bytes32 movesHash, address recepient) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(movesHash, recepient));
     }
 
     /**
@@ -68,7 +63,7 @@ contract CloversController is Ownable {
     * @return A boolean representing whether or not the game is valid.
     */
     function isValid(bytes28[2] memory moves) public pure returns (bool) {
-        IReversi.Game memory game = IReversi.playGame(moves);
+        Reversi.Game memory game = Reversi.playGame(moves);
         return isValidGame(game.error, game.complete);
     }
 
@@ -79,11 +74,26 @@ contract CloversController is Ownable {
     * @return A boolean representing whether or not the game is valid.
     */
     function isValidGame(bool error, bool complete) public pure returns (bool) {
-        if (error) return false;
-        if (!complete) return false;
-        return true;
+        if (error || !complete) {
+            return false;
+        } else {
+            return true;
+        }
     }
-   
+
+    function getGame (bytes28[2] memory moves) public pure returns (bool error, bool complete, bool symmetrical, bytes16 board, uint8 currentPlayer, uint8 moveKey) {
+        // return Reversi.getGame(moves);
+        Reversi.Game memory game = Reversi.playGame(moves);
+        return (
+            game.error,
+            game.complete,
+            game.symmetrical,
+            game.board,
+            game.currentPlayer,
+            game.moveKey
+            // game.msg
+        );
+    }
     /**
     * @dev Calculates the reward of the board.
     * @param symmetries symmetries saved as a uint256 value like 00010101 where bits represent symmetry types.
@@ -115,25 +125,34 @@ contract CloversController is Ownable {
         return basePrice.add(calculateReward(symmetries));
     }
 
-    function claimCloverWithVerificationCommit(bytes32 movesHash, bytes32 movesHashWithRecepient) public {
-        commits[movesHash] = true;
-        commits[movesHashWithRecepient] = true;
+    // In order to prevent commit reveal griefing the first commit is a combined hash of the moves and the recepient.
+    // In order to use the same commit mapping, we mark this hash simply as address(1) so it is no longer the equivalent of address(0)
+    function claimCloverSecurelyPartOne(bytes32 movesHashWithRecepient) public {
+        commits[movesHashWithRecepient] = address(1);
     }
 
-    function claimCloverWithVerificationReveal(bytes28[2] memory moves, bool keep) public payable returns (bool) {
-        require(commits[keccak256(abi.encodePacked(moves, keep, msg.sender))], "No commit with that info");
-        require(claimCloverWithVerification(moves, keep), "Claim must succeed");
-        return true;
+    // Once a commit has been made to guarantee the move hash is associated with the recepient we can make a commit on the hash of the moves themselves
+    // If we were to make a claim on the moves in plaintext, the transaction could be front run on the claimCloverWithVerification or the claimCloverWithSignature
+    function claimCloverSecurelyPartTwo(bytes32 movesHash, address recepient) public {
+        address commitOfMovesHashWithRecepient = commits[getMovesHashWithRecepient(movesHash, recepient)];
+        require(
+            address(commitOfMovesHashWithRecepient) == address(1),
+            "Invalid commitOfMovesHashWithRecepient, please do claimCloverSecurelyPartOne"
+        );
+        commits[movesHash] = recepient;
     }
 
-    function claimCloverWithVerification(bytes28[2] memory moves, bool keep) internal returns (bool) {
-        IReversi.Game memory game = IReversi.playGame(moves);
+    function claimCloverWithVerification(bytes28[2] memory moves, bool keep) public returns (bool) {
+        address committedRecepient = commits[getMovesHash(moves)];
+        require(committedRecepient == address(0) || committedRecepient == msg.sender, "Invalid committedRecepient");
+
+        Reversi.Game memory game = Reversi.playGame(moves);
         require(isValidGame(game.error, game.complete), "Invalid game");
         uint256 tokenId = convertBytes16ToUint(game.board);
         require(!IClovers(clovers).exists(tokenId), "Clover already exists");
-  
-        uint256 symmetries = IReversi.returnSymmetricals(game.RotSym, game.Y0Sym, game.X0Sym, game.XYSym, game.XnYSym);
-        require(_claimClover(moves, tokenId, symmetries, msg.sender, keep), "Claim must succeed");
+
+        uint256 symmetries = Reversi.returnSymmetricals(game.RotSym, game.Y0Sym, game.X0Sym, game.XYSym, game.XnYSym);
+        require(_claimClover(tokenId, moves, symmetries, msg.sender, keep), "Claim must succeed");
         return true;
     }
 
@@ -141,26 +160,24 @@ contract CloversController is Ownable {
 
     /**
     * @dev Claim the Clover without a commit or reveal. Payable so you can buy tokens if needed.
-    * @param moves The moves that make up the Clover reversi game.
     * @param tokenId The board that results from the moves.
+    * @param moves The moves that make up the Clover reversi game.
     * @param symmetries symmetries saved as a uint256 value like 00010101 where bits represent symmetry
     * @param keep symmetries saved as a uint256 value like 00010101 where bits represent symmetry
-    * @param recepient symmetries saved as a uint256 value like 00010101 where bits represent symmetry
     * @param signature symmetries saved as a uint256 value like 00010101 where bits represent symmetry
     * types.
     * @return A boolean representing whether or not the claim was successful.
     */
-    function claimCloverWithSignature(bytes28[2] memory moves, uint256 tokenId, uint256 symmetries, bool keep, address recepient, bytes memory signature) public payable notPaused returns (bool) {
+    function claimCloverWithSignature(uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, bool keep, bytes memory signature) public payable notPaused returns (bool) {
+        address committedRecepient = commits[getMovesHash(moves)];
+        require(committedRecepient == address(0) || committedRecepient == msg.sender, "Invalid committedRecepient");
         require(!IClovers(clovers).exists(tokenId), "Clover already exists");
-        require(!commits[getMovesHashByMoves(moves)], "Moves already committed");
-        require(checkSignature(tokenId, moves, symmetries, keep, recepient, signature, oracle), "Invalid Signature");
-        require(_claimClover(moves, tokenId, symmetries, recepient, keep), "Claim must succeed");
-
+        require(checkSignature(tokenId, moves, symmetries, keep, msg.sender, signature, oracle), "Invalid Signature");
+        require(_claimClover(tokenId, moves, symmetries, msg.sender, keep), "Claim must succeed");
         return true;
     }
 
-
-    function _claimClover(bytes28[2] memory moves, uint256 tokenId, uint256 symmetries, address recepient, bool keep) internal returns (bool) {
+    function _claimClover(uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, address recepient, bool keep) internal returns (bool) {
         IClovers(clovers).setCloverMoves(tokenId, moves);
         IClovers(clovers).setKeep(tokenId, keep);
 
@@ -193,7 +210,8 @@ contract CloversController is Ownable {
                 require(IClubToken(clubToken).mint(recepient, reward), "mint must succeed");
             }
         }
-        emit cloverClaimed(moves, tokenId, msg.sender, recepient, reward, symmetries, keep);
+        emit cloverClaimed(tokenId, moves, msg.sender, recepient, reward, symmetries, keep);
+        return true;
     }
 
 
@@ -220,7 +238,7 @@ contract CloversController is Ownable {
         bytes28[2] memory moves = IClovers(clovers).getCloverMoves(tokenId);
         address payable _owner = address(uint160(owner()));
         if (msg.sender != _owner && msg.sender != oracle) {
-            IReversi.Game memory game = IReversi.playGame(moves);
+            Reversi.Game memory game = Reversi.playGame(moves);
             if(convertBytes16ToUint(game.board) != tokenId) {
                 valid = false;
             }
@@ -239,7 +257,7 @@ contract CloversController is Ownable {
 
         removeSymmetries(tokenId);
         address committer = IClovers(clovers).ownerOf(tokenId);
-        emit cloverChallenged(moves, tokenId, committer, msg.sender);
+        emit cloverChallenged(tokenId, moves, committer, msg.sender);
         IClovers(clovers).deleteClover(tokenId);
         return true;
     }
