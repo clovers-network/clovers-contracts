@@ -1,6 +1,7 @@
 pragma solidity ^0.5.9;
 
 contract IClovers {
+    function ownerOf(uint256 _tokenId) public view returns (address _owner);
     function setCloverMoves(uint256 _tokenId, bytes28[2] memory moves) public;
     function getCloverMoves(uint256 _tokenId) public view returns (bytes28[2] memory);
     function getAllSymmetries() public view returns (uint256, uint256, uint256, uint256, uint256, uint256);

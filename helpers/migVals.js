@@ -87,23 +87,6 @@ async function updateCloversController({
   }
 
 
-  var currentStakePeriod = await cloversController.stakePeriod()
-  if (!currentStakePeriod.eq(vals.stakePeriod)) {
-    console.log(`cloversController.updateStakePeriod from ${currentStakePeriod} to ${vals.stakePeriod}`)
-    var tx = await cloversController.updateStakePeriod(vals.stakePeriod) 
-  } else {
-    console.log('stakePeriod hasnt changed')
-  }
-
-
-  var gasBlockMargin = await cloversController.gasBlockMargin()
-  if (!gasBlockMargin.eq(vals.gasBlockMargin)) {
-    console.log(`cloversController.updategasBlockMargin from ${gasBlockMargin} to ${vals.gasBlockMargin}`)
-    var tx = await cloversController.updategasBlockMargin(vals.gasBlockMargin) 
-  } else {
-    console.log('gasBlockMargin hasnt changed')
-  }
-
 
   var currentPayMultiplier = await cloversController.payMultiplier()
   if (!currentPayMultiplier.eq(vals.payMultiplier)) {

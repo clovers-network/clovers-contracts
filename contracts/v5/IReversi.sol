@@ -20,5 +20,6 @@ library IReversi {
         uint8 whiteScore;
         // string msg;
     }
-    function playGame (bytes28[2] memory moves) internal pure returns (Game memory) {}
+    function playGame (bytes28[2] memory moves) internal pure returns (Game memory){}
+    function returnSymmetricals (bool RotSym, bool Y0Sym, bool X0Sym, bool XYSym, bool XnYSym) public view returns (uint256);
 }

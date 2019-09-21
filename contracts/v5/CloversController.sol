@@ -133,7 +133,7 @@ contract CloversController is Ownable {
         require(!IClovers(clovers).exists(tokenId), "Clover already exists");
   
         uint256 symmetries = IReversi.returnSymmetricals(game.RotSym, game.Y0Sym, game.X0Sym, game.XYSym, game.XnYSym);
-        require(_claimClover(tokenId, symmetries, msg.sender, keep), "Claim must succeed");
+        require(_claimClover(moves, tokenId, symmetries, msg.sender, keep), "Claim must succeed");
         return true;
     }
 
@@ -369,8 +369,8 @@ contract CloversController is Ownable {
         IClovers(clovers).setAllSymmetries(Symmetricals, RotSym, Y0Sym, X0Sym, XYSym, XnYSym);
     }
 
-    function getHash(uint256 tokenId, bytes28[2] memory moves) public pure returns (bytes32) {
-        return keccak256(abi.encodePacked(tokenId, moves));
+    function getHash(uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, bool keep, address recepient) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(tokenId, moves, symmetries, keep, recepient));
     }
     function recover(bytes32 hash, bytes memory signature) public pure returns (address) {
         return hash.recover(signature);

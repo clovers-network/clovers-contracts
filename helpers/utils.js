@@ -14,13 +14,17 @@ async function getLowestPrice(
     targetAmount = new BigNumber(targetAmount)
   let littleIncrement = new BigNumber(utils.toWei('0.001'))
   let bigIncrement = new BigNumber(utils.toWei('0.1'))
-  currentPrice = currentPrice.add(useLittle ? littleIncrement : bigIncrement)
+  currentPrice = currentPrice.plus(useLittle ? littleIncrement : bigIncrement)
   let resultOfSpend
+  console.log('1111')
   if (tokenId) {
+    console.log('2222')
     resultOfSpend = await contract.getBuy(tokenId, currentPrice)
   } else {
+    console.log('3333')
     resultOfSpend = await contract.getBuy(currentPrice)
   }
+  console.log('4444')
   if (resultOfSpend.gt(targetAmount)) {
     return useLittle
       ? currentPrice
