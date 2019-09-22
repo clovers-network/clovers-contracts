@@ -163,7 +163,7 @@ contract('SimpleCloversMarket.sol', async function(accounts) {
           'buyer was unable to buy'
         )
       } catch (error) {
-        assert(false, error.message)
+        assert(false, `UHOH: ${error.message}`)
       }
     })
   })

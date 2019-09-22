@@ -2,6 +2,19 @@ const utils = require('web3-utils')
 const BigNumber = require('bignumber.js')
 const oneGwei = new BigNumber('1000000000') // 1 GWEI
 const _ = '        '
+var Rev = require('clovers-reversi').default
+
+
+
+function randomGame() {
+  const rev = new Rev()
+  rev.mine()
+  rev.playGameMovesString(rev.movesString)
+  const moves = rev.returnByteMoves().map(m => '0x' + m.padStart(56, '0'))
+  const tokenId = `0x${rev.byteBoard}`
+  const symmetries = rev.returnSymmetriesAsBN()
+  return {moves, tokenId, symmetries}
+}
 
 async function getLowestPrice(
   contract,
@@ -55,6 +68,7 @@ function getFlag(flag, value = true) {
 }
 
 var vals = (module.exports = {
+  randomGame,
   globalGasPrice: oneGwei.toString(10),
   oneGwei,
   getLowestPrice,

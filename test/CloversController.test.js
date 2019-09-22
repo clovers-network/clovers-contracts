@@ -6,6 +6,7 @@ var networks = require('../networks.json')
 const {
   gasToCash,
   getLowestPrice, 
+  randomGame,
   _
 } = require('../helpers/utils')
 
@@ -97,7 +98,7 @@ contract('CloversController.sol', async function(accounts) {
       {type:"address", value: recepient}
     )
 
-    it('cloversController.getHash should work', async () => {
+    it('getHash should work', async () => {
       //    function getHash(uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, bool keep, address recepient) public pure returns (bytes32) {
       const contractHashedMsg = await cloversController.getHash(
         tokenId,
@@ -108,7 +109,7 @@ contract('CloversController.sol', async function(accounts) {
       )
       assert(contractHashedMsg === hashedMsg, "Hashed messages didn't match")
     })
-    it('cloversController.recover should work', async () => {
+    it('recover should work', async () => {
       signature = fixSignature(await web3.eth.sign(hashedMsg, oracle));
       const jsHashWithPrefix = toEthSignedMessageHash(hashedMsg)
 
@@ -119,7 +120,7 @@ contract('CloversController.sol', async function(accounts) {
       )
       assert(result.toLowerCase() === oracle.toLowerCase(), "Signatures don't match")
     })
-    it('cloversController.checkSignature should work', async () => {
+    it('checkSignature should work', async () => {
       const validClaim = await cloversController.checkSignature(
         tokenId,
         moves,
@@ -131,7 +132,7 @@ contract('CloversController.sol', async function(accounts) {
       )
       assert(validClaim, "checkSignature() returned false")
     })
-    it('cloversController.claimCloverWithSignature should work', async () => {
+    it('claimCloverWithSignature should work', async () => {
       const _oracle = await cloversController.oracle()
       assert(_oracle.toLowerCase() === oracle.toLowerCase(), "oracles don't match")
 
@@ -146,40 +147,141 @@ contract('CloversController.sol', async function(accounts) {
     })
   })
 
-  describe('Full on-chain verification with commit-reveal', () => {
+  describe('securely claimCloverWithVerification + keep = false', () => {
 
     let movesHash, movesHashWithRecepient
-    let from = accounts[0]
-    let keep = false
-    const moves = _moves
+    let from = accounts[7]
+    let notFrom = accounts[6]
+    const {moves, tokenId} = randomGame()
 
-    it('should make a commit', async () => {
-
-      let isValid = await reversi.isValid(moves)
-      console.log({isValid})
-
-      isValid = await cloversController.isValid(moves)
-      console.log({isValid})
-
-      let getGame = await reversi.getGame(moves)
-      console.log({getGame})
-
-      getGame = await cloversController.getGame(moves)
-      console.log({getGame})
-
-      // console.log(cloversController.constructor.links)
-      // console.log(reversi.address)
-
-
+    it('getMovesHash and getMovesHashWithRecepient should be same as js', async () => {
       movesHash = await cloversController.getMovesHash(moves)
       movesHashWithRecepient = await cloversController.getMovesHashWithRecepient(movesHash, from)
-      // function claimCloverWithVerificationCommit(bytes32 movesHash, bytes32 movesHashWithRecepient) public {
-      await cloversController.claimCloverSecurelyPartOne(movesHashWithRecepient, {from})
-      await cloversController.claimCloverSecurelyPartTwo(movesHash, from, {from})
-      await cloversController.claimCloverWithVerification(moves, keep)
-    })
 
+      const movesHashFromJS = web3.utils.soliditySha3(
+        {type:"bytes28[2]", value: moves}
+      )
+      assert(movesHash === movesHashFromJS, `movesHashes don't match`)
+
+      const movesHashWithRecepientFromJS = web3.utils.soliditySha3(
+        {type:"bytes32", value: movesHash},
+        {type:"address", value: from},
+      )
+      assert(movesHashWithRecepient === movesHashWithRecepientFromJS, `movesHashWithRecepients don't match`)
+    })
+    it('claimCloverSecurelyPartTwo should fail without partOne', async () => {
+      let failed = false
+      try {
+        await cloversController.claimCloverSecurelyPartTwo(movesHash, {from})
+      } catch (_) {
+        failed = true
+      }
+      assert(failed, `claimCloverSecurelyPartTwo did not fail when it should have`)
+    })
+    it('claimCloverSecurelyPartOne should work', async () => {
+      await cloversController.claimCloverSecurelyPartOne(movesHashWithRecepient, {from})
+      let movesHashWithRecepientCommit = await cloversController.commits(movesHashWithRecepient)
+      assert(parseInt(movesHashWithRecepientCommit) === 1, `movesHashWithRecepientCommit (${parseInt(movesHashWithRecepientCommit)}) does not equal 1`)
+    })
+    it('claimCloverSecurelyPartTwo should work', async () => {
+      await cloversController.claimCloverSecurelyPartTwo(movesHash, {from})
+      let movesHashCommit = await cloversController.commits(movesHash)
+      assert(movesHashCommit.toLowerCase() === from.toLowerCase(), `movesHashCommit (${movesHashCommit}) does not equal ${from}`)
+    })
+    it('claimCloverWithVerification should fail with keep = false when not from correct committer', async () => {
+      let keep = false
+      let failed = false
+      try {
+        await cloversController.claimCloverWithVerification(moves, keep, {from: notFrom})
+      } catch (_) {
+        failed = true
+      }
+      assert(failed, `claimCloverWithVerification did not fail when not from correct committer`)
+    })
+    it('claimCloverWithVerification should fail with keep = true and not enough CloverCoin', async () => {
+      let keep = true
+      let failed = false
+      try {
+        await cloversController.claimCloverWithVerification(moves, keep, {from})
+      } catch (error) {
+        failed = true
+      }
+      assert(failed, `claimCloverWithVerification didn't fail when CloverCoin balance was too low`)
+    })
+    it('claimCloverWithVerification should work with keep = false', async () => {
+      let keep = false
+      let game = await cloversController.getGame(moves)
+
+      let isValidCloversController = await cloversController.isValid(moves)
+      let isValidReversi = await reversi.isValid(moves)
+      assert(isValidCloversController && isValidReversi, `game is not valid in cloversController ${isValidCloversController} or reversi ${isValidReversi}`)
+
+      let exists = await clovers.exists(game.board)
+      assert(!exists, `board ${game.board} should not exist yet`)
+
+      await cloversController.claimCloverWithVerification(moves, keep, {from})
+      ownerOf = await clovers.ownerOf(tokenId)
+      assert(ownerOf.toLowerCase() === clovers.address.toLowerCase(), `owner of token (${ownerOf}) is not address 'from' (${clovers.address})`)
+    })
   })
+
+  describe('securely claimCloverWithVerification + keep = true',  () => {
+   
+    const {moves, tokenId, symmetries} = randomGame()
+
+    it('claimCloverWithVerification should work with keep = true', async () => {
+      const keep = true
+      const from = accounts[7]
+
+      const movesHash = await cloversController.getMovesHash(moves)
+      const movesHashWithRecepient = await cloversController.getMovesHashWithRecepient(movesHash, from)
+        
+      // let reward
+      // try {
+      //   reward = await cloversController.calculateReward(symmetries.toString(10))
+      // } catch (error) {
+      //   assert(false, 'calculate reward failed')
+      //   return
+      // }
+
+      let costInTokens
+      try {
+        costInTokens = await cloversController.getPrice(symmetries.toString())
+      } catch (error) {
+        console.log(error)
+        assert(false, 'getPrice failed')
+        return
+      }
+
+      let costOfTokens
+      try {
+        costOfTokens = await getLowestPrice(clubTokenController, costInTokens)
+      } catch (error) {
+        console.log(error)
+        assert(false, 'get lowest price failed')
+        return
+      }
+
+      let tryNow
+      try {
+        tryNow = 'claimCloverSecurelyPartOne'
+        await cloversController.claimCloverSecurelyPartOne(movesHashWithRecepient, {from})
+        tryNow = 'claimCloverSecurelyPartTwo'
+        await cloversController.claimCloverSecurelyPartTwo(movesHash, {from})
+        tryNow = 'claimCloverWithVerification'
+        await cloversController.claimCloverWithVerification(moves, keep, {from, value: costOfTokens})
+      } catch (error) {
+        assert(false, `failed on ${tryNow} with ${error}`)
+      }
+      
+      let exists = await clovers.exists(tokenId)
+      assert(exists, `token ${tokenId} doesnt exit yet`)
+          
+      let ownerOf = await clovers.ownerOf(tokenId)
+      assert(ownerOf.toLowerCase() === from.toLowerCase(), `owner of token (${ownerOf}) is not address 'from' (${from})`)
+    })
+  })
+
 
 
   describe('Params and Utils', () => {

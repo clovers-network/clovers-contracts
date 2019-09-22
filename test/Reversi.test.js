@@ -37,8 +37,18 @@ contract('Reversi', async function(accounts) {
       'C4C5C6C3E3B5C2B2A4E2A2B3F5C7C8B6A6B1F3A7B7D6F2G2G3A5B4C1D2A3H2D1F4G5G4F1F6D8H4H3H1E1A1H5G1F7F8E7H6B8D3D7E6G6E8G8G7H7A8A2'
     let valid_emptySquares = 'C4C3C2C5E6F4C6F6G4D6G6E3E2'
 
+    it('should have correct emptyBoard', async () => {
+      // function returnTile (bytes16 board, uint8 col, uint8 row) public pure returns (uint8){
+      let emptyBoard = await reversi.emptyBoard()
+      assert(emptyBoard === '0xfffffffffffffe7ffdbfffffffffffff', `empty board is wrong ${emptyBoard}`)
+      // console.log({emptyBoard})
+      // reversi.returnTile()
+    })
+
     it('should get a game', async function() {
       let game = await reversi.getGame(_realMoves)
+      assert(game.complete && !game.error, `game had an error`)
+      // console.log({game})
     })
 
     it('should get cost to play a game', async function() {

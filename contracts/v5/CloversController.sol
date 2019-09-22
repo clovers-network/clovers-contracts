@@ -23,10 +23,11 @@ contract CloversController is Ownable {
 
     bool public paused;
     address public oracle;
-    address public clovers;
-    address public clubToken;
-    address public clubTokenController;
-    address public simpleCloversMarket;
+    IClovers public clovers;
+    IClubToken public clubToken;
+    IClubTokenController public clubTokenController;
+    ISimpleCloversMarket public simpleCloversMarket;
+    // Reversi public reversi;
 
     uint256 public gasLastUpdated_fastGasPrice_averageGasPrice_safeLowGasPrice;
     uint256 public gasBlockMargin = 240; // ~1 hour at 15 second blocks
@@ -42,18 +43,24 @@ contract CloversController is Ownable {
         _;
     }
 
-    constructor(address _clovers, address _clubToken, address _clubTokenController) public {
+    constructor(
+        IClovers _clovers,
+        IClubToken _clubToken,
+        IClubTokenController _clubTokenController
+        // Reversi _reversi
+    ) public {
         clovers = _clovers;
         clubToken = _clubToken;
         clubTokenController = _clubTokenController;
+        // reversi = _reversi;
         paused = true;
     }
 
-    function getMovesHash(bytes28[2] memory moves) public pure returns (bytes32) {
+    function getMovesHash(bytes28[2] memory moves) public view returns (bytes32) {
         return keccak256(abi.encodePacked(moves));
     }
 
-    function getMovesHashWithRecepient(bytes32 movesHash, address recepient) public pure returns (bytes32) {
+    function getMovesHashWithRecepient(bytes32 movesHash, address recepient) public view returns (bytes32) {
         return keccak256(abi.encodePacked(movesHash, recepient));
     }
 
@@ -62,7 +69,7 @@ contract CloversController is Ownable {
     * @param moves The moves needed to play validate the game.
     * @return A boolean representing whether or not the game is valid.
     */
-    function isValid(bytes28[2] memory moves) public pure returns (bool) {
+    function isValid(bytes28[2] memory moves) public view returns (bool) {
         Reversi.Game memory game = Reversi.playGame(moves);
         return isValidGame(game.error, game.complete);
     }
@@ -73,7 +80,7 @@ contract CloversController is Ownable {
     * @param complete The pre-played game complete boolean
     * @return A boolean representing whether or not the game is valid.
     */
-    function isValidGame(bool error, bool complete) public pure returns (bool) {
+    function isValidGame(bool error, bool complete) public view returns (bool) {
         if (error || !complete) {
             return false;
         } else {
@@ -81,7 +88,7 @@ contract CloversController is Ownable {
         }
     }
 
-    function getGame (bytes28[2] memory moves) public pure returns (bool error, bool complete, bool symmetrical, bytes16 board, uint8 currentPlayer, uint8 moveKey) {
+    function getGame (bytes28[2] memory moves) public view returns (bool error, bool complete, bool symmetrical, bytes16 board, uint8 currentPlayer, uint8 moveKey) {
         // return Reversi.getGame(moves);
         Reversi.Game memory game = Reversi.playGame(moves);
         return (
@@ -111,7 +118,7 @@ contract CloversController is Ownable {
         Y0Sym,
         X0Sym,
         XYSym,
-        XnYSym) = IClovers(clovers).getAllSymmetries();
+        XnYSym) = clovers.getAllSymmetries();
         uint256 base = 0;
         if (symmetries >> 4 & 1 == 1) base = base.add(payMultiplier.mul(Symmetricals + 1).div(RotSym + 1));
         if (symmetries >> 3 & 1 == 1) base = base.add(payMultiplier.mul(Symmetricals + 1).div(Y0Sym + 1));
@@ -133,23 +140,23 @@ contract CloversController is Ownable {
 
     // Once a commit has been made to guarantee the move hash is associated with the recepient we can make a commit on the hash of the moves themselves
     // If we were to make a claim on the moves in plaintext, the transaction could be front run on the claimCloverWithVerification or the claimCloverWithSignature
-    function claimCloverSecurelyPartTwo(bytes32 movesHash, address recepient) public {
-        address commitOfMovesHashWithRecepient = commits[getMovesHashWithRecepient(movesHash, recepient)];
+    function claimCloverSecurelyPartTwo(bytes32 movesHash) public {
+        address commitOfMovesHashWithRecepient = commits[getMovesHashWithRecepient(movesHash, msg.sender)];
         require(
             address(commitOfMovesHashWithRecepient) == address(1),
             "Invalid commitOfMovesHashWithRecepient, please do claimCloverSecurelyPartOne"
         );
-        commits[movesHash] = recepient;
+        commits[movesHash] = msg.sender;
     }
 
-    function claimCloverWithVerification(bytes28[2] memory moves, bool keep) public returns (bool) {
+    function claimCloverWithVerification(bytes28[2] memory moves, bool keep) public payable returns (bool) {
         address committedRecepient = commits[getMovesHash(moves)];
         require(committedRecepient == address(0) || committedRecepient == msg.sender, "Invalid committedRecepient");
 
         Reversi.Game memory game = Reversi.playGame(moves);
         require(isValidGame(game.error, game.complete), "Invalid game");
         uint256 tokenId = convertBytes16ToUint(game.board);
-        require(!IClovers(clovers).exists(tokenId), "Clover already exists");
+        require(!clovers.exists(tokenId), "Clover already exists");
 
         uint256 symmetries = Reversi.returnSymmetricals(game.RotSym, game.Y0Sym, game.X0Sym, game.XYSym, game.XnYSym);
         require(_claimClover(tokenId, moves, symmetries, msg.sender, keep), "Claim must succeed");
@@ -171,43 +178,43 @@ contract CloversController is Ownable {
     function claimCloverWithSignature(uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, bool keep, bytes memory signature) public payable notPaused returns (bool) {
         address committedRecepient = commits[getMovesHash(moves)];
         require(committedRecepient == address(0) || committedRecepient == msg.sender, "Invalid committedRecepient");
-        require(!IClovers(clovers).exists(tokenId), "Clover already exists");
+        require(!clovers.exists(tokenId), "Clover already exists");
         require(checkSignature(tokenId, moves, symmetries, keep, msg.sender, signature, oracle), "Invalid Signature");
         require(_claimClover(tokenId, moves, symmetries, msg.sender, keep), "Claim must succeed");
         return true;
     }
 
     function _claimClover(uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, address recepient, bool keep) internal returns (bool) {
-        IClovers(clovers).setCloverMoves(tokenId, moves);
-        IClovers(clovers).setKeep(tokenId, keep);
+        clovers.setCloverMoves(tokenId, moves);
+        clovers.setKeep(tokenId, keep);
 
         uint256 reward;
         if (symmetries > 0) {
-            IClovers(clovers).setSymmetries(tokenId, symmetries);
+            clovers.setSymmetries(tokenId, symmetries);
             reward = calculateReward(symmetries);
-            IClovers(clovers).setReward(tokenId, reward);
+            clovers.setReward(tokenId, reward);
         }
         uint256 price = basePrice.add(reward);
         if (keep && price > 0) {
             // If the user decides to keep the Clover, they must
             // pay for it in club tokens according to the reward price.
-            if (IClubToken(clubToken).balanceOf(msg.sender) < price) {
-                IClubTokenController(clubTokenController).buy.value(msg.value)(msg.sender);
+            if (clubToken.balanceOf(msg.sender) < price) {
+                clubTokenController.buy.value(msg.value)(msg.sender);
             }
-            IClubToken(clubToken).burn(msg.sender, price);
+            clubToken.burn(msg.sender, price);
         }
 
         if (keep) {
             // If the user decided to keep the Clover
-            IClovers(clovers).mint(recepient, tokenId);
+            clovers.mint(recepient, tokenId);
         } else {
             // If the user decided not to keep the Clover, they will
             // receive the reward price in club tokens, and the clover will
             // go for sale by the contract.
-            IClovers(clovers).mint(clovers, tokenId);
-            ISimpleCloversMarket(simpleCloversMarket).sell(tokenId, basePrice.add(reward.mul(priceMultiplier)));
+            clovers.mint(address(clovers), tokenId);
+            simpleCloversMarket.sell(tokenId, basePrice.add(reward.mul(priceMultiplier)));
             if (reward > 0) {
-                require(IClubToken(clubToken).mint(recepient, reward), "mint must succeed");
+                require(clubToken.mint(recepient, reward), "mint must succeed");
             }
         }
         emit cloverClaimed(tokenId, moves, msg.sender, recepient, reward, symmetries, keep);
@@ -233,9 +240,9 @@ contract CloversController is Ownable {
     * @return A boolean representing whether or not the challenge was successful.
     */
     function challengeClover(uint256 tokenId) public returns (bool) {
-        require(IClovers(clovers).exists(tokenId), "Clover must exist to be challenged");
+        require(clovers.exists(tokenId), "Clover must exist to be challenged");
         bool valid = true;
-        bytes28[2] memory moves = IClovers(clovers).getCloverMoves(tokenId);
+        bytes28[2] memory moves = clovers.getCloverMoves(tokenId);
         address payable _owner = address(uint160(owner()));
         if (msg.sender != _owner && msg.sender != oracle) {
             Reversi.Game memory game = Reversi.playGame(moves);
@@ -243,7 +250,7 @@ contract CloversController is Ownable {
                 valid = false;
             }
             if(valid && isValidGame(game.error, game.complete)) {
-                uint256 symmetries = IClovers(clovers).getSymmetries(tokenId);
+                uint256 symmetries = clovers.getSymmetries(tokenId);
                 valid = (symmetries >> 4 & 1) > 0 == game.RotSym ? valid : false;
                 valid = (symmetries >> 3 & 1) > 0 == game.Y0Sym ? valid : false;
                 valid = (symmetries >> 2 & 1) > 0 == game.X0Sym ? valid : false;
@@ -256,14 +263,14 @@ contract CloversController is Ownable {
         }
 
         removeSymmetries(tokenId);
-        address committer = IClovers(clovers).ownerOf(tokenId);
+        address committer = clovers.ownerOf(tokenId);
         emit cloverChallenged(tokenId, moves, committer, msg.sender);
-        IClovers(clovers).deleteClover(tokenId);
+        clovers.deleteClover(tokenId);
         return true;
     }
 
     function updateSalePrice(uint256 tokenId, uint256 _price) public onlyOwner {
-        ISimpleCloversMarket(simpleCloversMarket).sell(tokenId, _price);
+        simpleCloversMarket.sell(tokenId, _price);
     }
 
     /**
@@ -274,8 +281,8 @@ contract CloversController is Ownable {
     * @param tokenId The Clover
     */
     function transferFrom(address _from, address _to, uint256 tokenId) public {
-        require(msg.sender == simpleCloversMarket, "transferFrom can only be done by simpleCloversMarket");
-        IClovers(clovers).transferFrom(_from, _to, tokenId);
+        require(msg.sender == address(simpleCloversMarket), "transferFrom can only be done by simpleCloversMarket");
+        clovers.transferFrom(_from, _to, tokenId);
     }
 
     /**
@@ -298,7 +305,7 @@ contract CloversController is Ownable {
     * @dev Updates simpleCloversMarket Address.
     * @param _simpleCloversMarket The new simpleCloversMarket address.
     */
-    function updateSimpleCloversMarket(address _simpleCloversMarket) public onlyOwner {
+    function updateSimpleCloversMarket(ISimpleCloversMarket _simpleCloversMarket) public onlyOwner {
         simpleCloversMarket = _simpleCloversMarket;
     }
 
@@ -306,7 +313,7 @@ contract CloversController is Ownable {
     * @dev Updates clubTokenController Address.
     * @param _clubTokenController The new clubTokenController address.
     */
-    function updateClubTokenController(address _clubTokenController) public onlyOwner {
+    function updateClubTokenController(IClubTokenController _clubTokenController) public onlyOwner {
         clubTokenController = _clubTokenController;
     }
     /**
@@ -347,15 +354,15 @@ contract CloversController is Ownable {
         Y0Sym,
         X0Sym,
         XYSym,
-        XnYSym) = IClovers(clovers).getAllSymmetries();
-        uint256 symmetries = IClovers(clovers).getSymmetries(tokenId);
+        XnYSym) = clovers.getAllSymmetries();
+        uint256 symmetries = clovers.getSymmetries(tokenId);
         Symmetricals = Symmetricals.add(symmetries > 0 ? 1 : 0);
         RotSym = RotSym.add(uint256(symmetries >> 4 & 1));
         Y0Sym = Y0Sym.add(uint256(symmetries >> 3 & 1));
         X0Sym = X0Sym.add(uint256(symmetries >> 2 & 1));
         XYSym = XYSym.add(uint256(symmetries >> 1 & 1));
         XnYSym = XnYSym.add(uint256(symmetries & 1));
-        IClovers(clovers).setAllSymmetries(Symmetricals, RotSym, Y0Sym, X0Sym, XYSym, XnYSym);
+        clovers.setAllSymmetries(Symmetricals, RotSym, Y0Sym, X0Sym, XYSym, XnYSym);
     }
     /**
     * @dev Remove false tallys of the totals numbers of clover symmetries.
@@ -373,15 +380,15 @@ contract CloversController is Ownable {
         Y0Sym,
         X0Sym,
         XYSym,
-        XnYSym) = IClovers(clovers).getAllSymmetries();
-        uint256 symmetries = IClovers(clovers).getSymmetries(tokenId);
+        XnYSym) = clovers.getAllSymmetries();
+        uint256 symmetries = clovers.getSymmetries(tokenId);
         Symmetricals = Symmetricals.sub(symmetries > 0 ? 1 : 0);
         RotSym = RotSym.sub(uint256(symmetries >> 4 & 1));
         Y0Sym = Y0Sym.sub(uint256(symmetries >> 3 & 1));
         X0Sym = X0Sym.sub(uint256(symmetries >> 2 & 1));
         XYSym = XYSym.sub(uint256(symmetries >> 1 & 1));
         XnYSym = XnYSym.sub(uint256(symmetries & 1));
-        IClovers(clovers).setAllSymmetries(Symmetricals, RotSym, Y0Sym, X0Sym, XYSym, XnYSym);
+        clovers.setAllSymmetries(Symmetricals, RotSym, Y0Sym, X0Sym, XYSym, XnYSym);
     }
 
     function checkSignature(

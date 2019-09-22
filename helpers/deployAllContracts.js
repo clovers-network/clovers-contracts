@@ -120,8 +120,8 @@ async function deployAllContracts({overwrites, accounts, artifacts, web3, chainI
 
             let network = await CloversController.detectNetwork()
             await CloversController.setNetwork(network)
-            await CloversController.link(`\\$5b17bcb97970e1ce5ed9096dcff7f451d7\\$`, reversi.address)
-            // await CloversController.link('IReversi', reversi.address)
+            await CloversController.link(`\\$b2fca45de5ef9c5a18731e56fbc51add96\\$`, reversi.address)
+            // await CloversController.link('Reversi', reversi.address)
 
             // -w Clovers address
             // -w ClubToken address

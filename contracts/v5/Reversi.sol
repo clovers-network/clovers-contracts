@@ -40,7 +40,15 @@ library Reversi {
         }
     }
 
-    function getGame (bytes28[2] memory moves) public pure returns (bool error, bool complete, bool symmetrical, bytes16 board, uint8 currentPlayer, uint8 moveKey) {
+    function getGame (bytes28[2] memory moves) public pure returns (
+        bool error,
+        bool complete,
+        bool symmetrical,
+        bytes16 board,
+        uint8 currentPlayer,
+        uint8 moveKey
+    // , string memory msg
+    ) {
       Game memory game = playGame(moves);
         return (
             game.error,
@@ -49,12 +57,18 @@ library Reversi {
             game.board,
             game.currentPlayer,
             game.moveKey
-            // game.msg
+            // , game.msg
         );
     }
 
     function showColors () public pure returns(uint8, uint8, uint8) {
         return (EMPTY, BLACK, WHITE);
+    }
+
+    function emptyBoard() public pure returns (bytes16) {
+        uint256 emptyBoard = 340282366920938456379662753540715053055;
+        // game.board = bytes16(10625432672847758622720); // completely empty board
+        return bytes16(uint128(emptyBoard)); // empty board except for center pieces
     }
 
     function playGame (bytes28[2] memory moves) internal pure returns (Game memory)  {
@@ -70,9 +84,7 @@ library Reversi {
         game.complete = false;
         game.currentPlayer = BLACK;
 
-
-        // game.board = bytes16(10625432672847758622720); // completely empty board
-        game.board = bytes16(bytes32(340282366920938456379662753540715053055)); // empty board except for center pieces
+        game.board = emptyBoard();
 
         bool skip;
         uint8 move;
@@ -381,24 +393,24 @@ library Reversi {
 
     function returnBytes (bytes16 board, uint8 col, uint8 row) internal pure returns (bytes16) {
         uint128 push = posToPush(col, row);
-        return (board >> push) & bytes16(3);
+        return (board >> push) & bytes16(uint128(3));
     }
 
     function turnTile (bytes16 board, uint8 color, uint8 col, uint8 row) internal pure returns (bytes16){
         if (col > 7) revert();
         if (row > 7) revert();
         uint128 push = posToPush(col, row);
-        bytes16 mask = bytes16(3) << push;// 0b00000011 (ones)
+        bytes16 mask = bytes16(uint128(3)) << push;// 0b00000011 (ones)
 
         board = ((board ^ mask) & board);
 
-        return board | (bytes16(color) << push);
+        return board | (bytes16(uint128(color)) << push);
     }
 
-    function returnTile (bytes16 board, uint8 col, uint8 row) internal pure returns (uint8){
+    function returnTile (bytes16 board, uint8 col, uint8 row) public pure returns (uint8){
         uint128 push = posToPush(col, row);
-        bytes16 tile = (board >> push ) & bytes16(3);
-        return uint8(tile); // returns 2
+        bytes16 tile = (board >> push ) & bytes16(uint128(3));
+        return uint8(uint128(tile)); // returns 2
     }
 
     function posToPush (uint8 col, uint8 row) internal pure returns (uint128){
@@ -406,13 +418,14 @@ library Reversi {
     }
 
     function readMove (bytes28 moveSequence, uint8 moveKey, uint8 movesLength) public pure returns(uint8) {
-        bytes28 mask = bytes28(127);
+        bytes28 mask = bytes28(uint224(127));
         uint8 push = (movesLength * 7) - (moveKey * 7) - 7;
-        return uint8((moveSequence >> push) & mask);
+        return uint8(uint224((moveSequence >> push) & mask));
     }
 
     function addMove (bytes28 moveSequence, uint8 movesLength, uint8 col, uint8 row) internal pure returns (bytes28, uint8) {
-        bytes28 move = bytes28(col + (row * 8) + 64);
+        uint256 foo = col + (row * 8) + 64;
+        bytes28 move = bytes28(uint224(foo));
         moveSequence = moveSequence << 7;
         moveSequence = moveSequence | move;
         movesLength++;
