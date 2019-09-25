@@ -56,11 +56,11 @@ contract CloversController is Ownable {
         paused = true;
     }
 
-    function getMovesHash(bytes28[2] memory moves) public view returns (bytes32) {
+    function getMovesHash(bytes28[2] memory moves) public pure returns (bytes32) {
         return keccak256(abi.encodePacked(moves));
     }
 
-    function getMovesHashWithRecepient(bytes32 movesHash, address recepient) public view returns (bytes32) {
+    function getMovesHashWithRecepient(bytes32 movesHash, address recepient) public pure returns (bytes32) {
         return keccak256(abi.encodePacked(movesHash, recepient));
     }
 
@@ -69,7 +69,7 @@ contract CloversController is Ownable {
     * @param moves The moves needed to play validate the game.
     * @return A boolean representing whether or not the game is valid.
     */
-    function isValid(bytes28[2] memory moves) public view returns (bool) {
+    function isValid(bytes28[2] memory moves) public pure returns (bool) {
         Reversi.Game memory game = Reversi.playGame(moves);
         return isValidGame(game.error, game.complete);
     }
@@ -80,7 +80,7 @@ contract CloversController is Ownable {
     * @param complete The pre-played game complete boolean
     * @return A boolean representing whether or not the game is valid.
     */
-    function isValidGame(bool error, bool complete) public view returns (bool) {
+    function isValidGame(bool error, bool complete) public pure returns (bool) {
         if (error || !complete) {
             return false;
         } else {
@@ -88,7 +88,7 @@ contract CloversController is Ownable {
         }
     }
 
-    function getGame (bytes28[2] memory moves) public view returns (bool error, bool complete, bool symmetrical, bytes16 board, uint8 currentPlayer, uint8 moveKey) {
+    function getGame (bytes28[2] memory moves) public pure returns (bool error, bool complete, bool symmetrical, bytes16 board, uint8 currentPlayer, uint8 moveKey) {
         // return Reversi.getGame(moves);
         Reversi.Game memory game = Reversi.playGame(moves);
         return (

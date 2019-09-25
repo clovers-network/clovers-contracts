@@ -66,9 +66,8 @@ library Reversi {
     }
 
     function emptyBoard() public pure returns (bytes16) {
-        uint256 emptyBoard = 340282366920938456379662753540715053055;
         // game.board = bytes16(10625432672847758622720); // completely empty board
-        return bytes16(uint128(emptyBoard)); // empty board except for center pieces
+        return bytes16(uint128(340282366920938456379662753540715053055)); // empty board except for center pieces
     }
 
     function playGame (bytes28[2] memory moves) internal pure returns (Game memory)  {
@@ -132,7 +131,22 @@ library Reversi {
     }
 
     function validMoveRemains (Game memory game) internal pure returns (bool) {
-
+        bool validMovesRemain = false;
+        bytes16 board = game.board;
+        uint8 i;
+        for (i = 0; i < 64 && !validMovesRemain; i++) {
+            uint8[2] memory move = [((i - (i % 8)) / 8), (i % 8)];
+            uint8 tile = returnTile(game.board, move[0], move[1]);
+            if (tile == EMPTY) {
+                game.error = false;
+                game.board = board;
+                game = makeMove(game, move[0], move[1]);
+                if (!game.error) {
+                    validMovesRemain = true;
+                }
+            }
+        }
+        return validMovesRemain;
     }
 
     function makeMove (Game memory game, uint8 col, uint8 row) internal pure returns (Game memory)  {
@@ -288,7 +302,6 @@ library Reversi {
     }
 
     function isComplete (Game memory game) internal pure returns (Game memory) {
-
         if (game.moveKey == 60) {
             // game.msg = "good game";
             game.complete = true;
@@ -298,11 +311,9 @@ library Reversi {
             bool validMovesRemains = false;
             bytes16 board = game.board;
             for (i = 0; i < 64 && !validMovesRemains; i++) {
-                uint8[2] memory move;
-                uint8 tile = returnTile(game.board, ((i - (i % 8)) / 8), (i % 8));
+                uint8[2] memory move = [((i - (i % 8)) / 8), (i % 8)];
+                uint8 tile = returnTile(game.board, move[0], move[1]);
                 if (tile == EMPTY) {
-                    move = [((i - (i % 8)) / 8), (i % 8)];
-
                     game.currentPlayer = BLACK;
                     game.error = false;
                     game.board = board;
@@ -319,7 +330,6 @@ library Reversi {
                     }
                 }
             }
-            game.board = board;
             if (validMovesRemains) {
                 game.error = true;
                 // game.msg = "Invalid Game (moves still available)";
@@ -378,7 +388,7 @@ library Reversi {
 
     // Utilities
 
-    function returnSymmetricals (bool RotSym, bool Y0Sym, bool X0Sym, bool XYSym, bool XnYSym) public view returns (uint256) {
+    function returnSymmetricals (bool RotSym, bool Y0Sym, bool X0Sym, bool XYSym, bool XnYSym) public pure returns (uint256) {
         uint256 symmetries = (RotSym ? 1  : 0) << 1;
         symmetries = (symmetries & (Y0Sym ? 1 : 0)) << 1;
         symmetries = (symmetries & (X0Sym ? 1 : 0)) << 1;
