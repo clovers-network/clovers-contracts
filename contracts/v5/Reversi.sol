@@ -107,27 +107,32 @@ library Reversi {
                 game = makeMove(game, col, row);
                 game.moveKey = game.moveKey + 1;
                 if (game.error) {
-                    game.error = false;
-                    // maybe player has no valid moves and must pass
-                    if (game.currentPlayer == BLACK) {
-                        game.currentPlayer = WHITE;
-                    } else {
-                        game.currentPlayer = BLACK;
-                    }
-                    game = makeMove(game, col, row);
-                    if (game.error) {
-                        game.error = true;
-                        skip = true;
+                    if (!validMoveRemains(game)) {
+                        // player has no valid moves and must pass
+                        game.error = false;
+                        if (game.currentPlayer == BLACK) {
+                            game.currentPlayer = WHITE;
+                        } else {
+                            game.currentPlayer = BLACK;
+                        }
+                        game = makeMove(game, col, row);
+                        if (game.error) {
+                            game.error = true;
+                            skip = true;
+                        }
                     }
                 }
             }
         }
         if (!game.error) {
-            game.error = false;
             game = isComplete(game);
             game = isSymmetrical(game);
         }
         return game;
+    }
+
+    function validMoveRemains (Game memory game) internal pure returns (bool) {
+
     }
 
     function makeMove (Game memory game, uint8 col, uint8 row) internal pure returns (Game memory)  {
@@ -289,22 +294,14 @@ library Reversi {
             game.complete = true;
             return game;
         } else {
-            uint8[2][60] memory empties;
-            uint8 emptiesLength = 0;
             uint8 i;
-            for (i = 0; i < 64; i++) {
+            bool validMovesRemains = false;
+            bytes16 board = game.board;
+            for (i = 0; i < 64 && !validMovesRemains; i++) {
+                uint8[2] memory move;
                 uint8 tile = returnTile(game.board, ((i - (i % 8)) / 8), (i % 8));
                 if (tile == EMPTY) {
-                    empties[emptiesLength] = [((i - (i % 8)) / 8), (i % 8)];
-                    emptiesLength++;
-                }
-            }
-            bool validMovesRemains = false;
-            if (emptiesLength > 0) {
-                bytes16 board = game.board;
-                uint8[2] memory move;
-                for (i = 0; i < emptiesLength && !validMovesRemains; i++) {
-                    move = empties[i];
+                    move = [((i - (i % 8)) / 8), (i % 8)];
 
                     game.currentPlayer = BLACK;
                     game.error = false;
@@ -321,8 +318,8 @@ library Reversi {
                         validMovesRemains = true;
                     }
                 }
-                game.board = board;
             }
+            game.board = board;
             if (validMovesRemains) {
                 game.error = true;
                 // game.msg = "Invalid Game (moves still available)";
@@ -442,6 +439,5 @@ library Reversi {
         uint8 row = (move - col) / 8;
         return (col, row);
     }
-
 
 }
