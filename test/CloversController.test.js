@@ -78,71 +78,144 @@ contract('CloversController.sol', async function(accounts) {
     '0xbb9af45dbeefd78f120678dd7ef4dfe69f3d9bbe7eeddfc7f0000000'
   ]
 
+  const _tokenId2 = '0x55555555596556955695596555555555'
+  const _moves2 = [
+    '0xb58b561d7532f1e59aef3970a6d1cfb7d55b34a25febe7c53e9bf4e8',
+    '0xb1b257cc10f841fb2287b8116b49dd1af768ffbbd7ff3274f0000000'
+  ]
+
   describe('Signing Methods', async () => {
 
     let reversi = new Rev()
     reversi.playGameByteMoves(..._moves)
 
-    const keep = false
+    const keep1 = false
+    const keep = keep1
     const recepient = accounts[0]
-    const tokenId = `0x${reversi.byteBoard}`
-    const moves = _moves
-    const symmetries = reversi.returnSymmetriesAsBN().toString(10)
-    let signature
+    const symmetricalTokenId1 = `0x${reversi.byteBoard}`
+    const symmetricalMoves1 = _moves
+    const symmetricalSymmetries1 = reversi.returnSymmetriesAsBN().toString(10)
+    let signature1
 
-    const hashedMsg = web3.utils.soliditySha3(
-      {type: "uint256", value: tokenId},
-      {type:"bytes28[2]", value: moves},
-      {type:"uint256", value: symmetries},
-      {type:"bool", value: keep},
+    const hashedMsg1 = web3.utils.soliditySha3(
+      {type: "uint256", value: symmetricalTokenId1},
+      {type:"bytes28[2]", value: symmetricalMoves1},
+      {type:"uint256", value: symmetricalSymmetries1},
+      {type:"bool", value: keep1},
+      {type:"address", value: recepient}
+    )
+
+
+    const keep2 = true
+    reversi = new Rev()
+    reversi.playGameByteMoves(..._moves2)
+
+    const symmetricalTokenId2= `0x${reversi.byteBoard}`
+    const symmetricalMoves2= _moves2
+    const symmetricalSymmetries2= reversi.returnSymmetriesAsBN().toString(10)
+    let signature2
+
+    const hashedMsg2= web3.utils.soliditySha3(
+      {type: "uint256", value: symmetricalTokenId2},
+      {type:"bytes28[2]", value: symmetricalMoves2},
+      {type:"uint256", value: symmetricalSymmetries2},
+      {type:"bool", value: keep2},
       {type:"address", value: recepient}
     )
 
     it('getHash should work', async () => {
       //    function getHash(uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, bool keep, address recepient) public pure returns (bytes32) {
       const contractHashedMsg = await cloversController.getHash(
-        tokenId,
-        moves,
-        symmetries,
-        keep,
+        symmetricalTokenId1,
+        symmetricalMoves1,
+        symmetricalSymmetries1,
+        keep1,
         recepient
       )
-      assert(contractHashedMsg === hashedMsg, "Hashed messages didn't match")
+      assert(contractHashedMsg === hashedMsg1, "Hashed messages didn't match")
     })
     it('recover should work', async () => {
-      signature = fixSignature(await web3.eth.sign(hashedMsg, oracle));
-      const jsHashWithPrefix = toEthSignedMessageHash(hashedMsg)
+      signature1 = fixSignature(await web3.eth.sign(hashedMsg1, oracle));
+      const jsHashWithPrefix = toEthSignedMessageHash(hashedMsg1)
 
       // Recover the signer address from the generated message and signature.
       let result = await cloversController.recover(
         jsHashWithPrefix,
-        signature
+        signature1
       )
       assert(result.toLowerCase() === oracle.toLowerCase(), "Signatures don't match")
     })
     it('checkSignature should work', async () => {
       const validClaim = await cloversController.checkSignature(
-        tokenId,
-        moves,
-        symmetries,
-        keep,
+        symmetricalTokenId1,
+        symmetricalMoves1,
+        symmetricalSymmetries1,
+        keep1,
         recepient,
-        signature,
+        signature1,
         oracle
       )
       assert(validClaim, "checkSignature() returned false")
     })
-    it('claimCloverWithSignature should work', async () => {
+    it('oracle addresses should match', async () => {
       const _oracle = await cloversController.oracle()
       assert(_oracle.toLowerCase() === oracle.toLowerCase(), "oracles don't match")
+    })
+    it('claimCloverWithSignature should work with symmetrical clover & keep = false', async () => {
+      var tx = await cloversController.claimCloverWithSignature(
+        symmetricalTokenId1,
+        symmetricalMoves1,
+        symmetricalSymmetries1,
+        keep1,
+        signature1
+      )
+      console.log(_ + 'cloversController.claimCloverWithSignature: ' + tx.receipt.cumulativeGasUsed)
+      gasToCash(tx.receipt.cumulativeGasUsed)
+      assert(tx.receipt.status, "tx.receipt.status wasn't true")
+    })
+
+    it('claimCloverWithSignature should work with symmetrical clover, keep = true & buy tokens during', async () => {
+      signature2 = fixSignature(await web3.eth.sign(hashedMsg2, oracle));
+
+      let reward
+      try {
+        reward = await cloversController.calculateReward(symmetricalSymmetries2.toString(10))
+      } catch (error) {
+        console.log({error})
+        assert(false, 'calculate reward failed')
+        return
+      }
+
+      let costInTokens
+      try {
+        costInTokens = await cloversController.getPrice(symmetricalSymmetries2.toString())
+      } catch (error) {
+        console.log(error)
+        assert(false, 'costInTokens2 reward failed')
+        return
+      }
+
+      let costOfTokens
+      try {
+        costOfTokens = await getLowestPrice(clubTokenController, costInTokens)
+      } catch (error) {
+        assert(false, 'get lowest price failed')
+        console.log(error)
+        return
+      }
 
       var tx = await cloversController.claimCloverWithSignature(
-        tokenId,
-        moves,
-        symmetries,
-        keep,
-        signature
+        symmetricalTokenId2,
+        symmetricalMoves2,
+        symmetricalSymmetries2,
+        keep2,
+        signature2,
+        {
+          value: costOfTokens
+        }
       )
+      console.log(_ + 'cloversController.claimCloverWithSignature: ' + tx.receipt.cumulativeGasUsed)
+      gasToCash(tx.receipt.cumulativeGasUsed)
       assert(tx.receipt.status, "tx.receipt.status wasn't true")
     })
   })
@@ -179,12 +252,16 @@ contract('CloversController.sol', async function(accounts) {
       assert(failed, `claimCloverSecurelyPartTwo did not fail when it should have`)
     })
     it('claimCloverSecurelyPartOne should work', async () => {
-      await cloversController.claimCloverSecurelyPartOne(movesHashWithRecepient, {from})
+      var tx = await cloversController.claimCloverSecurelyPartOne(movesHashWithRecepient, {from})
+      console.log(_ + 'cloversController.claimCloverSecurelyPartOne: ' + tx.receipt.cumulativeGasUsed)
+      gasToCash(tx.receipt.cumulativeGasUsed)
       let movesHashWithRecepientCommit = await cloversController.commits(movesHashWithRecepient)
       assert(parseInt(movesHashWithRecepientCommit) === 1, `movesHashWithRecepientCommit (${parseInt(movesHashWithRecepientCommit)}) does not equal 1`)
     })
     it('claimCloverSecurelyPartTwo should work', async () => {
-      await cloversController.claimCloverSecurelyPartTwo(movesHash, {from})
+      var tx = await cloversController.claimCloverSecurelyPartTwo(movesHash, {from})
+      console.log(_ + 'cloversController.claimCloverSecurelyPartTwo: ' + tx.receipt.cumulativeGasUsed)
+      gasToCash(tx.receipt.cumulativeGasUsed)
       let movesHashCommit = await cloversController.commits(movesHash)
       assert(movesHashCommit.toLowerCase() === from.toLowerCase(), `movesHashCommit (${movesHashCommit}) does not equal ${from}`)
     })
@@ -192,7 +269,7 @@ contract('CloversController.sol', async function(accounts) {
       let keep = false
       let failed = false
       try {
-        await cloversController.claimCloverWithVerification(moves, keep, {from: notFrom})
+        var tx = await cloversController.claimCloverWithVerification(moves, keep, {from: notFrom})
       } catch (_) {
         failed = true
       }
@@ -219,7 +296,9 @@ contract('CloversController.sol', async function(accounts) {
       let exists = await clovers.exists(game.board)
       assert(!exists, `board ${game.board} should not exist yet`)
 
-      await cloversController.claimCloverWithVerification(moves, keep, {from})
+      var tx = await cloversController.claimCloverWithVerification(moves, keep, {from})
+      console.log(_ + 'cloversController.claimCloverWithVerification: ' + tx.receipt.cumulativeGasUsed)
+      gasToCash(tx.receipt.cumulativeGasUsed)
       ownerOf = await clovers.ownerOf(tokenId)
       assert(ownerOf.toLowerCase() === clovers.address.toLowerCase(), `owner of token (${ownerOf}) is not address 'from' (${clovers.address})`)
     })
@@ -265,11 +344,19 @@ contract('CloversController.sol', async function(accounts) {
       let tryNow
       try {
         tryNow = 'claimCloverSecurelyPartOne'
-        await cloversController.claimCloverSecurelyPartOne(movesHashWithRecepient, {from})
+        var tx = await cloversController.claimCloverSecurelyPartOne(movesHashWithRecepient, {from})
+        console.log(_ + 'cloversController.claimCloverSecurelyPartOne: ' + tx.receipt.cumulativeGasUsed)
+        gasToCash(tx.receipt.cumulativeGasUsed)
+
         tryNow = 'claimCloverSecurelyPartTwo'
-        await cloversController.claimCloverSecurelyPartTwo(movesHash, {from})
+        tx = await cloversController.claimCloverSecurelyPartTwo(movesHash, {from})
+        console.log(_ + 'cloversController.claimCloverSecurelyPartTwo: ' + tx.receipt.cumulativeGasUsed)
+        gasToCash(tx.receipt.cumulativeGasUsed)
+
         tryNow = 'claimCloverWithVerification'
-        await cloversController.claimCloverWithVerification(moves, keep, {from, value: costOfTokens})
+        tx = await cloversController.claimCloverWithVerification(moves, keep, {from, value: costOfTokens})
+        console.log(_ + 'cloversController.claimCloverWithVerification: ' + tx.receipt.cumulativeGasUsed)
+        gasToCash(tx.receipt.cumulativeGasUsed)
       } catch (error) {
         assert(false, `failed on ${tryNow} with ${error}`)
       }
@@ -312,6 +399,9 @@ contract('CloversController.sol', async function(accounts) {
       assert(_basePrice.toString() === basePrice, 'basePrice not equal')
     })
   })
+})
+
+
 
   // async function makeFullClaim({ user, buyClubToken }) {
   //   let rev = new Rev()
@@ -405,4 +495,3 @@ contract('CloversController.sol', async function(accounts) {
   //   }
   //   // retrieveStake
   // }
-})

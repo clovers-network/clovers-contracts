@@ -136,21 +136,26 @@ contract CloversController is Ownable {
     // In order to use the same commit mapping, we mark this hash simply as address(1) so it is no longer the equivalent of address(0)
     function claimCloverSecurelyPartOne(bytes32 movesHashWithRecepient) public {
         commits[movesHashWithRecepient] = address(1);
+        commits[keccak256(abi.encodePacked(msg.sender))] = address(block.number);
     }
 
     // Once a commit has been made to guarantee the move hash is associated with the recepient we can make a commit on the hash of the moves themselves
     // If we were to make a claim on the moves in plaintext, the transaction could be front run on the claimCloverWithVerification or the claimCloverWithSignature
     function claimCloverSecurelyPartTwo(bytes32 movesHash) public {
-        address commitOfMovesHashWithRecepient = commits[getMovesHashWithRecepient(movesHash, msg.sender)];
+        require(uint256(commits[keccak256(abi.encodePacked(msg.sender))]) < block.number, "Can't combine step1 with step2");
+        bytes32 commitHash = getMovesHashWithRecepient(movesHash, msg.sender);
+        address commitOfMovesHashWithRecepient = commits[commitHash];
         require(
             address(commitOfMovesHashWithRecepient) == address(1),
             "Invalid commitOfMovesHashWithRecepient, please do claimCloverSecurelyPartOne"
         );
+        delete(commits[commitHash]);
         commits[movesHash] = msg.sender;
     }
 
     function claimCloverWithVerification(bytes28[2] memory moves, bool keep) public payable returns (bool) {
-        address committedRecepient = commits[getMovesHash(moves)];
+        bytes32 movesHash = getMovesHash(moves);
+        address committedRecepient = commits[movesHash];
         require(committedRecepient == address(0) || committedRecepient == msg.sender, "Invalid committedRecepient");
 
         Reversi.Game memory game = Reversi.playGame(moves);
@@ -160,6 +165,7 @@ contract CloversController is Ownable {
 
         uint256 symmetries = Reversi.returnSymmetricals(game.RotSym, game.Y0Sym, game.X0Sym, game.XYSym, game.XnYSym);
         require(_claimClover(tokenId, moves, symmetries, msg.sender, keep), "Claim must succeed");
+        delete(commits[movesHash]);
         return true;
     }
 
