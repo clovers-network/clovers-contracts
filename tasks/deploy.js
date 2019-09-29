@@ -31,14 +31,14 @@ task("deploy", "Deploys contracts")
         simpleCloversMarket, 
         clubToken
     } = await deployAllContracts({overwrites, accounts, artifacts, web3, chainId})
-    saveNetworks([reversi, 
+    await saveNetworks([reversi, 
         clovers, 
         cloversMetadata, 
         cloversController, 
         clubTokenController, 
         simpleCloversMarket, 
         clubToken])
-    extractNetworks(confFile).catch(console.error)
+    await extractNetworks(confFile)
  });
 
  function saveNetworks(contractArray) {
