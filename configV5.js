@@ -29,6 +29,6 @@ module.exports = {
     sources: "./contracts/v5",
     tests: "./tests", 
     cache: "./cache",
-    artifacts: "./build/contracts/"
+    artifacts: "./artifacts"
   }
 };

@@ -18,6 +18,6 @@ module.exports = {
   
     paths: {
       sources: "./contracts/v4",
-      artifacts: "./build/contracts/"
+      artifacts: "./artifacts"
     },
   };

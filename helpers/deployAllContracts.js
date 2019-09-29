@@ -40,7 +40,7 @@ async function deployAllContracts({overwrites, accounts, artifacts, web3, chainI
     tx
 
     function alreadyDeployed(contractName) {
-        return networks[contractName] && networks[chainId] && networks[chainId].address
+        return networks && networks[contractName] && networks[chainId] && networks[chainId].address
     }
 
     try {
@@ -119,7 +119,7 @@ async function deployAllContracts({overwrites, accounts, artifacts, web3, chainI
             // CloversController.network.links["__5b17bcb97970e1ce5ed9096dcff7f451d7_+"] = reversi.address;
 
             let network = await CloversController.detectNetwork()
-            await CloversController.setNetwork(network)
+            await CloversController.setNetwork(network.id)
             await CloversController.link(`\\$b2fca45de5ef9c5a18731e56fbc51add96\\$`, reversi.address)
             // await CloversController.link('Reversi', reversi.address)
 

@@ -1,6 +1,13 @@
 usePlugin("@nomiclabs/buidler-truffle5");
-var networks =require('../networks.json')
-var deployAllContracts = require('../helpers/deployAllContracts')
+const Artifactor = require("@truffle/artifactor");
+// var networks = require('../networks.json')
+var {deployAllContracts} = require('../helpers/deployAllContracts')
+const extractNetworks = require('@gnosis.pm/util-contracts/src/util/extractNetworks')
+const path = require('path')
+
+const confFile = path.join(__dirname, '../conf/network-restore')
+const artifactor = new Artifactor(confFile.buildDir);
+
 const overwrites = {
     Reversi: false,
     Support: false,
@@ -23,5 +30,27 @@ task("deploy", "Deploys contracts")
         clubTokenController, 
         simpleCloversMarket, 
         clubToken
-    } = await deployAllContracts({overwrites, accounts, artifacts, web3, chainId, networks})
+    } = await deployAllContracts({overwrites, accounts, artifacts, web3, chainId})
+    saveNetworks([reversi, 
+        clovers, 
+        cloversMetadata, 
+        cloversController, 
+        clubTokenController, 
+        simpleCloversMarket, 
+        clubToken])
+    extractNetworks(confFile).catch(console.error)
  });
+
+ function saveNetworks(contractArray) {
+    artifactor.saveAll(contractArray.reduce((result, item) => {
+        let networkId = item.constructor.network_id
+        let json = item.constructor._json
+        if (!json.networks[networkId]) {
+            json.networks[networkId] = {}
+        }
+        json.networks[networkId].address = item.address
+        json.networks[networkId].transactionHash = item.transactionHash
+        result[json.contractName] = json
+        return result
+    }, {}))
+ }
