@@ -7,9 +7,9 @@ const path = require('path')
 const confFile = path.join(__dirname, '../conf/network-restore')
 const conf = require(confFile)
 const artifactor = new Artifactor(conf.buildPath);
-const verbose = true
-const overwrites = {
-    Reversi: true,
+
+let overwrites = {
+    Reversi: false,
     Support: false,
     Clovers: false,
     CloversMetadata: false,
@@ -19,7 +19,15 @@ const overwrites = {
     ClubToken: false
 }
 task("deploy", "Deploys contracts")
- .setAction(async (taskArgs, env) => {
+.addFlag("v", "Add verbose output to the command", false)
+.addOptionalVariadicPositionalParam("overwrite", "Just list the contract names you'd like to overwrite", [])
+.setAction(async ({ overwrite, v }, env) => {
+    const verbose = v
+    overwrite.forEach(element => {
+        if (overwrites[element] === undefined) throw new Error(`${element} does not exist`)
+        overwrites[element] = true
+    });
+
     const accounts = await web3.eth.getAccounts();
     var {
         reversi, 
@@ -30,6 +38,7 @@ task("deploy", "Deploys contracts")
         simpleCloversMarket, 
         clubToken
     } = await deployAllContracts({overwrites, accounts, artifacts, web3, verbose})
+
     // save contract info inside of ./truffle/
     await saveNetworks([reversi, 
         clovers, 
@@ -38,8 +47,18 @@ task("deploy", "Deploys contracts")
         clubTokenController, 
         simpleCloversMarket, 
         clubToken])
+
     // save network info inside of ./networks.json
     await extractNetworks(confFile)
+    return {
+        reversi, 
+        clovers, 
+        cloversMetadata, 
+        cloversController, 
+        clubTokenController, 
+        simpleCloversMarket, 
+        clubToken
+    }
  });
 
  async function saveNetworks(contractArray) {

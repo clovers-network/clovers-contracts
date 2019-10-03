@@ -1,12 +1,11 @@
 usePlugin("@nomiclabs/buidler-truffle5");
-var networks =require('../networks.json')
 var { deployAllContracts } = require('../helpers/deployAllContracts')
 var { updateAllContracts } = require('../helpers/updateAllContracts')
 
-const verbose = true
-
-task('update', 'Updates contract values').
-setAction(async (taskArgs, env) => {
+task('update', 'Updates contract values')
+.addFlag("v", "Add verbose output to the command", false)
+.setAction(async ({v, contracts}, env) => {
+    verbose = v
     const accounts = await web3.eth.getAccounts()
     var {
         reversi, 
@@ -16,8 +15,8 @@ setAction(async (taskArgs, env) => {
         clubTokenController, 
         simpleCloversMarket, 
         clubToken
-    } = await deployAllContracts({accounts, artifacts, web3})
-    
+    } = contracts || await deployAllContracts({accounts, artifacts, web3})
+
     await updateAllContracts({
         clovers, 
         cloversMetadata, 
