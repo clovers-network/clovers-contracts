@@ -2,6 +2,7 @@ usePlugin("@nomiclabs/buidler-truffle5");
 const Artifactor = require("@truffle/artifactor");
 var { deployAllContracts } = require('../helpers/deployAllContracts')
 const extractNetworks = require('@gnosis.pm/util-contracts/src/util/extractNetworks')
+const injectNetworks = require('@gnosis.pm/util-contracts/src/util/injectNetworks')
 const path = require('path')
 
 const confFile = path.join(__dirname, '../conf/network-restore')
@@ -27,6 +28,9 @@ task("deploy", "Deploys contracts")
         if (overwrites[element] === undefined) throw new Error(`${element} does not exist`)
         overwrites[element] = true
     });
+
+    // make sure no info from networks.json is missing from the build folder
+    await injectNetworks(confFile)
 
     const accounts = await web3.eth.getAccounts();
     var {
