@@ -108,7 +108,8 @@ async function updateAllContracts({
         totalGas = await updateCloversController({
             cloversController,
             clubTokenController,
-            simpleCloversMarket
+            simpleCloversMarket,
+            verbose
         })
 
         /* ----------------------------------------------------------------------------------------------------------- */
@@ -116,7 +117,8 @@ async function updateAllContracts({
         totalGas = await updateClubTokenController({
             clubTokenController,
             simpleCloversMarket,
-            accounts
+            accounts,
+            verbose
         })
         
         /* ----------------------------------------------------------------------------------------------------------- */

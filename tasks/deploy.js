@@ -21,7 +21,6 @@ const overwrites = {
 task("deploy", "Deploys contracts")
  .setAction(async (taskArgs, env) => {
     const accounts = await web3.eth.getAccounts();
-    const chainId = await web3.eth.net.getId()
     var {
         reversi, 
         clovers, 
@@ -30,7 +29,7 @@ task("deploy", "Deploys contracts")
         clubTokenController, 
         simpleCloversMarket, 
         clubToken
-    } = await deployAllContracts({overwrites, accounts, artifacts, web3, chainId, verbose})
+    } = await deployAllContracts({overwrites, accounts, artifacts, web3, verbose})
     // save contract info inside of ./truffle/
     await saveNetworks([reversi, 
         clovers, 

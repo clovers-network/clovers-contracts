@@ -88,7 +88,7 @@ async function updateCloversController({
   }
 
   var currentPayMultiplier = await cloversController.payMultiplier()
-  if (!currentPayMultiplier.eq(vals.payMultiplier)) {
+  if (!currentPayMultiplier.eq(utils.toBN(vals.payMultiplier))) {
     verbose && console.log(_ + `cloversController.updatePayMultipier from ${currentPayMultiplier} to ${vals.payMultiplier}`)
     var tx = await cloversController.updatePayMultipier(vals.payMultiplier)  
     verbose && gasToCash(tx.receipt.gasUsed)
@@ -99,7 +99,7 @@ async function updateCloversController({
 
 
   var currentPriceMultiplier = await cloversController.priceMultiplier()
-  if (!currentPriceMultiplier.eq(vals.priceMultiplier)) {
+  if (!currentPriceMultiplier.eq(utils.toBN(vals.priceMultiplier))) {
     verbose && console.log(_ + `cloversController.updatePriceMultipier from ${currentPriceMultiplier} to ${vals.priceMultiplier}`)
     var tx = await cloversController.updatePriceMultipier(vals.priceMultiplier)  
     verbose && gasToCash(tx.receipt.gasUsed)
@@ -110,7 +110,7 @@ async function updateCloversController({
 
 
   var currentBasePrice = await cloversController.basePrice()
-  if (!currentBasePrice.eq(vals.basePrice)) {
+  if (!currentBasePrice.eq(utils.toBN(vals.basePrice))) {
     verbose && console.log(_ + `cloversController.updateBasePrice from ${currentBasePrice} to ${vals.basePrice}`)
     var tx = await cloversController.updateBasePrice(vals.basePrice)  
     verbose && gasToCash(tx.receipt.gasUsed)
@@ -169,7 +169,7 @@ async function updateClubTokenController({
   // )
 
   var currentReserveRatio = await clubTokenController.reserveRatio()
-  if (!currentReserveRatio.eq(vals.reserveRatio)) {
+  if (!currentReserveRatio.eq(utils.toBN(vals.reserveRatio))) {
     verbose && console.log(_ + `clubTokenController.updateReserveRatio from ${currentReserveRatio} to ${vals.reserveRatio}`)
     var tx = await clubTokenController.updateReserveRatio(vals.reserveRatio)
     verbose && gasToCash(tx.receipt.gasUsed)
@@ -179,7 +179,7 @@ async function updateClubTokenController({
   }
 
   var currentVirtualSupply = await clubTokenController.virtualSupply()
-  if (!currentVirtualSupply.eq(vals.virtualSupply)) {
+  if (!currentVirtualSupply.eq(utils.toBN(vals.virtualSupply))) {
     verbose && console.log(_ + `clubTokenController.updateVirtualSupply from ${currentVirtualSupply.toString()} to ${vals.virtualSupply.toString()}`)
     var tx = await clubTokenController.updateVirtualSupply(vals.virtualSupply)
     verbose && gasToCash(tx.receipt.gasUsed)
@@ -189,7 +189,7 @@ async function updateClubTokenController({
   }
 
   var currentVirtualBalance = await clubTokenController.virtualBalance()
-  if (!currentVirtualBalance.eq(vals.virtualBalance)) {
+  if (!currentVirtualBalance.eq(utils.toBN(vals.virtualBalance))) {
     verbose && console.log(_ + `clubTokenController.updateVirtualBalance from ${currentVirtualBalance.toString()} to ${vals.virtualBalance.toString()}`)
     var tx = await clubTokenController.updateVirtualBalance(vals.virtualBalance)
     verbose && gasToCash(tx.receipt.gasUsed)
