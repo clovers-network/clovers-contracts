@@ -33,9 +33,13 @@ task("sign", "sign")
         jsHashWithPrefix,
         sig2
     )
-    console.log(result === other, result, other)
+    if (result !== other) {
+        throw new Error(`addresses don't match ${result} != ${other}`)
+    }
 
     result = await this.ecdsa.checkClover(other, sig2, tokenId, moves)
-    console.log({result})
-
+    if (!result) {
+        throw new Error(`result was false with checkClover`)
+    }
+    console.log(`Success!`)
 })

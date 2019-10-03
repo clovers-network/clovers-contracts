@@ -10,6 +10,7 @@ const {
   _
 } = require('../helpers/utils')
 
+var ethers = require('ethers')
 var {
   signMessage,
   toEthSignedMessageHash,
@@ -105,6 +106,13 @@ contract('CloversController.sol', async function(accounts) {
       {type:"address", value: recepient}
     )
 
+    const hashedMsgEthers = ethers.utils.solidityKeccak256([
+      'uint256', 'bytes28[2]', 'uint256', 'bool', 'address'
+    ], [
+      symmetricalTokenId1, symmetricalMoves1, symmetricalSymmetries1, keep1, recepient
+    ])
+
+    assert(hashedMsg1 === hashedMsgEthers, `hashes don't match ${hashedMsg1} != ${hashedMsgEthers}`)
 
     const keep2 = true
     reversi = new Rev()
@@ -135,8 +143,16 @@ contract('CloversController.sol', async function(accounts) {
       assert(contractHashedMsg === hashedMsg1, "Hashed messages didn't match")
     })
     it('recover should work', async () => {
-      signature1 = fixSignature(await web3.eth.sign(hashedMsg1, oracle));
+      const foo = await web3.eth.sign(hashedMsg1, oracle)
+      signature1 = fixSignature(foo);
       const jsHashWithPrefix = toEthSignedMessageHash(hashedMsg1)
+
+      const walletProvider = new ethers.Wallet('0xef09de2f5b5125b78652f07c8365b3dabd657611a2818715d73808d0df786f48')
+      const ethersSig = await walletProvider.signMessage(ethers.utils.arrayify(hashedMsg1))
+      assert(ethersSig === signature1, `signatures don't match ${ethersSig} !== ${signature1}`)
+
+      const ethersjsHashWithPrefix = ethers.utils.hashMessage(ethers.utils.arrayify(hashedMsg1))
+      assert(ethersjsHashWithPrefix === jsHashWithPrefix, `hashes don't match ${ethersjsHashWithPrefix} !== ${jsHashWithPrefix}`)
 
       // Recover the signer address from the generated message and signature.
       let result = await cloversController.recover(
