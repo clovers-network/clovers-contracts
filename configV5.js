@@ -8,7 +8,7 @@ module.exports = {
 
   networks: {
     develop: {
-      chainId: 1337,
+      // chainId: 1337,
       gas: 6000000,
       timeout: 50000,
       // accounts: {

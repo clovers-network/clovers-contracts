@@ -1,5 +1,6 @@
 module.exports = {deployAllContracts}
 var utils = require('web3-utils')
+var _networks = require('../networks.json')
 const {
     gasToCash,
     _
@@ -21,6 +22,7 @@ const _overwrites = {
 
 async function deployAllContracts({overwrites, accounts, artifacts, web3, chainId, networks, verbose}) {
     overwrites = overwrites || _overwrites
+    networks = networks || _networks
 
     var Reversi = artifacts.require('./Reversi.sol')
     var Clovers = artifacts.require('./Clovers.sol')
@@ -40,7 +42,7 @@ async function deployAllContracts({overwrites, accounts, artifacts, web3, chainI
     tx
 
     function alreadyDeployed(contractName) {
-        return networks && networks[contractName] && networks[chainId] && networks[chainId].address
+        return  networks && networks[contractName] && networks[contractName][chainId] && networks[contractName][chainId].address
     }
 
     try {
@@ -49,79 +51,77 @@ async function deployAllContracts({overwrites, accounts, artifacts, web3, chainI
         // Deploy Clovers.sol (NFT)
         // -w NFT name
         // -w NFT symbol
-        if (overwrites['Clovers'] || !alreadyDeployed('Clovers')) {
+        let cloversAddress = alreadyDeployed('Clovers')
+        if (overwrites['Clovers'] || !cloversAddress) {
             clovers = await Clovers.new('Clovers', 'CLVR')
             tx = await web3.eth.getTransactionReceipt(clovers.transactionHash)
             verbose && console.log(_ + 'Deploy clovers - ' + tx.gasUsed)
             verbose && gasToCash(tx.gasUsed)
             totalGas = totalGas.add(utils.toBN(tx.gasUsed))
         } else {
-            clovers = await Clovers.deployed()
+            clovers = await Clovers.at(cloversAddress)
         }
     
         // Deploy CloversMetadata.sol
         // -w Clovers address
-        if (overwrites['CloversMetadata'] || !alreadyDeployed('CloversMetadata')){
+        let cloversMetadataAddress = alreadyDeployed('CloversMetadata')
+        if (overwrites['CloversMetadata'] || !cloversMetadataAddress){
             cloversMetadata = await CloversMetadata.new(clovers.address)
             tx = await web3.eth.getTransactionReceipt(cloversMetadata.transactionHash)
             verbose && console.log(_ + 'Deploy cloversMetadata - ' + tx.gasUsed)
             verbose && gasToCash(tx.gasUsed)
             totalGas = totalGas.add(utils.toBN(tx.gasUsed))
         } else {
-            cloversMetadata = await CloversMetadata.deployed()
+            cloversMetadata = await CloversMetadata.at(cloversMetadataAddress)
         }
     
         // Deploy ClubToken.sol (ERC20)
         // -w ERC20 name
         // -w ERC20 symbol
         // -w ERC20 decimals
-        if (overwrites['ClubToken'] || !alreadyDeployed('ClubToken')) {
+        let clubTokenAddress = alreadyDeployed('ClubToken')
+        if (overwrites['ClubToken'] || !clubTokenAddress) {
             clubToken = await ClubToken.new('CloverCoin', 'CLC', decimals)
             tx = await web3.eth.getTransactionReceipt(clubToken.transactionHash)
             verbose && console.log(_ + 'Deploy clubToken - ' + tx.gasUsed)
             verbose && gasToCash(tx.gasUsed)
             totalGas = totalGas.add(utils.toBN(tx.gasUsed))
         } else {
-            clubToken = await ClubToken.at(alreadyDeployed['ClubToken'])
+            clubToken = await ClubToken.at(clubTokenAddress)
         }
     
         // Deploy Reversi.sol
-        if (overwrites['Reversi'] || !alreadyDeployed('Reversi')){
+        let reversiAddress = alreadyDeployed('Reversi')
+        if (overwrites['Reversi'] || overwrites['CloversController'] || !reversiAddress){
             reversi = await Reversi.new()
             tx = await web3.eth.getTransactionReceipt(reversi.transactionHash)
             verbose && console.log(_ + 'Deploy reversi - ' + tx.gasUsed)
             verbose && gasToCash(tx.gasUsed)
             totalGas = totalGas.add(utils.toBN(tx.gasUsed))
         }else {
-            reversi = await Reversi.deployed()
+            reversi = await Reversi.at(reversiAddress)
         }
         // Deploy ClubTokenController.sol
         // -w ClubToken address
-        if (overwrites['ClubTokenController'] || !alreadyDeployed('ClubTokenController')){
+        let clubTokenControllerAddress = alreadyDeployed('ClubTokenController')
+        if (overwrites['ClubTokenController'] || !clubTokenControllerAddress){
             clubTokenController = await ClubTokenController.new(clubToken.address)
             tx = await web3.eth.getTransactionReceipt(clubTokenController.transactionHash)
             verbose && console.log(_ + 'Deploy clubTokenController - ' + tx.gasUsed)
             verbose && gasToCash(tx.gasUsed)
             totalGas = totalGas.add(utils.toBN(tx.gasUsed))
         } else {
-            clubTokenController = await ClubTokenController.deployed()
+            clubTokenController = await ClubTokenController.at(clubTokenControllerAddress)
         }
-        // Deploy CloversController.sol
-        if (overwrites['CloversController'] || !alreadyDeployed('CloversController')) {
-            // -link w cloversController
-            // await CloversController.detectNetwork()
-            // CloversController.setNetwork(chainId)
-            // CloversController.network_id = chainId
-            // CloversController.networks[CloversController.network_id] = {
-            //     events: {},
-            //     links: {}
-            //   }
-            // CloversController.network.links["__5b17bcb97970e1ce5ed9096dcff7f451d7_+"] = reversi.address;
 
-            let network = await CloversController.detectNetwork()
-            await CloversController.setNetwork(network.id)
+        // Deploy CloversController.sol
+        let cloversControllerAdress = alreadyDeployed('CloversController')
+        if (overwrites['CloversController'] || overwrites['Reversi'] || !cloversControllerAdress) {
+            // -link w cloversController
+            // CloversController.network.links["__5b17bcb97970e1ce5ed9096dcff7f451d7_+"] = reversi.address;
+            await CloversController.setNetwork(chainId)
             await CloversController.link(`\\$b2fca45de5ef9c5a18731e56fbc51add96\\$`, reversi.address)
-            // await CloversController.link('Reversi', reversi.address)
+            await CloversController.link('Reversi', reversi.address)
 
             // -w Clovers address
             // -w ClubToken address
@@ -136,7 +136,7 @@ async function deployAllContracts({overwrites, accounts, artifacts, web3, chainI
             verbose && gasToCash(tx.gasUsed)
             totalGas = totalGas.add(utils.toBN(tx.gasUsed))
         } else {
-            cloversController = await CloversController.deployed()
+            cloversController = await CloversController.at(cloversControllerAdress)
         }
     
         // Deploy SimpleCloversMarket.sol
@@ -144,7 +144,8 @@ async function deployAllContracts({overwrites, accounts, artifacts, web3, chainI
         // -w ClubToken address
         // -w ClubTokenController address
         // -w CloversController address
-        if (overwrites['SimpleCloversMarket'] || !alreadyDeployed('SimpleCloversMarket')){
+        let simpleCloversMarketAddress = alreadyDeployed('SimpleCloversMarket')
+        if (overwrites['SimpleCloversMarket'] || !simpleCloversMarketAddress){
             simpleCloversMarket = await SimpleCloversMarket.new(
                 clovers.address,
                 clubToken.address,
@@ -156,7 +157,7 @@ async function deployAllContracts({overwrites, accounts, artifacts, web3, chainI
             verbose && gasToCash(tx.gasUsed)
             totalGas = totalGas.add(utils.toBN(tx.gasUsed))
         } else {
-            simpleCloversMarket = await SimpleCloversMarket.deployed()
+            simpleCloversMarket = await SimpleCloversMarket.at(simpleCloversMarketAddress)
         }
 
         return {
