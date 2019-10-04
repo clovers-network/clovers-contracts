@@ -1278,7 +1278,7 @@ Clovers: {
     }
    },
    "links": {},
-   "address": "0xb55c5cac5014c662fdbf21a2c59cd45403c482fd",
+   "address": "0xB55C5cAc5014C662fDBF21A2C59Cd45403C482Fd",
    "transactionHash": null
   },
   "4": {
@@ -2574,12 +2574,121 @@ CloversController: {
  ],
  "networks": {
   "1": {
-   "events": {},
-   "links": {
-    "Reversi": "0xd6e4737118f6d12468edb0746755281e223eaaaa"
+   "events": {
+    "0x4c0f83654ac2972673e4d81058f833de298389df1dce04cc2db9f231b907d5ff": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": false,
+       "name": "movesHash",
+       "type": "bytes32"
+      },
+      {
+       "indexed": false,
+       "name": "owner",
+       "type": "address"
+      }
+     ],
+     "name": "cloverCommitted",
+     "type": "event",
+     "signature": "0x4c0f83654ac2972673e4d81058f833de298389df1dce04cc2db9f231b907d5ff"
+    },
+    "0xbffd4880cee44a71d4266cf8dcf3179608df035c1883808a2370a9cfd180f6ed": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": false,
+       "name": "tokenId",
+       "type": "uint256"
+      },
+      {
+       "indexed": false,
+       "name": "moves",
+       "type": "bytes28[2]"
+      },
+      {
+       "indexed": false,
+       "name": "sender",
+       "type": "address"
+      },
+      {
+       "indexed": false,
+       "name": "recepient",
+       "type": "address"
+      },
+      {
+       "indexed": false,
+       "name": "reward",
+       "type": "uint256"
+      },
+      {
+       "indexed": false,
+       "name": "symmetries",
+       "type": "uint256"
+      },
+      {
+       "indexed": false,
+       "name": "keep",
+       "type": "bool"
+      }
+     ],
+     "name": "cloverClaimed",
+     "type": "event",
+     "signature": "0xbffd4880cee44a71d4266cf8dcf3179608df035c1883808a2370a9cfd180f6ed"
+    },
+    "0x36b306723b6493a90002bbf27460db864a9ac8ce1af82ad1f0183f83c0cecc39": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": false,
+       "name": "tokenId",
+       "type": "uint256"
+      },
+      {
+       "indexed": false,
+       "name": "moves",
+       "type": "bytes28[2]"
+      },
+      {
+       "indexed": false,
+       "name": "owner",
+       "type": "address"
+      },
+      {
+       "indexed": false,
+       "name": "challenger",
+       "type": "address"
+      }
+     ],
+     "name": "cloverChallenged",
+     "type": "event",
+     "signature": "0x36b306723b6493a90002bbf27460db864a9ac8ce1af82ad1f0183f83c0cecc39"
+    },
+    "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": true,
+       "name": "previousOwner",
+       "type": "address"
+      },
+      {
+       "indexed": true,
+       "name": "newOwner",
+       "type": "address"
+      }
+     ],
+     "name": "OwnershipTransferred",
+     "type": "event",
+     "signature": "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0"
+    }
    },
-   "address": "0x1f2ca5623db46b2ecc693011eef8506e80f4328e",
-   "transactionHash": "0xdb0a5233e05aafafe4a89d2ae8ade4871aa78fb80715edc4e0c783b383941b24"
+   "links": {
+    "Reversi": "0xF640b022ab52A003466dAAefb5E87bBEE7aC1bdF",
+    "\\$b2fca45de5ef9c5a18731e56fbc51add96\\$": "0xF640b022ab52A003466dAAefb5E87bBEE7aC1bdF"
+   },
+   "address": "0xD3B55Ba131CE66c1F4299917e1347533Ad16E06c",
+   "transactionHash": "0x44eb4bb2744ef16f6639a8971d9b73d06e6f46563299207d529be20735a6cf4b"
   },
   "4": {
    "events": {},
@@ -2708,11 +2817,11 @@ CloversController: {
     }
    },
    "links": {
-    "\\$b2fca45de5ef9c5a18731e56fbc51add96\\$": "0x03B488d9Bc23079d7C773dC39C2CA75B1334305A",
-    "Reversi": "0x03B488d9Bc23079d7C773dC39C2CA75B1334305A"
+    "\\$b2fca45de5ef9c5a18731e56fbc51add96\\$": "0xd08DA2D161b0B1a363372Cc7A76c2044f35F6743",
+    "Reversi": "0xd08DA2D161b0B1a363372Cc7A76c2044f35F6743"
    },
-   "address": "0x98b3210ACb992D75c5D828309D309811dB931091",
-   "transactionHash": "0x4a557f3d096e481cb9ec7815ac5423bf1b3fc1d0a8cd49475688a4e7ee797037"
+   "address": "0x83f43A2D67Cb3C020c61975b04Ef0f44a9B9ee1F",
+   "transactionHash": "0x0400875f838026664bad0e3fdd47987884c1cf3241534a29040389362a732fab"
   },
   "1569787081442": {
    "events": {},
@@ -3333,7 +3442,7 @@ ClubToken: {
   "1": {
    "events": {},
    "links": {},
-   "address": "0x1a94656a6245379bc0d9c64c402197528edb2bd1",
+   "address": "0x1A94656A6245379bC0d9c64C402197528EdB2bD1",
    "transactionHash": null
   },
   "4": {
@@ -4221,7 +4330,7 @@ ClubTokenController: {
     }
    },
    "links": {},
-   "address": "0x1754a612ca578f72d678196bcc16710f01db7655",
+   "address": "0x1754a612cA578F72d678196bcC16710f01DB7655",
    "transactionHash": null
   },
   "4": {
@@ -5115,7 +5224,7 @@ SimpleCloversMarket: {
     }
    },
    "links": {},
-   "address": "0x6ebd97252d34645263c1d074f202f1d7546ce06b",
+   "address": "0x6ebD97252D34645263c1d074f202F1d7546CE06b",
    "transactionHash": null
   },
   "4": {
