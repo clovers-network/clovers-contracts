@@ -1,7 +1,7 @@
 require("dotenv").config();
 // require('babel-register')
 // require('babel-polyfill')
-
+console.log('------------------------------------------')
 const HDWalletProvider = require("truffle-hdwallet-provider");
 module.exports = {
   // See <http://truffleframework.com/docs/advanced/configuration>
