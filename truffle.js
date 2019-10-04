@@ -1,7 +1,7 @@
 require("dotenv").config();
 // require('babel-register')
 // require('babel-polyfill')
-
+console.log('------------------------------------------')
 const HDWalletProvider = require("truffle-hdwallet-provider");
 module.exports = {
   // See <http://truffleframework.com/docs/advanced/configuration>
@@ -31,13 +31,13 @@ module.exports = {
       provider() {
         return new HDWalletProvider(
           process.env.TRUFFLE_MNEMONIC,
-          "http://localhost:9545",
+          "http://localhost:8545",
           0,
           10
         );
       },
       host: "localhost",
-      port: 9545,
+      port: 8545,
       network_id: "*", // Match any network id
       // gas: 10000000
     },

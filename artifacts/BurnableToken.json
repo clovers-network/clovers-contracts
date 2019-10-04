@@ -1,0 +1,116 @@
+{
+  "contractName": "BurnableToken",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "totalSupply",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_value",
+          "type": "uint256"
+        }
+      ],
+      "name": "burn",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_owner",
+          "type": "address"
+        }
+      ],
+      "name": "balanceOf",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_to",
+          "type": "address"
+        },
+        {
+          "name": "_value",
+          "type": "uint256"
+        }
+      ],
+      "name": "transfer",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "burner",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "Burn",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "Transfer",
+      "type": "event"
+    }
+  ],
+  "bytecode": "608060405234801561001057600080fd5b506103f0806100206000396000f3006080604052600436106100615763ffffffff7c010000000000000000000000000000000000000000000000000000000060003504166318160ddd811461006657806342966c681461008d57806370a08231146100a7578063a9059cbb146100d5575b600080fd5b34801561007257600080fd5b5061007b61011a565b60408051918252519081900360200190f35b34801561009957600080fd5b506100a5600435610120565b005b3480156100b357600080fd5b5061007b73ffffffffffffffffffffffffffffffffffffffff6004351661012d565b3480156100e157600080fd5b5061010673ffffffffffffffffffffffffffffffffffffffff60043516602435610155565b604080519115158252519081900360200190f35b60015490565b61012a338261025d565b50565b73ffffffffffffffffffffffffffffffffffffffff1660009081526020819052604090205490565b600073ffffffffffffffffffffffffffffffffffffffff8316151561017957600080fd5b3360009081526020819052604090205482111561019557600080fd5b336000908152602081905260409020546101b5908363ffffffff61039f16565b336000908152602081905260408082209290925573ffffffffffffffffffffffffffffffffffffffff8516815220546101f4908363ffffffff6103b116565b73ffffffffffffffffffffffffffffffffffffffff8416600081815260208181526040918290209390935580518581529051919233927fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef9281900390910190a350600192915050565b73ffffffffffffffffffffffffffffffffffffffff821660009081526020819052604090205481111561028f57600080fd5b73ffffffffffffffffffffffffffffffffffffffff82166000908152602081905260409020546102c5908263ffffffff61039f16565b73ffffffffffffffffffffffffffffffffffffffff83166000908152602081905260409020556001546102fe908263ffffffff61039f16565b60015560408051828152905173ffffffffffffffffffffffffffffffffffffffff8416917fcc16f5dbb4873280815c1ee09dbd06736cffcc184412cf7a71a0fdb75d397ca5919081900360200190a260408051828152905160009173ffffffffffffffffffffffffffffffffffffffff8516917fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef9181900360200190a35050565b6000828211156103ab57fe5b50900390565b818101828110156103be57fe5b929150505600a165627a7a72305820727933f97024c68f9ed1be670952642e27babc09f32d276157d58ac13c30b6590029",
+  "linkReferences": {}
+}

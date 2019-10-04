@@ -1,17 +1,22 @@
 {
   "name": "clovers-contracts",
-  "version": "1.0.21",
-  "description": "",
+  "version": "2.0.0",
+  "description": "Clovers Network contracts",
   "main": "index.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "compile": "truffle compile --reset --compile-all",
+    "testnet": "npx ganache-cli -i 1234 -m='result chalk culture device mouse post focus marble nurse fire gun venue'",
+    "compile": "yarn compile-old && yarn compile-new",
+    "compile-old": "buidler compile --config buidler.config.4.js",
+    "compile-new": "buidler compile",
     "compileAndTest": "yarn compile && truffle test",
-    "test": "truffle test",
-    "build": "build.js",
+    "test": "buidler test --no-compile test/*.test.js",
+    "build": "buidler buildIndex",
     "patch": "npm version patch",
+    "minor": "npm version minor",
+    "major": "npm version major",
     "pub": "npm publish",
     "networks-extract": "node extract_network_info.js",
     "networks-inject": "node inject_network_info.js",
@@ -20,17 +25,27 @@
   "author": "Billy Rennekamp <billy.rennekamp@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "@gnosis.pm/util-contracts": "^2.0.1",
+    "@nomiclabs/buidler": "^1.0.0-beta.13",
+    "@nomiclabs/buidler-solhint": "^1.0.0-beta.13",
+    "@nomiclabs/buidler-truffle4": "^1.0.0-beta.13",
+    "@nomiclabs/buidler-truffle5": "^1.0.0-beta.13",
+    "@nomiclabs/buidler-web3": "^1.0.0-beta.13",
+    "@nomiclabs/buidler-web3-legacy": "^1.0.0-beta.13",
+    "@openzeppelin/contracts": "v2.3.0",
+    "@truffle/artifactor": "^4.0.33",
     "bancor-contracts": "github:bancorprotocol/contracts#973c9919e146a1b61297632f3253ee1c891462a9",
+    "bignumber.js": "^9.0.0",
     "clovers-reversi": "^1.0.16",
     "dotenv": "^6.0.0",
-    "ethers": "^3.0.9",
+    "ethers": "^4.0.37",
+    "ganache-cli": "6.5.0",
     "truffle": "^4.1.13",
     "truffle-flattener": "^1.4.0",
     "truffle-hdwallet-provider": "^0.0.6",
+    "web3": "^1.2.1",
     "web3-utils": "^1.0.0-beta.33",
-    "zeppelin-solidity": "^1.8.0"
+    "zeppelin-solidity": "1.11.0"
   },
-  "dependencies": {
-    "@gnosis.pm/util-contracts": "^2.0.1"
-  }
+  "dependencies": {}
 }
