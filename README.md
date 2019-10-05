@@ -6,7 +6,8 @@
 
  - [Clovers](https://etherscan.io/address/0xb55c5cac5014c662fdbf21a2c59cd45403c482fd#code)
  - ~~[Clovers Controller V1](https://etherscan.io/address/0x521d32f3d23f1fc82b1dbe306edc3ef668e5d973#code)~~
- - [Clovers Controller V2](https://etherscan.io/address/0x1f2ca5623db46b2ecc693011eef8506e80f4328e)
+ - ~~[Clovers Controller V2](https://etherscan.io/address/0x1f2ca5623db46b2ecc693011eef8506e80f4328e#code)~~
+ - [Clovers Controller V3](https://etherscan.io/address/0xd3b55ba131ce66c1f4299917e1347533ad16e06c)
  - [Clovers Coin](https://etherscan.io/address/0x1a94656a6245379bc0d9c64c402197528edb2bd1#code)
  - [Clovers Coin Controller](https://etherscan.io/address/0x1754a612ca578f72d678196bcc16710f01db7655#code)
  - [Clovers Simple Market](https://etherscan.io/address/0x6ebd97252d34645263c1d074f202f1d7546ce06b#code)
