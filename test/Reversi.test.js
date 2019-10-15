@@ -7,16 +7,12 @@ const _ = require('../helpers/utils')._
 var assert = require('assert');
 
 
-describe('Reversi', async ()=>  {
-  const accounts = await web3.eth.getAccounts();
-
+contract('Reversi', async (accounts)=>  {
   let reversi, reversiMock
   before(done => {
     ;(async () => {
       try {
         reversi = await Reversi_.new()
-        ReversiMock.setNetwork('develop')
-        await ReversiMock.link('Reversi', reversi.address)
         reversiMock = await ReversiMock.new()
         done()
       } catch (error) {

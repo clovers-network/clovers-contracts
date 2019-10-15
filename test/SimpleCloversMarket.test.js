@@ -9,9 +9,7 @@ const {
 } = require('../helpers/utils')
 var assert = require('assert');
 
-describe('SimpleCloversMarket.sol', async function() {
-  const accounts = await web3.eth.getAccounts();
-
+contract('SimpleCloversMarket.sol', async function(accounts) {
   var
     clovers, 
     cloversMetadata, 
