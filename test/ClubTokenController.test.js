@@ -18,9 +18,7 @@ const {
 } = require('../helpers/migVals')
 var assert = require('assert');
 
-describe('ClubTokenController.sol', async function() {
-  const accounts = await web3.eth.getAccounts();
-
+contract('ClubTokenController.sol', async function(accounts) {
   var
     clovers, 
     cloversMetadata, 
