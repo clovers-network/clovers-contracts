@@ -13,8 +13,6 @@ contract('Reversi', async (accounts)=>  {
     ;(async () => {
       try {
         reversi = await Reversi_.new()
-        ReversiMock.setNetwork('develop')
-        await ReversiMock.link('Reversi', reversi.address)
         reversiMock = await ReversiMock.new()
         done()
       } catch (error) {
