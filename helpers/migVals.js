@@ -15,7 +15,7 @@ var vals = (module.exports = {
   // stakePeriod: '6000', // at 15 sec block times this is ~25 hours
   stakePeriod: '60000', // at 15 sec block times this is ~250 hours
   // payMultiplier: utils.toWei('0.327'),
-  payMultiplier: utils.toWei('0.01'),
+  payMultiplier: utils.toWei('0.05'),
   priceMultiplier: '3',
   marginOferror: '3',
   basePrice: utils.toWei('3'),

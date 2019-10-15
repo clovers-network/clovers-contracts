@@ -23,8 +23,12 @@ const {
   priceMultiplier,
   basePrice
 } = require('../helpers/migVals')
+var assert = require('assert');
+const { web3 } = require("@nomiclabs/buidler")
 
-contract('CloversController.sol', async function(accounts) {
+describe('CloversController.sol', async () => {
+  const accounts = await web3.eth.getAccounts();
+
   let oracle = accounts[8]
 
   var reversi,
@@ -35,6 +39,7 @@ contract('CloversController.sol', async function(accounts) {
     simpleCloversMarket, 
     clubToken
   before(async () => {
+    console.log('before')
     try {
       var totalGas = utils.toBN('0')
       const chainId = await web3.eth.net.getId()
@@ -97,7 +102,6 @@ contract('CloversController.sol', async function(accounts) {
     const symmetricalMoves1 = _moves
     const symmetricalSymmetries1 = reversi.returnSymmetriesAsBN().toString(10)
     let signature1
-
     const hashedMsg1 = web3.utils.soliditySha3(
       {type: "uint256", value: symmetricalTokenId1},
       {type:"bytes28[2]", value: symmetricalMoves1},
@@ -313,6 +317,7 @@ contract('CloversController.sol', async function(accounts) {
       assert(!exists, `board ${game.board} should not exist yet`)
 
       var tx = await cloversController.claimCloverWithVerification(moves, keep, {from})
+      console.log({tx})
       console.log(_ + 'cloversController.claimCloverWithVerification: ' + tx.receipt.cumulativeGasUsed)
       gasToCash(tx.receipt.cumulativeGasUsed)
       ownerOf = await clovers.ownerOf(tokenId)

@@ -6,8 +6,9 @@ const {
   gasToCash,
   _
 } = require('../helpers/utils')
+var assert = require('assert');
 
-contract('Clovers.sol', async function(accounts) {
+describe('Clovers.sol', async function(accounts) {
   var
     clovers, 
     cloversMetadata, 

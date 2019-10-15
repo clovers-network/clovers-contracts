@@ -4,8 +4,10 @@ var ReversiMock = artifacts.require('./mocks/ReversiMock.sol')
 var Reversi = require('clovers-reversi').default
 const gasToCash = require('../helpers/utils').gasToCash
 const _ = require('../helpers/utils')._
+var assert = require('assert');
 
-contract('Reversi', async (accounts)=>  {
+
+describe('Reversi', async (accounts)=>  {
   let reversi, reversiMock
   before(done => {
     ;(async () => {
@@ -23,7 +25,7 @@ contract('Reversi', async (accounts)=>  {
   })
 
   describe('Reversi.sol', () => {
-    let _realTokenId = '0x5555555565556955695566955aa55555'
+    let _realTokenId = '0x55555aa5569955695569555955555555'
     let _realMoves = [
         '0xb58b552a986549b132451cbcbd69d106af0e3ae6cead82cc297427c3',
         '0xbb9af45dbeefd78f120678dd7ef4dfe69f3d9bbe7eeddfc7f0000000',
@@ -50,6 +52,7 @@ contract('Reversi', async (accounts)=>  {
     it('should get a game', async () => {
       let game = await reversi.getGame(_realMoves)
       assert(game.complete && !game.error, `game had an error`)
+      assert(game.board === _realTokenId, `token IDs did not match ${game.board} !== ${_realTokenId}`)
       // console.log({game})
     })
 

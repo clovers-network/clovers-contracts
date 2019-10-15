@@ -7,8 +7,9 @@ const {
   getLowestPrice,
   _
 } = require('../helpers/utils')
+var assert = require('assert');
 
-contract('SimpleCloversMarket.sol', async function(accounts) {
+describe('SimpleCloversMarket.sol', async function(accounts) {
   var
     clovers, 
     cloversMetadata, 

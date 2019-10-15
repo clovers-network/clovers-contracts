@@ -9,6 +9,7 @@ module.exports = {
   networks: {
     develop: {
       // chainId: 1337,
+      url: "http://localhost:8545",
       gas: 6000000,
       timeout: 50000,
       // accounts: {

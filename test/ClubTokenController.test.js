@@ -16,8 +16,9 @@ const {
   priceMultiplier,
   basePrice
 } = require('../helpers/migVals')
+var assert = require('assert');
 
-contract('ClubTokenController.sol', async function(accounts) {
+describe('ClubTokenController.sol', async function(accounts) {
   var
     clovers, 
     cloversMetadata, 
