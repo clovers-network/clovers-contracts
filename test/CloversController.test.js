@@ -42,7 +42,14 @@ contract('CloversController.sol', async (accounts) => {
     try {
       var totalGas = utils.toBN('0')
       const chainId = await web3.eth.net.getId()
-      var allContracts = await deployAllContracts({accounts, artifacts, web3, chainId, networks})
+      var allContracts = await deployAllContracts({
+        accounts,
+        artifacts,
+        web3,
+        chainId,
+        networks,
+        testing: true
+      })
 
       reversi = allContracts.reversi 
       clovers = allContracts.clovers 
@@ -62,7 +69,8 @@ contract('CloversController.sol', async (accounts) => {
           clubTokenController, 
           simpleCloversMarket, 
           clubToken,
-          accounts
+          accounts,
+          verbose: false
       })
 
       await cloversController.updateOracle(oracle)
@@ -307,6 +315,7 @@ contract('CloversController.sol', async (accounts) => {
     it('claimCloverWithVerification should work with keep = false', async () => {
       let keep = false
       let game = await cloversController.getGame(moves)
+      assert(game.board === tokenId, `tokenIds don't match ${tokenIdLog} !== ${tokenId}`)
 
       let isValidCloversController = await cloversController.isValid(moves)
       let isValidReversi = await reversi.isValid(moves)
@@ -316,7 +325,9 @@ contract('CloversController.sol', async (accounts) => {
       assert(!exists, `board ${game.board} should not exist yet`)
 
       var tx = await cloversController.claimCloverWithVerification(moves, keep, {from})
-      console.log({tx})
+      var tokenIdLog = '0x' + tx.logs[0].args.tokenId.toString(16)
+      assert(tokenIdLog === tokenId, `tokenIds don't match ${tokenIdLog} !== ${tokenId}`)
+      
       console.log(_ + 'cloversController.claimCloverWithVerification: ' + tx.receipt.cumulativeGasUsed)
       gasToCash(tx.receipt.cumulativeGasUsed)
       ownerOf = await clovers.ownerOf(tokenId)

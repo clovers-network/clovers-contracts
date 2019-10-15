@@ -20,10 +20,16 @@ const _overwrites = {
     ClubToken: false
 }
 
-async function deployAllContracts({overwrites, accounts, artifacts, web3, chainId, networks, verbose}) {
+async function deployAllContracts({overwrites, accounts, artifacts, web3, chainId, networks, verbose, testing}) {
     overwrites = overwrites || _overwrites
     networks = networks || _networks
     chainId = chainId || await web3.eth.net.getId()
+
+    if (testing) {
+        Object.keys(overwrites).forEach((key) => {
+            overwrites[key] = true
+        })
+    }
 
     var Reversi = artifacts.require('./Reversi.sol')
     var Clovers = artifacts.require('./Clovers.sol')

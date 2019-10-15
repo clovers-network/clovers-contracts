@@ -210,7 +210,7 @@ async function updateClubTokenController({
   }
 
   verbose && console.log(_ + 'remove as admins to clubTokenController')
-  // await addAsAdmin(clubTokenController, accounts)
+  await addAsAdmin(clubTokenController, accounts)
   var gasUsed = await removeAsAdmin(clubTokenController, accounts)
   totalGas = totalGas.add(gasUsed)
   return totalGas
@@ -221,7 +221,7 @@ async function updateClubTokenController({
 
 async function addAsAdmin(contract, accounts, verbose) {
 
-  var secondOwner = await contract.isAdmin(accounts[0])
+  var secondOwner = await contract.admins(accounts[0])
   if (!secondOwner) {
     verbose && console.log(_ + `adding ${accounts[0]} as admin in contract`)
     await contract.transferAdminship(accounts[0])
@@ -230,7 +230,7 @@ async function addAsAdmin(contract, accounts, verbose) {
   }
 
 
-  var secondOwner = await contract.isAdmin(accounts[1])
+  var secondOwner = await contract.admins(accounts[1])
   if (!secondOwner) {
     verbose && console.log(_ + `adding ${accounts[1]} as admin in contract`)
     await contract.transferAdminship(accounts[1])
@@ -238,7 +238,7 @@ async function addAsAdmin(contract, accounts, verbose) {
     verbose && console.log(_ + `${accounts[1]} is already an admin in contract`)
   }
 
-  var secondOwner = await contract.isAdmin(accounts[2])
+  var secondOwner = await contract.admins(accounts[2])
   if (!secondOwner) {
     verbose && console.log(_ + `adding ${accounts[2]} as admin in contract`)
     await contract.transferAdminship(accounts[2])
@@ -246,7 +246,7 @@ async function addAsAdmin(contract, accounts, verbose) {
     verbose && console.log(_ + `${accounts[2]} is already an admin in contract`)
   }
 
-  var secondOwner = await contract.isAdmin(accounts[3])
+  var secondOwner = await contract.admins(accounts[3])
   if (!secondOwner) {
     verbose && console.log(_ + `adding ${accounts[3]} as admin in contract`)
     await contract.transferAdminship(accounts[3])
@@ -254,7 +254,7 @@ async function addAsAdmin(contract, accounts, verbose) {
     verbose && console.log(_ + `${accounts[3]} is already an admin in contract`)
   }
 
-  var secondOwner = await contract.isAdmin(accounts[4])
+  var secondOwner = await contract.admins(accounts[4])
   if (!secondOwner) {
     verbose && console.log(_ + `adding ${accounts[4]} as admin in contract`)
     await contract.transferAdminship(accounts[4])
@@ -265,8 +265,7 @@ async function addAsAdmin(contract, accounts, verbose) {
 
 async function removeAsAdmin(contract, accounts, verbose) {
   var totalGas = utils.toBN('0')
-
-  var secondOwner = await contract.isAdmin(accounts[1])
+  var secondOwner = await contract.admins(accounts[1])
   if (secondOwner) {
     verbose && console.log(_ + `removing ${accounts[1]} as admin in contract`)
     var tx = await contract.renounceAdminship(accounts[1])
@@ -276,7 +275,7 @@ async function removeAsAdmin(contract, accounts, verbose) {
     verbose && console.log(_ + `${accounts[1]} is already removed as an admin in contract`)
   }
 
-  var secondOwner = await contract.isAdmin(accounts[2])
+  var secondOwner = await contract.admins(accounts[2])
   if (secondOwner) {
     verbose && console.log(_ + `removing ${accounts[2]} as admin in contract`)
     var tx = await contract.renounceAdminship(accounts[2])
@@ -286,7 +285,7 @@ async function removeAsAdmin(contract, accounts, verbose) {
     verbose && console.log(_ + `${accounts[2]} is already removed as an admin in contract`)
   }
 
-  var secondOwner = await contract.isAdmin(accounts[3])
+  var secondOwner = await contract.admins(accounts[3])
   if (secondOwner) {
     verbose && console.log(_ + `removing ${accounts[3]} as admin in contract`)
     var tx = await contract.renounceAdminship(accounts[3])
@@ -296,7 +295,7 @@ async function removeAsAdmin(contract, accounts, verbose) {
     verbose && console.log(_ + `${accounts[3]} is already removed as an admin in contract`)
   }
 
-  var secondOwner = await contract.isAdmin(accounts[4])
+  var secondOwner = await contract.admins(accounts[4])
   if (secondOwner) {
     verbose && console.log(_ + `removing ${accounts[4]} as admin in contract`)
     var tx = await contract.renounceAdminship(accounts[4])
@@ -306,7 +305,7 @@ async function removeAsAdmin(contract, accounts, verbose) {
     verbose && console.log(_ + `${accounts[4]} is already removed as an admin in contract`)
   }
 
-  var secondOwner = await contract.isAdmin(accounts[0])
+  var secondOwner = await contract.admins(accounts[0])
   if (secondOwner) {
     verbose && console.log(_ + `removing ${accounts[0]} as admin in contract`)
     var tx = await contract.renounceAdminship(accounts[0])
