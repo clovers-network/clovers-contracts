@@ -141,9 +141,8 @@ async function deployAllContracts({overwrites, accounts, artifacts, web3, chainI
         if (overwrites['CloversController'] || overwrites['Reversi'] || !cloversControllerAdress) {
             // -link w cloversController
             // CloversController.network.links["__5b17bcb97970e1ce5ed9096dcff7f451d7_+"] = reversi.address;
-            await CloversController.setNetwork(chainId)
-            await CloversController.link(`\\$b2fca45de5ef9c5a18731e56fbc51add96\\$`, reversi.address)
-            await CloversController.link('Reversi', reversi.address)
+            await CloversController.link(reversi)
+            
 
             // -w Clovers address
             // -w ClubToken address
