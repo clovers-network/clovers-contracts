@@ -26,8 +26,7 @@ const {
 var assert = require('assert');
 const { web3 } = require("@nomiclabs/buidler")
 
-describe('CloversController.sol', async () => {
-  const accounts = await web3.eth.getAccounts();
+contract('CloversController.sol', async (accounts) => {
 
   let oracle = accounts[8]
 

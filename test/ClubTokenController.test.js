@@ -18,7 +18,7 @@ const {
 } = require('../helpers/migVals')
 var assert = require('assert');
 
-describe('ClubTokenController.sol', async function(accounts) {
+contract('ClubTokenController.sol', async function(accounts) {
   var
     clovers, 
     cloversMetadata, 

@@ -7,7 +7,7 @@ const _ = require('../helpers/utils')._
 var assert = require('assert');
 
 
-describe('Reversi', async (accounts)=>  {
+contract('Reversi', async (accounts)=>  {
   let reversi, reversiMock
   before(done => {
     ;(async () => {

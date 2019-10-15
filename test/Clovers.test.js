@@ -8,7 +8,7 @@ const {
 } = require('../helpers/utils')
 var assert = require('assert');
 
-describe('Clovers.sol', async function(accounts) {
+contract('Clovers.sol', async function(accounts) {
   var
     clovers, 
     cloversMetadata, 
