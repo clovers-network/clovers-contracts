@@ -43,6 +43,6 @@ module.exports = {
     sources: "./contracts/v5",
     tests: "./test", 
     cache: "./cache",
-    artifacts: "./artifacts"
+    artifacts: "./build/contracts"
   }
 };

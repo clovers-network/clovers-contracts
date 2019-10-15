@@ -20,12 +20,13 @@ const _overwrites = {
     ClubToken: false
 }
 
-async function deployAllContracts({overwrites, accounts, artifacts, web3, chainId, networks, verbose, testing}) {
+async function deployAllContracts({overwrites, accounts, artifacts, web3, chainId, networks, verbose, deployAll}) {
     overwrites = overwrites || _overwrites
     networks = networks || _networks
     chainId = chainId || await web3.eth.net.getId()
 
-    if (testing) {
+
+    if (deployAll) {
         Object.keys(overwrites).forEach((key) => {
             overwrites[key] = true
         })
@@ -51,12 +52,12 @@ async function deployAllContracts({overwrites, accounts, artifacts, web3, chainI
     async function alreadyDeployed(contractName) {
         let address =  networks && networks[contractName] && networks[contractName][chainId] && networks[contractName][chainId].address
         if (!address) {
-            // console.log('no address')
+            console.log('no address')
             return false
         }
         let code = await web3.eth.getCode(address)
         if (code === '0x') {
-            // console.log('no code')
+            console.log('no code')
             return false
         }
         // let contract = eval(contractName)
@@ -148,7 +149,6 @@ async function deployAllContracts({overwrites, accounts, artifacts, web3, chainI
             // -link w cloversController
             // CloversController.network.links["__5b17bcb97970e1ce5ed9096dcff7f451d7_+"] = reversi.address;
             await CloversController.link(reversi)
-            
 
             // -w Clovers address
             // -w ClubToken address

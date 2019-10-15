@@ -48,7 +48,7 @@ contract('CloversController.sol', async (accounts) => {
         web3,
         chainId,
         networks,
-        testing: true
+        deployAll: true
       })
 
       reversi = allContracts.reversi 

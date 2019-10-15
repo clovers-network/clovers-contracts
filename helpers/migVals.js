@@ -209,8 +209,8 @@ async function updateClubTokenController({
     verbose && console.log(_ + 'paused hasnt changed')
   }
 
-  verbose && console.log(_ + 'remove as admins to clubTokenController')
-  await addAsAdmin(clubTokenController, accounts)
+  verbose && console.log(_ + 'remove as admins from clubTokenController')
+  // await addAsAdmin(clubTokenController, accounts)
   var gasUsed = await removeAsAdmin(clubTokenController, accounts)
   totalGas = totalGas.add(gasUsed)
   return totalGas

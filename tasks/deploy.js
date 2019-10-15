@@ -3,6 +3,7 @@ var { deployAllContracts } = require('../helpers/deployAllContracts')
 const extractNetworks = require('@gnosis.pm/util-contracts/src/util/extractNetworks')
 const injectNetworks = require('@gnosis.pm/util-contracts/src/util/injectNetworks')
 const path = require('path')
+var fs = require('fs');
 
 const confFile = path.join(__dirname, '../conf/network-restore')
 const conf = require(confFile)
@@ -20,8 +21,9 @@ let overwrites = {
 }
 task("deploy", "Deploys contracts")
 .addFlag("v", "Add verbose output to the command", false)
+.addFlag("a", "Deploy all", false)
 .addOptionalVariadicPositionalParam("overwrite", "Just list the contract names you'd like to overwrite", [])
-.setAction(async ({ overwrite, v }, env) => {
+.setAction(async ({ overwrite, v, a }, env) => {
     const verbose = v
     overwrite.forEach(element => {
         if (overwrites[element] === undefined) throw new Error(`${element} does not exist`)
@@ -32,6 +34,7 @@ task("deploy", "Deploys contracts")
     await injectNetworks(confFile)
 
     const accounts = await web3.eth.getAccounts();
+
     var {
         reversi, 
         clovers, 
@@ -40,16 +43,23 @@ task("deploy", "Deploys contracts")
         clubTokenController, 
         simpleCloversMarket, 
         clubToken
-    } = await deployAllContracts({overwrites, accounts, artifacts, web3, verbose})
+    } = await deployAllContracts({
+        overwrites, 
+        accounts, 
+        artifacts, 
+        web3, 
+        verbose,
+        deployAll: a
+    })
 
-    // save contract info inside of ./truffle/
-    await saveNetworks([reversi, 
+    // save contract info inside of ./build/contracts
+    saveNetworks([reversi, 
         clovers, 
         cloversMetadata, 
         cloversController, 
         clubTokenController, 
         simpleCloversMarket, 
-        clubToken])
+        clubToken], env)
 
     // save network info inside of ./networks.json
     await extractNetworks(confFile)
@@ -64,17 +74,16 @@ task("deploy", "Deploys contracts")
     }
  });
 
- async function saveNetworks(contractArray) {
-     const contractArrayModified = contractArray.reduce((result, item) => {
+function saveNetworks(contractArray, env) {
+    contractArray.forEach((item) => {
         let networkId = item.constructor.network_id
-        let json = item.constructor._json
+        contractPath = path.join(env.config.paths.artifacts, item.constructor._json.contractName + '.json')
+        json = JSON.parse(fs.readFileSync(contractPath))
         if (!json.networks[networkId]) {
             json.networks[networkId] = {}
         }
         json.networks[networkId].address = item.address
         json.networks[networkId].transactionHash = item.transactionHash
-        result[json.contractName] = json
-        return result
-    }, {})
-    return artifactor.saveAll(contractArrayModified)
+        fs.writeFileSync(contractPath, JSON.stringify(json, null, 1))
+    })
  }
