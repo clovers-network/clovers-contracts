@@ -1,7 +1,10 @@
 require("dotenv").config();
 usePlugin("@nomiclabs/buidler-solhint");
+usePlugin("@nomiclabs/buidler-web3")
+usePlugin("@nomiclabs/buidler-truffle5");
 
 require('./tasks')
+
  
 module.exports = {
   defaultNetwork: "develop",
@@ -38,7 +41,7 @@ module.exports = {
 
   paths: {
     sources: "./contracts/v5",
-    tests: "./tests", 
+    tests: "./test", 
     cache: "./cache",
     artifacts: "./artifacts"
   }

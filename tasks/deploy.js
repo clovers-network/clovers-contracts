@@ -1,4 +1,3 @@
-usePlugin("@nomiclabs/buidler-truffle5");
 const Artifactor = require("@truffle/artifactor");
 var { deployAllContracts } = require('../helpers/deployAllContracts')
 const extractNetworks = require('@gnosis.pm/util-contracts/src/util/extractNetworks')

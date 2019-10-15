@@ -8,7 +8,9 @@ const {
 } = require('../helpers/utils')
 var assert = require('assert');
 
-describe('Clovers.sol', async function(accounts) {
+describe('Clovers.sol', async () => {
+  const accounts = await web3.eth.getAccounts();
+
   var
     clovers, 
     cloversMetadata, 

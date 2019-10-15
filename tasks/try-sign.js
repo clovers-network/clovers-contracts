@@ -1,4 +1,3 @@
-usePlugin("@nomiclabs/buidler-truffle5");
 
 task("sign", "sign")
 .setAction(async (taskArgs, env) => {

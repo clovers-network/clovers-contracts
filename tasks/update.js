@@ -1,4 +1,3 @@
-usePlugin("@nomiclabs/buidler-truffle5");
 var { deployAllContracts } = require('../helpers/deployAllContracts')
 var { updateAllContracts } = require('../helpers/updateAllContracts')
 

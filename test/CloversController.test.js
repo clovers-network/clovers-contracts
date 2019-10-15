@@ -24,7 +24,7 @@ const {
   basePrice
 } = require('../helpers/migVals')
 var assert = require('assert');
-const { web3 } = require("@nomiclabs/buidler")
+// const { web3 } = require("@nomiclabs/buidler")
 
 describe('CloversController.sol', async () => {
   const accounts = await web3.eth.getAccounts();

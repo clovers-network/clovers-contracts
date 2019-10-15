@@ -7,7 +7,9 @@ const _ = require('../helpers/utils')._
 var assert = require('assert');
 
 
-describe('Reversi', async (accounts)=>  {
+describe('Reversi', async ()=>  {
+  const accounts = await web3.eth.getAccounts();
+
   let reversi, reversiMock
   before(done => {
     ;(async () => {

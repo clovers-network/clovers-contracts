@@ -1,4 +1,3 @@
-usePlugin("@nomiclabs/buidler-truffle5");
 
 task("deployUpdate", "Deploy and Update Contracts")
 .addFlag("v", "Add verbose output to the command", false)
