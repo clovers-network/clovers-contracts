@@ -1,5 +1,5 @@
 module.exports = {
-Clovers: {
+  Clovers: {
  "abi": [
   {
    "constant": true,
@@ -1278,8 +1278,7 @@ Clovers: {
     }
    },
    "links": {},
-   "address": "0xB55C5cAc5014C662fDBF21A2C59Cd45403C482Fd",
-   "transactionHash": null
+   "address": "0xB55C5cAc5014C662fDBF21A2C59Cd45403C482Fd"
   },
   "4": {
    "events": {
@@ -1409,8 +1408,7 @@ Clovers: {
     }
    },
    "links": {},
-   "address": "0xe312398f2741e2ab4c0c985c8d91adcc4a995a59",
-   "transactionHash": null
+   "address": "0xe312398f2741E2Ab4C0C985c8d91AdcC4a995a59"
   },
   "42": {
    "events": {
@@ -1547,6 +1545,16 @@ Clovers: {
    "address": "0xF4f7F9CD9b912D8f3EA0e1a686942978B573723D",
    "transactionHash": "0x5d28d949ef517bff6dfd633a37541127d22192f0a744914c785d2f4e3a921b05"
   },
+  "1337": {
+   "address": "0xbF40978F57E66F2fCd890934FEDEF2A832672Ff7",
+   "transactionHash": "0xb1cbff7bc6e5af3d21bbba170598ae960e1cd8497c8d34b3e0073d8df5eeed0c"
+  },
+  "31337": {
+   "address": "0x7c2C195CD6D34B8F845992d380aADB2730bB9C6F",
+   "transactionHash": "0x067f9ec962e32bd5d9c5f544936e3422a817eae70619668fb9e46eefdd51da1f",
+   "links": {},
+   "events": {}
+  },
   "1569787081442": {
    "events": {
     "0xf8df31144d9c2f0f6b59d69b8b98abd5459d07f2742c4df920b25aae33c64820": {
@@ -1680,7 +1688,7 @@ Clovers: {
   }
  }
 },
-CloversController: {
+  CloversController: {
  "abi": [
   {
    "constant": false,
@@ -2687,16 +2695,16 @@ CloversController: {
     "Reversi": "0xF640b022ab52A003466dAAefb5E87bBEE7aC1bdF",
     "\\$b2fca45de5ef9c5a18731e56fbc51add96\\$": "0xF640b022ab52A003466dAAefb5E87bBEE7aC1bdF"
    },
-   "address": "0xD3B55Ba131CE66c1F4299917e1347533Ad16E06c",
-   "transactionHash": "0x44eb4bb2744ef16f6639a8971d9b73d06e6f46563299207d529be20735a6cf4b"
+   "address": "0x3c037014486aaA5D509c5171d413C8B3022f1072",
+   "transactionHash": "0x9cfea433f6b86e39313f87d61d5dc9c14e56070d8128a52200fd92672e0bf782"
   },
   "4": {
    "events": {},
    "links": {
     "Reversi": "0xbff258e5c379ac4fe61ac005f4f341476a2ab180"
    },
-   "address": "0x83550091623dbf42c9762cea09f74ee5f7f32686",
-   "transactionHash": "0x33828d5696099bea8d051581e73d1f27562a1f60f043b7d65b23b7bf7d4d5812"
+   "address": "0x2ab5359105CE86eFa5555bE7D10aD9ACaF4E3d71",
+   "transactionHash": "0x8dc5474f67404c6eb592c9c861dcc12a1a82066364ec5c5936340c60ea632bbb"
   },
   "42": {
    "events": {},
@@ -2823,6 +2831,126 @@ CloversController: {
    "address": "0x83f43A2D67Cb3C020c61975b04Ef0f44a9B9ee1F",
    "transactionHash": "0x0400875f838026664bad0e3fdd47987884c1cf3241534a29040389362a732fab"
   },
+  "1337": {
+   "address": "0x3fc42A96184c8A60B98a8d33828cA0Ed98b8c26B",
+   "transactionHash": "0xcbc16b874a6e9e3aa3d2857a5f1de8396a213c63da11ff1441617ba43bd0a879"
+  },
+  "31337": {
+   "events": {
+    "0x4c0f83654ac2972673e4d81058f833de298389df1dce04cc2db9f231b907d5ff": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": false,
+       "name": "movesHash",
+       "type": "bytes32"
+      },
+      {
+       "indexed": false,
+       "name": "owner",
+       "type": "address"
+      }
+     ],
+     "name": "cloverCommitted",
+     "type": "event",
+     "signature": "0x4c0f83654ac2972673e4d81058f833de298389df1dce04cc2db9f231b907d5ff"
+    },
+    "0xbffd4880cee44a71d4266cf8dcf3179608df035c1883808a2370a9cfd180f6ed": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": false,
+       "name": "tokenId",
+       "type": "uint256"
+      },
+      {
+       "indexed": false,
+       "name": "moves",
+       "type": "bytes28[2]"
+      },
+      {
+       "indexed": false,
+       "name": "sender",
+       "type": "address"
+      },
+      {
+       "indexed": false,
+       "name": "recepient",
+       "type": "address"
+      },
+      {
+       "indexed": false,
+       "name": "reward",
+       "type": "uint256"
+      },
+      {
+       "indexed": false,
+       "name": "symmetries",
+       "type": "uint256"
+      },
+      {
+       "indexed": false,
+       "name": "keep",
+       "type": "bool"
+      }
+     ],
+     "name": "cloverClaimed",
+     "type": "event",
+     "signature": "0xbffd4880cee44a71d4266cf8dcf3179608df035c1883808a2370a9cfd180f6ed"
+    },
+    "0x36b306723b6493a90002bbf27460db864a9ac8ce1af82ad1f0183f83c0cecc39": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": false,
+       "name": "tokenId",
+       "type": "uint256"
+      },
+      {
+       "indexed": false,
+       "name": "moves",
+       "type": "bytes28[2]"
+      },
+      {
+       "indexed": false,
+       "name": "owner",
+       "type": "address"
+      },
+      {
+       "indexed": false,
+       "name": "challenger",
+       "type": "address"
+      }
+     ],
+     "name": "cloverChallenged",
+     "type": "event",
+     "signature": "0x36b306723b6493a90002bbf27460db864a9ac8ce1af82ad1f0183f83c0cecc39"
+    },
+    "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+     "anonymous": false,
+     "inputs": [
+      {
+       "indexed": true,
+       "name": "previousOwner",
+       "type": "address"
+      },
+      {
+       "indexed": true,
+       "name": "newOwner",
+       "type": "address"
+      }
+     ],
+     "name": "OwnershipTransferred",
+     "type": "event",
+     "signature": "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0"
+    }
+   },
+   "links": {
+    "\\$b2fca45de5ef9c5a18731e56fbc51add96\\$": "0xf4e77E5Da47AC3125140c470c71cBca77B5c638c"
+   },
+   "address": "0x3619DbE27d7c1e7E91aA738697Ae7Bc5FC3eACA5",
+   "transactionHash": "0xe6c227f01a8efd12add510e24f76e58e05d797a75425f4a47edc6057fc6b7cbf"
+  },
   "1569787081442": {
    "events": {},
    "links": {
@@ -2833,7 +2961,7 @@ CloversController: {
   }
  }
 },
-ClubToken: {
+  ClubToken: {
  "abi": [
   {
    "constant": false,
@@ -3442,14 +3570,12 @@ ClubToken: {
   "1": {
    "events": {},
    "links": {},
-   "address": "0x1A94656A6245379bC0d9c64C402197528EdB2bD1",
-   "transactionHash": null
+   "address": "0x1A94656A6245379bC0d9c64C402197528EdB2bD1"
   },
   "4": {
    "events": {},
    "links": {},
-   "address": "0x60217dcbf6a41bdf68df163199412f25992bc08b",
-   "transactionHash": null
+   "address": "0x60217dCbf6A41Bdf68df163199412F25992bc08B"
   },
   "42": {
    "events": {},
@@ -3461,6 +3587,16 @@ ClubToken: {
    "address": "0x738453Ff13e066a3f85B3F7adc9557C62f16C86B",
    "transactionHash": "0xf3b51501392d1ba8d577b78a0e86fb5fb6252003ed6a092b51ea7b1d451d3c6b"
   },
+  "1337": {
+   "address": "0x632230e94124D2c1A45473abc837794d0112d741",
+   "transactionHash": "0xdeae46b33e902885cb64b9c2e677cd6068a16cb16fd1b991aa3425094bb6e9f8"
+  },
+  "31337": {
+   "address": "0x0078371BDeDE8aAc7DeBfFf451B74c5EDB385Af7",
+   "transactionHash": "0xf5b39efc0bd35e18115684744214a627bc597cc86764a9aa136d78794c1b8dfc",
+   "links": {},
+   "events": {}
+  },
   "1569787081442": {
    "events": {},
    "links": {},
@@ -3469,7 +3605,7 @@ ClubToken: {
   }
  }
 },
-ClubTokenController: {
+  ClubTokenController: {
  "abi": [
   {
    "constant": false,
@@ -4330,8 +4466,7 @@ ClubTokenController: {
     }
    },
    "links": {},
-   "address": "0x1754a612cA578F72d678196bcC16710f01DB7655",
-   "transactionHash": null
+   "address": "0x1754a612cA578F72d678196bcC16710f01DB7655"
   },
   "4": {
    "events": {
@@ -4459,8 +4594,7 @@ ClubTokenController: {
     }
    },
    "links": {},
-   "address": "0x05adcbf9cb71d1d9f62015011e3760bbedc41123",
-   "transactionHash": null
+   "address": "0x05ADCbF9cB71D1d9F62015011e3760bbedc41123"
   },
   "42": {
    "events": {
@@ -4595,6 +4729,16 @@ ClubTokenController: {
    "address": "0x58223d5361760199Def28F2dad2f1bb5Ee51Ee5A",
    "transactionHash": "0x0648dd3e5399feeca08398441c061be5994f77cdacf8e43f1d5748c8936af44c"
   },
+  "1337": {
+   "address": "0x8013B2B4Ab9c8395229dB7F42cfF803c389C5318",
+   "transactionHash": "0x64db7cdb5409175480355b1e68e5c830a5f993c17b64d0c8e1351c8c3794a73a"
+  },
+  "31337": {
+   "address": "0xf784709d2317D872237C4bC22f867d1BAe2913AB",
+   "transactionHash": "0x96d83e5c8c5831c1e29a89eb1800a9cb0211592e1856bbf94ee071387827887a",
+   "links": {},
+   "events": {}
+  },
   "1569787081442": {
    "events": {
     "0x064fb1933e186be0b289a87e98518dc18cc9856ecbc9f1353d1a138ddf733ec5": {
@@ -4726,7 +4870,7 @@ ClubTokenController: {
   }
  }
 },
-SimpleCloversMarket: {
+  SimpleCloversMarket: {
  "abi": [
   {
    "constant": true,
@@ -5224,8 +5368,7 @@ SimpleCloversMarket: {
     }
    },
    "links": {},
-   "address": "0x6ebD97252D34645263c1d074f202F1d7546CE06b",
-   "transactionHash": null
+   "address": "0x6ebD97252D34645263c1d074f202F1d7546CE06b"
   },
   "4": {
    "events": {
@@ -5306,8 +5449,7 @@ SimpleCloversMarket: {
     }
    },
    "links": {},
-   "address": "0xe8d64ede6322c8208017dcdf33c7da8a5e4697cf",
-   "transactionHash": null
+   "address": "0xe8D64eDe6322C8208017DcdF33c7dA8a5E4697Cf"
   },
   "42": {
    "events": {
@@ -5395,6 +5537,16 @@ SimpleCloversMarket: {
    "address": "0xbbB611EAa01253522D53B23067A30ceA8743bCcE",
    "transactionHash": "0x78fb432c24afa2c39464055f7d44bcd59e4557cf9d1119cdfcfad9b274894b8a"
   },
+  "1337": {
+   "address": "0x951A9f5B0186C4A24ca74Fe934bC5677e1d3e066",
+   "transactionHash": "0x3448233fc52e293d779f5ce01b91e072367453aadbbe0cddbc6891c9af6e0255"
+  },
+  "31337": {
+   "address": "0x038B86d9d8FAFdd0a02ebd1A476432877b0107C8",
+   "transactionHash": "0xacd8698de73b84bc3c86c6ce8228bd62092810d9a0d9e9dedce4f0c8c8e5d5d8",
+   "links": {},
+   "events": {}
+  },
   "1569787081442": {
    "events": {
     "0x82367b2d6e4540d07b2a6e64ecb6a2f8130985e6a17e157c3e556591c6b54f69": {
@@ -5479,4 +5631,4 @@ SimpleCloversMarket: {
   }
  }
 }
-};
+  };
