@@ -313,7 +313,7 @@ contract('CloversController.sol', async (accounts) => {
       assert(failed, `claimCloverWithVerification didn't fail when CloverCoin balance was too low`)
     })
     it('claimCloverWithVerification should work with keep = false', async () => {
-
+      console.log(this)
       let keep = false
       let game = await cloversController.getGame(moves)
       assert(game.board === tokenId, `tokenIds don't match ${tokenIdLog} !== ${tokenId}`)
