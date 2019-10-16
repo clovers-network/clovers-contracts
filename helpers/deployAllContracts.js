@@ -52,12 +52,12 @@ async function deployAllContracts({overwrites, accounts, artifacts, web3, chainI
     async function alreadyDeployed(contractName) {
         let address =  networks && networks[contractName] && networks[contractName][chainId] && networks[contractName][chainId].address
         if (!address) {
-            console.log('no address')
+            verbose && console.log('no address')
             return false
         }
         let code = await web3.eth.getCode(address)
         if (code === '0x') {
-            console.log('no code')
+            verbose && console.log('no code')
             return false
         }
         // let contract = eval(contractName)

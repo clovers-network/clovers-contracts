@@ -25,6 +25,7 @@ const {
 } = require('../helpers/migVals')
 var assert = require('assert');
 // const { web3 } = require("@nomiclabs/buidler")
+const { contract } = require("@nomiclabs/buidler")
 
 contract('CloversController.sol', async (accounts) => {
 
@@ -38,7 +39,6 @@ contract('CloversController.sol', async (accounts) => {
     simpleCloversMarket, 
     clubToken
   before(async () => {
-    console.log('before')
     try {
       var totalGas = utils.toBN('0')
       const chainId = await web3.eth.net.getId()
@@ -313,6 +313,7 @@ contract('CloversController.sol', async (accounts) => {
       assert(failed, `claimCloverWithVerification didn't fail when CloverCoin balance was too low`)
     })
     it('claimCloverWithVerification should work with keep = false', async () => {
+
       let keep = false
       let game = await cloversController.getGame(moves)
       assert(game.board === tokenId, `tokenIds don't match ${tokenIdLog} !== ${tokenId}`)
@@ -323,11 +324,9 @@ contract('CloversController.sol', async (accounts) => {
 
       let exists = await clovers.exists(game.board)
       assert(!exists, `board ${game.board} should not exist yet`)
-
       var tx = await cloversController.claimCloverWithVerification(moves, keep, {from})
       var tokenIdLog = '0x' + tx.logs[0].args.tokenId.toString(16)
       assert(tokenIdLog === tokenId, `tokenIds don't match ${tokenIdLog} !== ${tokenId}`)
-      
       console.log(_ + 'cloversController.claimCloverWithVerification: ' + tx.receipt.cumulativeGasUsed)
       gasToCash(tx.receipt.cumulativeGasUsed)
       ownerOf = await clovers.ownerOf(tokenId)

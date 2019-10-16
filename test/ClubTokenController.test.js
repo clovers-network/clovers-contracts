@@ -17,6 +17,7 @@ const {
   basePrice
 } = require('../helpers/migVals')
 var assert = require('assert');
+const { contract } = require("@nomiclabs/buidler")
 
 contract('ClubTokenController.sol', async function(accounts) {
   var

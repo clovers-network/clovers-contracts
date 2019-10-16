@@ -49,7 +49,7 @@ library Reversi {
         uint8 moveKey
     // , string memory msg
     ) {
-      Game memory game = playGame(moves);
+        Game memory game = playGame(moves);
         return (
             game.error,
             game.complete,
@@ -389,11 +389,12 @@ library Reversi {
     // Utilities
 
     function returnSymmetricals (bool RotSym, bool Y0Sym, bool X0Sym, bool XYSym, bool XnYSym) public pure returns (uint256) {
-        uint256 symmetries = (RotSym ? 1  : 0) << 1;
-        symmetries = (symmetries & (Y0Sym ? 1 : 0)) << 1;
-        symmetries = (symmetries & (X0Sym ? 1 : 0)) << 1;
-        symmetries = (symmetries & (XYSym ? 1 : 0)) << 1;
-        symmetries = symmetries & (XnYSym ? 1 : 0);
+        uint256 symmetries = 0;
+        if(RotSym) symmetries |= 16;
+        if(Y0Sym) symmetries |= 8;
+        if(X0Sym) symmetries |= 4;
+        if(XYSym) symmetries |= 2;
+        if(XnYSym) symmetries |= 1;
         return symmetries;
     }
 
@@ -404,8 +405,8 @@ library Reversi {
     }
 
     function turnTile (bytes16 board, uint8 color, uint8 col, uint8 row) internal pure returns (bytes16){
-        if (col > 7) revert();
-        if (row > 7) revert();
+        if (col > 7) revert("can't turn tile outside of board col");
+        if (row > 7) revert("can't turn tile outside of board row");
         uint128 push = posToPush(col, row);
         bytes16 mask = bytes16(uint128(3)) << push;// 0b00000011 (ones)
 

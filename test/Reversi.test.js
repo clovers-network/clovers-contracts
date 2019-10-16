@@ -6,6 +6,7 @@ const gasToCash = require('../helpers/utils').gasToCash
 const _ = require('../helpers/utils')._
 var assert = require('assert');
 
+const { contract } = require("@nomiclabs/buidler")
 
 contract('Reversi', async (accounts)=>  {
   let reversi, reversiMock
@@ -52,6 +53,32 @@ contract('Reversi', async (accounts)=>  {
       assert(game.complete && !game.error, `game had an error`)
       assert(game.board === _realTokenId, `token IDs did not match ${game.board} !== ${_realTokenId}`)
       // console.log({game})
+
+    })
+
+    it('should return symmetricals correctly', async () => {
+      let result, rResult
+      let r = new Reversi()
+      for (let i = 0; i < 2; i ++) {
+        for (let j = 0; j < 2; j ++) {
+          for (let k = 0; k < 2; k++) {
+            for (let l = 0; l < 2; l ++) {
+              for (let m = 0; m < 2; m ++) {
+                result = await reversi.returnSymmetricals(i == 0, j == 0, k == 0, l == 0, m == 0)
+                r.RotSym = i == 0
+                r.Y0Sym = j == 0
+                r.X0Sym = k == 0
+                r.XYSym = l == 0
+                r.XnYSym = m == 0
+                rResult = r.returnSymmetriesAsBN()
+                // console.log(i == 0, j == 0, k == 0, l == 0, m == 0, result.toString(2).padStart(5, '0'), rResult.toString(2).padStart(5, '0'))
+                assert(rResult.toString(2) === result.toString(2), `Results were different: ${result.toString(2).padStart(5, '0')} and ${rResult.toString(2).padStart(5, '0')}`)
+              }
+            }
+          }
+        }
+      }
+
     })
 
     it('should get cost to play a game', async () => {

@@ -8,6 +8,7 @@ const {
   _
 } = require('../helpers/utils')
 var assert = require('assert');
+const { contract } = require("@nomiclabs/buidler")
 
 contract('SimpleCloversMarket.sol', async function(accounts) {
   var

@@ -193,12 +193,12 @@ contract CloversController is Ownable {
     function _claimClover(uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, address recepient, bool keep) internal returns (bool) {
         clovers.setCloverMoves(tokenId, moves);
         clovers.setKeep(tokenId, keep);
-
         uint256 reward;
         if (symmetries > 0) {
             clovers.setSymmetries(tokenId, symmetries);
             reward = calculateReward(symmetries);
             clovers.setReward(tokenId, reward);
+            addSymmetries(symmetries);
         }
         uint256 price = basePrice.add(reward);
         if (keep && price > 0) {
@@ -346,9 +346,9 @@ contract CloversController is Ownable {
 
     /**
     * @dev Adds new tallys of the totals numbers of clover symmetries.
-    * @param tokenId The token which needs to be examined.
+    * @param symmetries The symmetries which needs to be added.
     */
-    function addSymmetries(uint256 tokenId) private {
+    function addSymmetries(uint256 symmetries) private {
         uint256 Symmetricals;
         uint256 RotSym;
         uint256 Y0Sym;
@@ -361,7 +361,6 @@ contract CloversController is Ownable {
         X0Sym,
         XYSym,
         XnYSym) = clovers.getAllSymmetries();
-        uint256 symmetries = clovers.getSymmetries(tokenId);
         Symmetricals = Symmetricals.add(symmetries > 0 ? 1 : 0);
         RotSym = RotSym.add(uint256(symmetries >> 4 & 1));
         Y0Sym = Y0Sym.add(uint256(symmetries >> 3 & 1));
