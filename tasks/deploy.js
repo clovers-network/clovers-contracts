@@ -30,8 +30,8 @@ task("deploy", "Deploys contracts")
         overwrites[element] = true
     });
 
-    // make sure no info from networks.json is missing from the build folder
-    await injectNetworks(confFile)
+    // there's some kind of race condition where this function prevents extractNetworks from working
+    // await injectNetworks(confFile)
 
     const accounts = await web3.eth.getAccounts();
 
@@ -52,7 +52,6 @@ task("deploy", "Deploys contracts")
         deployAll: a
     })
 
-    console.log({reversi})
 
     // save contract info inside of ./build/contracts
     saveNetworks([reversi, 
@@ -81,8 +80,14 @@ function saveNetworks(contractArray, env) {
         let networkId = item.constructor.network_id
         contractPath = path.join(env.config.paths.artifacts, item.constructor._json.contractName + '.json')
         json = JSON.parse(fs.readFileSync(contractPath))
+        if (!json.networks) {
+            json.networks = {}
+        }
         if (!json.networks[networkId]) {
             json.networks[networkId] = {}
+        }
+        if (!json.transactionHash) {
+            json.transactionHash = null
         }
         json.networks[networkId].address = item.address
         json.networks[networkId].transactionHash = item.transactionHash

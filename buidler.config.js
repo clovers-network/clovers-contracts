@@ -36,7 +36,7 @@ module.exports = {
       accounts: testnetAccounts
     },
     develop: {
-      chainId: 1234,
+      chainId: 1337,
       url: "http://localhost:8545",
       // gas: 6000000,
       accounts: {mnemonic: process.env.TRUFFLE_MNEMONIC}

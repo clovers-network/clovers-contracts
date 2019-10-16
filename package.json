@@ -7,8 +7,8 @@
     "test": "test"
   },
   "scripts": {
-    "testnet": "npx ganache-cli -i 1234 -m='result chalk culture device mouse post focus marble nurse fire gun venue'",
-    "compile": "yarn compile-old && yarn compile-new",
+    "testnet": "npx ganache-cli -i 1337 -m='result chalk culture device mouse post focus marble nurse fire gun venue'",
+    "compile": "yarn compile-old && yarn compile-new && yarn networks-inject",
     "compile-old": "buidler compile --config buidler.config.4.js",
     "compile-new": "buidler compile",
     "compileAndTest": "yarn compile && truffle test",
