@@ -52,6 +52,8 @@ task("deploy", "Deploys contracts")
         deployAll: a
     })
 
+    console.log({reversi})
+
     // save contract info inside of ./build/contracts
     saveNetworks([reversi, 
         clovers, 
