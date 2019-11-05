@@ -32,6 +32,11 @@ module.exports = {
   defaultNetwork: "buidlerevm",
 
   networks: {
+    ethermint: {
+      chainId: 8,
+      url: "http://localhost:8545",
+      accounts: {mnemonic: process.env.ETHERMINT}
+    },
     buidlerevm: {
       accounts: testnetAccounts
     },
