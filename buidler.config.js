@@ -35,7 +35,7 @@ module.exports = {
     ethermint: {
       chainId: 8,
       url: "http://localhost:8545",
-      accounts: {mnemonic: process.env.ETHERMINT}
+      accounts: [process.env.ETHERMINT_KEY]
     },
     buidlerevm: {
       accounts: testnetAccounts
