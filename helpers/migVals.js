@@ -1,6 +1,8 @@
 const BigNumber = require('bignumber.js')
 const utils = require('web3-utils')
 const oneGwei = 1000000000
+const testnet_oracle = '0xB20FbdC70C19D0EBcee204d32e1828Fca9c2FB09'
+const mainnet_oracle = '0xaB0F3326F7F32988963D446543A0b3bbC21B8b92'
 var vals = (module.exports = {
   poaAMB: '0xfe446bef1dbf7afe24e81e05bc8b271c1ba9a560', // sokol (& kovan)
   poaID: '77',
@@ -27,7 +29,7 @@ var vals = (module.exports = {
   paused: false,
   limit: utils.toWei('5'),
   decimals: '18',
-  oracle: '0xaB0F3326F7F32988963D446543A0b3bbC21B8b92',
+  oracle: testnet_oracle,
   reserveRatio: '750000', // parts per million 500000 / 1000000 = 1/2
   virtualBalance: utils.toWei('10'),
   virtualSupply: utils.toWei('10000'),

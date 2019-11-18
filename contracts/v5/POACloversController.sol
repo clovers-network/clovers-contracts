@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/ownership/Ownable.sol";
 import "@openzeppelin/contracts/cryptography/ECDSA.sol";
 
 contract POACloversController is Ownable {
-    event cloverClaimed(uint256 tokenId, bytes28[2] moves, address sender, address recepient, uint reward, uint256 symmetries, bool keep);
+    event cloverClaimed(uint256 tokenId, bytes28[2] moves, address sender, address recipient, uint reward, uint256 symmetries, bool keep);
 
     using SafeMath for uint256;
     using ECDSA for bytes32;
@@ -29,14 +29,14 @@ contract POACloversController is Ownable {
         uint256 tokenId;
         bytes28[2] moves;
         uint256 symmetries;
-        address recepient;
+        address recipient;
         bool keep;
     }
 
-    function setMessageHashValue(bytes32 _hash, uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, address recepient, bool keep)
+    function setMessageHashValue(bytes32 _hash, uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, address recipient, bool keep)
         internal {
         require(submissions[_hash].tokenId == 0, "Hash has already been submitted");
-        submissions[_hash] = Submission(tokenId, moves, symmetries, recepient, keep);
+        submissions[_hash] = Submission(tokenId, moves, symmetries, recipient, keep);
     }
 
     modifier notPaused() {
@@ -56,8 +56,8 @@ contract POACloversController is Ownable {
         return keccak256(abi.encodePacked(moves));
     }
 
-    function getMovesHashWithRecepient(bytes32 movesHash, address recepient) public pure returns (bytes32) {
-        return keccak256(abi.encodePacked(movesHash, recepient));
+    function getMovesHashWithRecipient(bytes32 movesHash, address recipient) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(movesHash, recipient));
     }
 
     /**
@@ -99,30 +99,30 @@ contract POACloversController is Ownable {
         );
     }
 
-    // In order to prevent commit reveal griefing the first commit is a combined hash of the moves and the recepient.
+    // In order to prevent commit reveal griefing the first commit is a combined hash of the moves and the recipient.
     // In order to use the same commit mapping, we mark this hash simply as address(1) so it is no longer the equivalent of address(0)
-    function claimCloverSecurelyPartOne(bytes32 movesHashWithRecepient, address recepient) public {
+    function claimCloverSecurelyPartOne(bytes32 movesHashWithRecipient, address recipient) public {
         bytes4 methodSelector = CloversController(address(0)).claimCloverSecurelyPartOne.selector;
-        bytes memory data = abi.encodeWithSelector(methodSelector, movesHashWithRecepient, recepient);
+        bytes memory data = abi.encodeWithSelector(methodSelector, movesHashWithRecipient, recipient);
         amb.requireToPassMessage(address(cloversController), data, executionGasLimit); // TODO: set different gas limits
 
     }
 
-    // Once a commit has been made to guarantee the move hash is associated with the recepient we can make a commit on the hash of the moves themselves
+    // Once a commit has been made to guarantee the move hash is associated with the recipient we can make a commit on the hash of the moves themselves
     // If we were to make a claim on the moves in plaintext, the transaction could be front run on the claimCloverWithVerification or the claimCloverWithSignature
-    function claimCloverSecurelyPartTwo(bytes32 movesHash, address recepient) public {
+    function claimCloverSecurelyPartTwo(bytes32 movesHash, address recipient) public {
         bytes4 methodSelector = CloversController(address(0)).claimCloverSecurelyPartTwo.selector;
-        bytes memory data = abi.encodeWithSelector(methodSelector, movesHash, recepient);
+        bytes memory data = abi.encodeWithSelector(methodSelector, movesHash, recipient);
         amb.requireToPassMessage(address(cloversController), data, executionGasLimit); // TODO: set different gas limits
     }
 
-    function claimCloverWithVerification(bytes28[2] memory moves, bool keep, address recepient) public payable returns (bool) {
+    function claimCloverWithVerification(bytes28[2] memory moves, bool keep, address recipient) public payable returns (bool) {
         Reversi.Game memory game = Reversi.playGame(moves);
         require(isValidGame(game.error, game.complete), "Invalid game");
         uint256 tokenId = convertBytes16ToUint(game.board);
 
         uint256 symmetries = Reversi.returnSymmetricals(game.RotSym, game.Y0Sym, game.X0Sym, game.XYSym, game.XnYSym);
-        require(_claimClover(tokenId, moves, symmetries, recepient, keep), "Claim must succeed");
+        require(_claimClover(tokenId, moves, symmetries, recipient, keep), "Claim must succeed");
         return true;
     }
 
@@ -139,22 +139,22 @@ contract POACloversController is Ownable {
     * @return A boolean representing whether or not the claim was successful.
     */
     /* solium-disable-next-line  max-len */
-    function claimCloverWithSignature(uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, bool keep, address recepient, bytes memory signature)
+    function claimCloverWithSignature(uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, bool keep, address recipient, bytes memory signature)
         public payable notPaused returns (bool) {
-        require(checkSignature(tokenId, moves, symmetries, keep, recepient, signature, oracle), "Invalid Signature");
-        require(_claimClover(tokenId, moves, symmetries, recepient, keep), "Claim must succeed");
+        require(checkSignature(tokenId, moves, symmetries, keep, recipient, signature, oracle), "Invalid Signature");
+        require(_claimClover(tokenId, moves, symmetries, recipient, keep), "Claim must succeed");
         return true;
     }
 
-    function _claimClover(uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, address recepient, bool keep) internal returns (bool) {
+    function _claimClover(uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, address recipient, bool keep) internal returns (bool) {
 
         bytes4 methodSelector = CloversController(address(0)).claimCloverFromAMB.selector;
-        bytes memory data = abi.encodeWithSelector(methodSelector, tokenId, moves, symmetries, keep, recepient);
+        bytes memory data = abi.encodeWithSelector(methodSelector, tokenId, moves, symmetries, keep, recipient);
         amb.requireToPassMessage(address(cloversController), data, executionGasLimit);
 
         // Save value and from related to the data hash in case the message fails on the other side
         // bytes32 dataHash = keccak256(data);
-        // setMessageHashValue(dataHash, tokenId, moves, symmetries, recepient, keep);
+        // setMessageHashValue(dataHash, tokenId, moves, symmetries, recipient, keep);
         return true;
     }
 
@@ -215,17 +215,17 @@ contract POACloversController is Ownable {
         bytes28[2] memory moves,
         uint256 symmetries,
         bool keep,
-        address recepient,
+        address recipient,
         bytes memory signature,
         address signer
     ) public pure returns (bool) {
-        bytes32 hash = toEthSignedMessageHash(getHash(tokenId, moves, symmetries, keep, recepient));
+        bytes32 hash = toEthSignedMessageHash(getHash(tokenId, moves, symmetries, keep, recipient));
         address result = recover(hash, signature);
         return (result != address(0) && result == signer);
     }
 
-    function getHash(uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, bool keep, address recepient) public pure returns (bytes32) {
-        return keccak256(abi.encodePacked(tokenId, moves, symmetries, keep, recepient));
+    function getHash(uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, bool keep, address recipient) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(tokenId, moves, symmetries, keep, recipient));
     }
     function recover(bytes32 hash, bytes memory signature) public pure returns (address) {
         return hash.recover(signature);
