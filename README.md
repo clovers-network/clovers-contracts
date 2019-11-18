@@ -117,7 +117,7 @@ $ yarn test
       ✓ should make sure retrieveStake tx was successful (212ms)
       ✓ should make sure token exists & is owned by this clovers contract
       ✓ should make sure reward was received
-      ✓ should make sure stake amount was retured to your account (358ms)
+      ✓ should make sure stake amount was returned to your account (358ms)
 
   Contract: Reversi
     Reversi.sol
@@ -127,8 +127,8 @@ $ yarn test
       ✓ should get cost to play a game (5093ms)
       ✓ should play a valid game without error (4388ms)
       ✓ should play a valid game with empty squares without error (4597ms)
-      ✓ should fail when plaing empty moves game
-      ✓ should fail when plaing game where last move is invalid (3318ms)
+      ✓ should fail when playing empty moves game
+      ✓ should fail when playing game where last move is invalid (3318ms)
 
 
   23 passing (34s)

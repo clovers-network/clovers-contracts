@@ -1,10 +1,10 @@
 var { deployAllContracts } = require('../helpers/deployAllContracts')
 var { updateAllContracts } = require('../helpers/updateAllContracts')
-
+var networks = require('../networks.json')
 task('update', 'Updates contract values')
 .addFlag("v", "Add verbose output to the command", false)
 .setAction(async ({v, contracts}, env) => {
-    verbose = v
+    var verbose = v
     const accounts = await web3.eth.getAccounts()
     var {
         reversi, 
@@ -24,7 +24,8 @@ task('update', 'Updates contract values')
         simpleCloversMarket, 
         clubToken,
         accounts,
-        verbose
+        verbose,
+        networks
     })
 
 })

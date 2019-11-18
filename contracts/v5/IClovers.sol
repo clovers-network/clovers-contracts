@@ -1,4 +1,4 @@
-pragma solidity ^0.5.9;
+pragma solidity ^0.5.8;
 
 contract IClovers {
     function ownerOf(uint256 _tokenId) public view returns (address _owner);

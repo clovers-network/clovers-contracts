@@ -2,6 +2,11 @@ const BigNumber = require('bignumber.js')
 const utils = require('web3-utils')
 const oneGwei = 1000000000
 var vals = (module.exports = {
+  poaAMB: '0xfe446bef1dbf7afe24e81e05bc8b271c1ba9a560', // sokol (& kovan)
+  poaID: '77',
+  ethAMB: '0xfe446bef1dbf7afe24e81e05bc8b271c1ba9a560', // kovan (& sokol)
+  ethID: '42',
+  executionGasLimit: '0xffffffffffffffffff',
   // stakeAmount: new BigNumber(529271).times(1000000000).times(40), // gasPrice * 1GWEI * 40 (normal person price)
   stakeAmount: new BigNumber(286774), // gasPrice * 10GWEI (oracle price)
   fastGasPrice: new BigNumber(10).times(oneGwei),
@@ -40,7 +45,8 @@ async function updateCloversController({
   cloversController,
   clubTokenController,
   simpleCloversMarket,
-  verbose
+  verbose,
+  networks
 }) {
 
   var totalGas = utils.toBN('0')
@@ -130,6 +136,41 @@ async function updateCloversController({
   } else {
     verbose && console.log(_ + 'paused hasnt changed')
   }
+
+  // amb
+  try {
+    var currentAMB = await cloversController.getAMB()
+    if (currentAMB.toLowerCase() !== vals.ethAMB.toLowerCase()) {
+      verbose && console.log(_ + `cloversController.updateAMB from ${currentAMB} to ${vals.ethAMB}`)
+      var tx = await cloversController.updateAMB(vals.ethAMB)
+      verbose && gasToCash(tx.receipt.gasUsed)
+      totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
+    } else {
+      verbose && console.log(_ + 'ethAMB hasnt changed')
+    }
+  } catch (error) {
+    console.log('--------------------------- something fucked up')
+    console.error(error)
+  }
+
+  try {
+    const poaCloversControllerAddress = networks['POACloversController'][vals.poaID].address
+
+    // poa cloversController
+    var currentPOACloversController = await cloversController.poaCloversController()
+    if (currentPOACloversController.toLowerCase() !== poaCloversControllerAddress.toLowerCase()) {
+    verbose && console.log(_ + `cloversController.updatePOACloversController from ${currentPOACloversController} to ${poaCloversControllerAddress}`)
+    var tx = await cloversController.updatePOACloversController(poaCloversControllerAddress)
+    verbose && gasToCash(tx.receipt.gasUsed)
+    totalGas = totalGas.add(utils.toBN(tx.receipt.gasUsed))
+    } else {
+    verbose && console.log(_ + 'poaCloversControllerAddress hasnt changed')
+    }
+
+} catch (error) {
+    console.log(`-------------Problem updating Clovers Controller from network ${vals.poaID} on network ${vals.ethID}-------------`)
+    console.error(error)
+}
 
   return totalGas
 }

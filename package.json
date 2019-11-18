@@ -20,7 +20,8 @@
     "pub": "npm publish",
     "networks-extract": "node extract_network_info.js",
     "networks-inject": "node inject_network_info.js",
-    "networks-reset": "mkdir -p build/contracts && npx truffle networks --clean && npm run networks-inject"
+    "networks-reset": "mkdir -p build/contracts && npx truffle networks --clean && npm run networks-inject",
+    "bridgeComplete": "buidler --network kovan deployUpdate --v && buidler --network sokol deployUpdatePOA --v && buidler --network kovan update --v"
   },
   "author": "Billy Rennekamp <billy.rennekamp@gmail.com>",
   "license": "MIT",

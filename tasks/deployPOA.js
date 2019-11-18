@@ -1,25 +1,20 @@
 // const Artifactor = require("@truffle/artifactor");
-var { deployAllContracts } = require('../helpers/deployAllContracts')
+var { deployPOAContracts } = require('../helpers/deployPOAContracts')
 const extractNetworks = require('@gnosis.pm/util-contracts/src/util/extractNetworks')
 // const injectNetworks = require('@gnosis.pm/util-contracts/src/util/injectNetworks')
 const path = require('path')
 
 var {saveNetworks} = require('../helpers/utils')
+
 const confFile = path.join(__dirname, '../conf/network-restore')
 const conf = require(confFile)
 // const artifactor = new Artifactor(conf.buildPath);
 
 let overwrites = {
     Reversi: false,
-    Support: false,
-    Clovers: false,
-    CloversMetadata: false,
-    CloversController: false,
-    ClubTokenController: false,
-    SimpleCloversMarket: false,
-    ClubToken: false
+    POACloversController: false,
 }
-task("deploy", "Deploys contracts")
+task("deployPOA", "Deploys POA contracts")
 .addFlag("v", "Add verbose output to the command", false)
 .addFlag("a", "Deploy all", false)
 .addOptionalVariadicPositionalParam("overwrite", "Just list the contract names you'd like to overwrite", [])
@@ -37,13 +32,8 @@ task("deploy", "Deploys contracts")
 
     var {
         reversi, 
-        clovers, 
-        cloversMetadata, 
-        cloversController, 
-        clubTokenController, 
-        simpleCloversMarket, 
-        clubToken
-    } = await deployAllContracts({
+        poaCloversController
+    } = await deployPOAContracts({
         overwrites, 
         accounts, 
         artifacts, 
@@ -54,23 +44,12 @@ task("deploy", "Deploys contracts")
 
 
     // save contract info inside of ./build/contracts
-    saveNetworks([reversi, 
-        clovers, 
-        cloversMetadata, 
-        cloversController, 
-        clubTokenController, 
-        simpleCloversMarket, 
-        clubToken], env)
+    saveNetworks([reversi, poaCloversController], env)
 
     // save network info inside of ./networks.json
     await extractNetworks(confFile)
     return {
         reversi, 
-        clovers, 
-        cloversMetadata, 
-        cloversController, 
-        clubTokenController, 
-        simpleCloversMarket, 
-        clubToken
+        poaCloversController
     }
  });

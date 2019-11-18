@@ -32,11 +32,11 @@ module.exports = {
   defaultNetwork: "buidlerevm",
 
   networks: {
-    ethermint: {
-      chainId: 8,
-      url: "http://localhost:8545",
-      accounts: [process.env.ETHERMINT_KEY]
-    },
+    // ethermint: {
+    //   chainId: 8,
+    //   url: "http://localhost:8545",
+    //   accounts: [process.env.ETHERMINT_KEY]
+    // },
     buidlerevm: {
       accounts: testnetAccounts
     },
@@ -59,10 +59,29 @@ module.exports = {
       // gas: 6000000,
       accounts: {mnemonic: process.env.TESTNET_MNEMONIC},
       gasPrice: 15000000000 // 15 GWEI
+    },
+    kovan: {
+      url: "https://kovan.infura.io/v3/" + process.env.INFURA_API_KEY,
+      chainId: 42,
+      // gas: 6000000,
+      accounts: {mnemonic: process.env.TESTNET_MNEMONIC},
+      gasPrice: 15000000000 // 15 GWEI
+    },
+    sokol: {
+      url: "https://sokol.poa.network",
+      chainId: 77,
+      accounts: {mnemonic: process.env.TESTNET_MNEMONIC},
+      gasPrice: 1000000000,
+    },
+    poa: {
+      url: "https://core.poa.network",
+      chainId: 99,
+      accounts: {mnemonic: process.env.TESTNET_MNEMONIC},
+      gasPrice: 1000000000,
     }
   },
   solc: {
-    version: "0.5.9",
+    version: "0.5.8",
     optimizer: {
       enabled: true,
       runs: 10000

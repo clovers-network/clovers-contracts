@@ -3,8 +3,29 @@ const BigNumber = require('bignumber.js')
 const oneGwei = new BigNumber('1000000000') // 1 GWEI
 const _ = '        '
 var Rev = require('clovers-reversi').default
+const path = require('path')
+var fs = require('fs');
 
 
+function saveNetworks(contractArray, env) {
+  contractArray.forEach((item) => {
+      let networkId = item.constructor.network_id
+      var contractPath = path.join(env.config.paths.artifacts, item.constructor._json.contractName + '.json')
+      var json = JSON.parse(fs.readFileSync(contractPath))
+      if (!json.networks) {
+          json.networks = {}
+      }
+      if (!json.networks[networkId]) {
+          json.networks[networkId] = {}
+      }
+      if (!json.transactionHash) {
+          json.transactionHash = null
+      }
+      json.networks[networkId].address = item.address
+      json.networks[networkId].transactionHash = item.transactionHash
+      fs.writeFileSync(contractPath, JSON.stringify(json, null, 1))
+  })
+}
 
 function randomGame() {
   const rev = new Rev()
@@ -67,8 +88,31 @@ function getFlag(flag, value = true) {
   return false
 }
 
+
+async function alreadyDeployed(contractName, networks, verbose, web3, chainId) {
+  let address =  networks && networks[contractName] && networks[contractName][chainId] && networks[contractName][chainId].address
+  if (!address) {
+      verbose && console.log(_ + 'no address')
+      return false
+  }
+  let code = await web3.eth.getCode(address)
+  if (code === '0x') {
+      verbose && console.log(_ + 'no code')
+      return false
+  }
+  // let contract = eval(contractName)
+  // console.log(contractName, contract._json.bytecode.length, code.length, contract._json.bytecode === code)
+  // if (code !== contract._json.bytecode) {
+  //     console.log('code doeesnt match')
+  //     return false
+  // }
+  return address
+}
+
 var vals = (module.exports = {
+  saveNetworks,
   randomGame,
+  alreadyDeployed,
   globalGasPrice: oneGwei.toString(10),
   oneGwei,
   getLowestPrice,

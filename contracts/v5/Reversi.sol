@@ -1,4 +1,4 @@
-pragma solidity ^0.5.9;
+pragma solidity ^0.5.8;
 
 library Reversi {
     // event DebugBool(bool boolean);
@@ -129,7 +129,7 @@ library Reversi {
         }
         return game;
     }
-
+    /* solium-disable-next-line  security/no-assign-params */
     function validMoveRemains (Game memory game) internal pure returns (bool) {
         bool validMovesRemain = false;
         bytes16 board = game.board;
@@ -300,7 +300,7 @@ library Reversi {
         }
         return (potentialFlips, potentialFlipsLength);
     }
-
+    /* solium-disable-next-line  security/no-assign-params */
     function isComplete (Game memory game) internal pure returns (Game memory) {
         if (game.moveKey == 60) {
             // game.msg = "good game";
@@ -404,6 +404,7 @@ library Reversi {
         return (board >> push) & bytes16(uint128(3));
     }
 
+    /* solium-disable-next-line  security/no-assign-params */
     function turnTile (bytes16 board, uint8 color, uint8 col, uint8 row) internal pure returns (bytes16){
         if (col > 7) revert("can't turn tile outside of board col");
         if (row > 7) revert("can't turn tile outside of board row");
@@ -431,6 +432,7 @@ library Reversi {
         return uint8(uint224((moveSequence >> push) & mask));
     }
 
+    /* solium-disable-next-line  security/no-assign-params */
     function addMove (bytes28 moveSequence, uint8 movesLength, uint8 col, uint8 row) internal pure returns (bytes28, uint8) {
         uint256 foo = col + (row * 8) + 64;
         bytes28 move = bytes28(uint224(foo));
@@ -444,6 +446,7 @@ library Reversi {
         return move >= 64;
     }
 
+    /* solium-disable-next-line  security/no-assign-params */
     function convertMove (uint8 move) public pure returns(uint8, uint8) {
         move = move - 64;
         uint8 col = move % 8;

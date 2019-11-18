@@ -21,7 +21,8 @@ async function updateAllContracts({
     simpleCloversMarket, 
     clubToken,
     accounts,
-    verbose
+    verbose,
+    networks
 }) {
     var totalGas = utils.toBN('0')
 
@@ -109,7 +110,8 @@ async function updateAllContracts({
             cloversController,
             clubTokenController,
             simpleCloversMarket,
-            verbose
+            verbose,
+            networks
         })
 
         /* ----------------------------------------------------------------------------------------------------------- */
