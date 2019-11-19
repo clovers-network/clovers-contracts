@@ -1,13 +1,13 @@
 // const Artifactor = require("@truffle/artifactor");
-var { deployPOAContracts } = require('../helpers/deployPOAContracts')
+var { deployPOAContracts } = require('../../helpers/deployPOAContracts')
 const extractNetworks = require('@gnosis.pm/util-contracts/src/util/extractNetworks')
 // const injectNetworks = require('@gnosis.pm/util-contracts/src/util/injectNetworks')
 const path = require('path')
 
-var {saveNetworks} = require('../helpers/utils')
-
-const confFile = path.join(__dirname, '../conf/network-restore')
-const conf = require(confFile)
+var {saveNetworks} = require('../../helpers/utils')
+// console.log({__dirname, '../conf/network-restore'})
+const confFile = path.join(__dirname, '../../conf/network-restore')
+// const conf = require(confFile)
 // const artifactor = new Artifactor(conf.buildPath);
 
 let overwrites = {

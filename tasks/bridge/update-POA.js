@@ -1,5 +1,5 @@
-var { deployPOAContracts } = require('../helpers/deployPOAContracts')
-var { updatePOAContracts } = require('../helpers/updatePOAContracts')
+var { deployPOAContracts } = require('../../helpers/deployPOAContracts')
+var { updatePOAContracts } = require('../../helpers/updatePOAContracts')
 
 task('updatePOA', 'Updates POA contract values')
 .addFlag("v", "Add verbose output to the command", false)

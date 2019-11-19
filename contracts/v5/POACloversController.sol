@@ -6,7 +6,7 @@ pragma solidity ^0.5.8;
 
 import "./Reversi.sol";
 import "./IAMB.sol";
-import "./CloversController.sol";
+import "./ICloversController.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/ownership/Ownable.sol";
 import "@openzeppelin/contracts/cryptography/ECDSA.sol";
@@ -20,7 +20,7 @@ contract POACloversController is Ownable {
     bool public paused;
     address public oracle;
     IAMB public amb;
-    CloversController public cloversController;
+    ICloversController public cloversController;
     uint256 public executionGasLimit;
 
     mapping(bytes32=>Submission) public submissions;
@@ -102,7 +102,7 @@ contract POACloversController is Ownable {
     // In order to prevent commit reveal griefing the first commit is a combined hash of the moves and the recipient.
     // In order to use the same commit mapping, we mark this hash simply as address(1) so it is no longer the equivalent of address(0)
     function claimCloverSecurelyPartOne(bytes32 movesHashWithRecipient, address recipient) public {
-        bytes4 methodSelector = CloversController(address(0)).claimCloverSecurelyPartOne.selector;
+        bytes4 methodSelector = ICloversController(address(0)).claimCloverSecurelyPartOne.selector;
         bytes memory data = abi.encodeWithSelector(methodSelector, movesHashWithRecipient, recipient);
         amb.requireToPassMessage(address(cloversController), data, executionGasLimit); // TODO: set different gas limits
 
@@ -111,7 +111,7 @@ contract POACloversController is Ownable {
     // Once a commit has been made to guarantee the move hash is associated with the recipient we can make a commit on the hash of the moves themselves
     // If we were to make a claim on the moves in plaintext, the transaction could be front run on the claimCloverWithVerification or the claimCloverWithSignature
     function claimCloverSecurelyPartTwo(bytes32 movesHash, address recipient) public {
-        bytes4 methodSelector = CloversController(address(0)).claimCloverSecurelyPartTwo.selector;
+        bytes4 methodSelector = ICloversController(address(0)).claimCloverSecurelyPartTwo.selector;
         bytes memory data = abi.encodeWithSelector(methodSelector, movesHash, recipient);
         amb.requireToPassMessage(address(cloversController), data, executionGasLimit); // TODO: set different gas limits
     }
@@ -148,7 +148,7 @@ contract POACloversController is Ownable {
 
     function _claimClover(uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, address recipient, bool keep) internal returns (bool) {
 
-        bytes4 methodSelector = CloversController(address(0)).claimCloverFromAMB.selector;
+        bytes4 methodSelector = ICloversController(address(0)).claimCloverFromAMB.selector;
         bytes memory data = abi.encodeWithSelector(methodSelector, tokenId, moves, symmetries, keep, recipient);
         amb.requireToPassMessage(address(cloversController), data, executionGasLimit);
 
@@ -206,7 +206,7 @@ contract POACloversController is Ownable {
     * @dev Updates cloversController Address.
     * @param _cloversController The new cloversController address.
     */
-    function updateCloversController(CloversController _cloversController) public onlyOwner {
+    function updateCloversController(ICloversController _cloversController) public onlyOwner {
         cloversController = _cloversController;
     }
 

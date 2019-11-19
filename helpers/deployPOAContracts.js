@@ -10,7 +10,7 @@ var {
     decimals,
     poaAMB,
     executionGasLimit
-} = require('./migVals')
+} = require('./migVals.js')
 
 const _overwrites = {
     Reversi: false,
