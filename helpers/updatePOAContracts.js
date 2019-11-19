@@ -62,7 +62,7 @@ async function updatePOAContracts({
 
         // executionGasLimit
         var currentExecutionGasLimit = await poaCloversController.executionGasLimit()
-        if ('0x' + utils.toBN(currentExecutionGasLimit).toString(16) !== executionGasLimit) {
+        if (!utils.toBN(currentExecutionGasLimit).eq(utils.toBN(executionGasLimit.toString(10)))) {
           verbose && console.log(_ + `poaCloversController.updateExecutionGasLimit from ${currentExecutionGasLimit} to ${executionGasLimit}`)
           var tx = await poaCloversController.updateExecutionGasLimit(executionGasLimit)
           verbose && gasToCash(tx.receipt.gasUsed)

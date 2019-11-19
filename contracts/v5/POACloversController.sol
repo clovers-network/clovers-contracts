@@ -127,7 +127,6 @@ contract POACloversController is Ownable {
     }
 
 
-
     /**
     * @dev Claim the Clover without a commit or reveal. Payable so you can buy tokens if needed.
     * @param tokenId The board that results from the moves.
@@ -157,6 +156,30 @@ contract POACloversController is Ownable {
         // setMessageHashValue(dataHash, tokenId, moves, symmetries, recipient, keep);
         return true;
     }
+
+
+    function getGasMinimum(bytes28[2] memory moves, bool keep, address recipient) public view returns (uint256) {
+        Reversi.Game memory game = Reversi.playGame(moves);
+        require(isValidGame(game.error, game.complete), "Invalid game");
+        uint256 tokenId = convertBytes16ToUint(game.board);
+        uint256 symmetries = Reversi.returnSymmetricals(game.RotSym, game.Y0Sym, game.X0Sym, game.XYSym, game.XnYSym);
+
+        bytes4 methodSelector = ICloversController(address(0)).claimCloverFromAMB.selector;
+        bytes memory data = abi.encodeWithSelector(methodSelector, tokenId, moves, symmetries, keep, recipient);
+        // amb.requireToPassMessage(address(cloversController), data, executionGasLimit);
+        return amb.getMinimumGasUsage(data);
+    }
+
+    function getData(bytes28[2] memory moves, bool keep, address recipient) public pure returns (bytes memory data) {
+        Reversi.Game memory game = Reversi.playGame(moves);
+        require(isValidGame(game.error, game.complete), "Invalid game");
+        uint256 tokenId = convertBytes16ToUint(game.board);
+        uint256 symmetries = Reversi.returnSymmetricals(game.RotSym, game.Y0Sym, game.X0Sym, game.XYSym, game.XnYSym);
+
+        bytes4 methodSelector = ICloversController(address(0)).claimCloverFromAMB.selector;
+        return abi.encodeWithSelector(methodSelector, tokenId, moves, symmetries, keep, recipient);
+    }
+
 
 
     /**

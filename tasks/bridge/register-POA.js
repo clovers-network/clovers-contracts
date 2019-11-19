@@ -10,6 +10,7 @@ task("registerPOA", "Register a Clover via POA contracts")
     const verbose = v
     const accounts = await web3.eth.getAccounts();
 
+
     var {
         poaCloversController
     } = await deployPOAContracts({accounts, artifacts, web3, verbose})
@@ -22,19 +23,46 @@ task("registerPOA", "Register a Clover via POA contracts")
     moves = [moves.substr(0, 56), moves.substr(56)].map(s => '0x' + s)
 
 
-    let isValid = await poaCloversController.isValid(moves)
-    console.log({isValid})
+    // let isValid = await poaCloversController.isValid(moves)
+    // console.log({isValid})
 
 
-    let amb = await poaCloversController.amb()
-    console.log({amb})
+    // let executionGasLimit = await poaCloversController.executionGasLimit()
+    // console.log({executionGasLimit})
 
+    // let cloversController = await poaCloversController.cloversController()
+    // console.log({cloversController})
 
+    // let amb = await poaCloversController.amb()
+    // console.log({amb})
+
+    // var IAMB = artifacts.require('./IAMB.sol')
+    // let ambInstance = await IAMB.at(amb)
+
+    // console.log(moves, false, accounts[0])
+
+    // let getGasMinimum = await poaCloversController.getGasMinimum(moves, false, accounts[0]);
+    // console.log({getGasMinimum: getGasMinimum.toString(10)})
+
+    // let data = await poaCloversController.getData(moves, false, accounts[0])
+    // console.log({data})
+
+    // let maxGasPerTx = await ambInstance.maxGasPerTx()
+    // console.log({maxGasPerTx: maxGasPerTx.toString(10)})
+
+    // console.log({cloversController, data, executionGasLimit})
     // try {
-    //     let tx = await poaCloversController.claimCloverWithVerification(moves, false, accounts[0])
+    //     let tx = await ambInstance.requireToPassMessage(cloversController, data, executionGasLimit)
     //     console.log({tx})
     // } catch (error) {
     //     console.log(error)
     // }
+
+    try {
+        let tx = await poaCloversController.claimCloverWithVerification(moves, false, accounts[0])
+        console.log({tx})
+    } catch (error) {
+        console.log(error)
+    }
 
  });

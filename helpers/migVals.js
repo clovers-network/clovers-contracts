@@ -8,7 +8,7 @@ var vals = (module.exports = {
   poaID: '77',
   ethAMB: '0xfe446bef1dbf7afe24e81e05bc8b271c1ba9a560', // kovan (& sokol)
   ethID: '42',
-  executionGasLimit: '0xffffffffffffffffff',
+  executionGasLimit: '2000000000000000000000',
   // stakeAmount: new BigNumber(529271).times(1000000000).times(40), // gasPrice * 1GWEI * 40 (normal person price)
   stakeAmount: new BigNumber(286774), // gasPrice * 10GWEI (oracle price)
   fastGasPrice: new BigNumber(10).times(oneGwei),

@@ -9,4 +9,5 @@ interface IAMB {
     function failedMessageReceiver(bytes32 _txHash) external view returns (address);
     function failedMessageSender(bytes32 _txHash) external view returns (address);
     function requireToPassMessage(address _contract, bytes calldata _data, uint256 _gas) external;
+    function getMinimumGasUsage(bytes calldata _data) external view returns  (uint256 gas);
 }
