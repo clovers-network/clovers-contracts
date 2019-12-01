@@ -117,6 +117,10 @@ contract POACloversController is Ownable {
     }
 
     function claimCloverWithVerification(bytes28[2] memory moves, bool keep, address recipient) public payable returns (bool) {
+        //TODO: Make sure that if keep is true, the tx was submitted by recipient
+        if (keep) {
+            require(msg.sender == recipient || recipient == msgSigner, "Can't keep a clover on bahalf of another user");
+        }
         Reversi.Game memory game = Reversi.playGame(moves);
         require(isValidGame(game.error, game.complete), "Invalid game");
         uint256 tokenId = convertBytes16ToUint(game.board);
@@ -140,6 +144,10 @@ contract POACloversController is Ownable {
     /* solium-disable-next-line  max-len */
     function claimCloverWithSignature(uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, bool keep, address recipient, bytes memory signature)
         public payable notPaused returns (bool) {
+        //TODO: Make sure that if keep is true, the tx was submitted by recipient
+        if (keep) {
+            require(msg.sender == recipient || recipient == msgSigner, "Can't keep a clover on bahalf of another user");
+        }
         require(checkSignature(tokenId, moves, symmetries, keep, recipient, signature, oracle), "Invalid Signature");
         require(_claimClover(tokenId, moves, symmetries, recipient, keep), "Claim must succeed");
         return true;

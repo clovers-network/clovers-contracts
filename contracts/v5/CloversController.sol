@@ -170,6 +170,8 @@ contract CloversController is Ownable {
         address committedRecipient = commits[movesHash];
         require(committedRecipient == address(0) || committedRecipient == recipient, "Invalid committedRecipient");
 
+        require(!keep || keep && recipient == msg.sender, "Can't keep on behalf of other user");
+
         Reversi.Game memory game = Reversi.playGame(moves);
         require(isValidGame(game.error, game.complete), "Invalid game");
         uint256 tokenId = convertBytes16ToUint(game.board);
@@ -195,6 +197,7 @@ contract CloversController is Ownable {
     /* solium-disable-next-line  max-len */
     function claimCloverWithSignature(uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, bool keep, bytes memory signature, address recipient)
         public payable notPaused returns (bool) {
+        require(!keep || keep && recipient == msg.sender, "Can't keep on behalf of other user");
         address committedRecipient = commits[getMovesHash(moves)];
         require(committedRecipient == address(0) || committedRecipient == recipient, "Invalid committedRecipient");
         require(!clovers.exists(tokenId), "Clover already exists");
