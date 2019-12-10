@@ -5,10 +5,10 @@ pragma solidity ^0.4.18;
 */
 
 
-import './ClubToken.sol';
+import "./ClubToken.sol";
 import "bancor-contracts/solidity/contracts/converter/BancorFormula.sol";
-import './helpers/Admin.sol';
-import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
+import "./helpers/Admin.sol";
+import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract ClubTokenController is BancorFormula, Admin, Ownable {
     event Buy(address buyer, uint256 tokens, uint256 value, uint256 poolBalance, uint256 tokenSupply);
@@ -17,6 +17,7 @@ contract ClubTokenController is BancorFormula, Admin, Ownable {
     bool public paused;
     address public clubToken;
     address public simpleCloversMarket;
+    address public cloversController;
     address public curationMarket;
     address public support;
 
@@ -125,12 +126,12 @@ contract ClubTokenController is BancorFormula, Admin, Ownable {
     }
 
     /**
-    * @dev updates the CurationMarket address
-    * @param _curationMarket The address of the curationMarket
+    * @dev updates the CloversController address
+    * @param _cloversController The address of the cloversController
     * @return A boolean representing whether or not the update was successful.
     */
-    function updateCurationMarket(address _curationMarket) public onlyOwner returns(bool){
-        curationMarket = _curationMarket;
+    function updateCloversController(address _cloversController) public onlyOwner returns(bool){
+        cloversController = _cloversController;
         return true;
     }
 
@@ -188,12 +189,24 @@ contract ClubTokenController is BancorFormula, Admin, Ownable {
         uint256 saleReturn = getSell(sellAmount);
         require(saleReturn > 0);
         require(saleReturn <= poolBalance());
-        require(saleReturn <= clubToken.balance);
         ClubToken(clubToken).burn(msg.sender, sellAmount);
         /* poolBalance = safeSub(poolBalance, saleReturn); */
         ClubToken(clubToken).moveEth(msg.sender, saleReturn);
         emit Sell(msg.sender, sellAmount, saleReturn, poolBalance(), ClubToken(clubToken).totalSupply());
     }
 
+    function sellOnBehalf(uint256 sellAmount, address recipient) public notPaused returns(uint256 weiReturned) {
+        require(msg.sender == cloversController, "Only allowed by CloversController");
+        require(sellAmount > 0, "Sell amount must be greater than 0");
+        require(ClubToken(clubToken).balanceOf(recipient) >= sellAmount, "User doen't have enough clubToken");
+        uint256 saleReturn = getSell(sellAmount);
+        require(saleReturn > 0, "Sale Return must be greater than 0");
+        require(saleReturn <= poolBalance(), "Not enough eth in pool");
+        ClubToken(clubToken).burn(recipient, sellAmount);
+        // let cloversController move it
+        // ClubToken(clubToken).moveEth(cloversController, saleReturn);
+        emit Sell(recipient, sellAmount, saleReturn, poolBalance(), ClubToken(clubToken).totalSupply());
+        return saleReturn;
+    }
 
- }
+}

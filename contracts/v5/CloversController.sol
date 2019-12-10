@@ -15,14 +15,14 @@ import "@openzeppelin/contracts/cryptography/ECDSA.sol";
 
 contract CloversController is Ownable {
     event cloverCommitted(bytes32 movesHash, address owner);
-    event cloverClaimed(uint256 tokenId, bytes28[2] moves, address sender, address recepient, uint reward, uint256 symmetries, bool keep);
+    event cloverClaimed(uint256 tokenId, bytes28[2] moves, address sender, address recipient, uint reward, uint256 symmetries, bool keep);
     event cloverChallenged(uint256 tokenId, bytes28[2] moves, address owner, address challenger);
 
     using SafeMath for uint256;
     using ECDSA for bytes32;
 
     bool public paused;
-    address public oracle;
+    address payable public oracle;
     IClovers public clovers;
     IClubToken public clubToken;
     IClubTokenController public clubTokenController;
@@ -60,8 +60,8 @@ contract CloversController is Ownable {
         return keccak256(abi.encodePacked(moves));
     }
 
-    function getMovesHashWithRecepient(bytes32 movesHash, address recepient) public pure returns (bytes32) {
-        return keccak256(abi.encodePacked(movesHash, recepient));
+    function getMovesHashWithRecipient(bytes32 movesHash, address recipient) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(movesHash, recipient));
     }
 
     /**
@@ -128,35 +128,80 @@ contract CloversController is Ownable {
         return base;
     }
 
+    function calculateRewardFunctional(
+        uint256 symmetries,
+        uint256 Symmetricals,
+        uint256 RotSym,
+        uint256 Y0Sym,
+        uint256 X0Sym,
+        uint256 XYSym,
+        uint256 XnYSym
+    ) public view returns (
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256
+    ) {
+        uint256 base = 0;
+
+        if (symmetries >> 4 & 1 == 1) {
+            base += payMultiplier * (Symmetricals + 1) / (RotSym + 1);
+            RotSym += 1;
+        }
+        if (symmetries >> 3 & 1 == 1) {
+            base += payMultiplier * (Symmetricals + 1) / (Y0Sym + 1);
+            Y0Sym += 1;
+        }
+        if (symmetries >> 2 & 1 == 1) {
+            base += payMultiplier * (Symmetricals + 1) / (X0Sym + 1);
+            X0Sym += 1;
+        }
+        if (symmetries >> 1 & 1 == 1) {
+            base += payMultiplier * (Symmetricals + 1) / (XYSym + 1);
+            XYSym += 1;
+        }
+        if (symmetries & 1 == 1) {
+            base += payMultiplier * (Symmetricals + 1) / (XnYSym + 1);
+            XnYSym += 1;
+        }
+        if (symmetries > 0) {
+            Symmetricals += 1;
+        }
+        return (base, Symmetricals, RotSym, Y0Sym, X0Sym, XYSym, XnYSym);
+    }
+
     function getPrice(uint256 symmetries) public view returns(uint256) {
         return basePrice.add(calculateReward(symmetries));
     }
 
-    // In order to prevent commit reveal griefing the first commit is a combined hash of the moves and the recepient.
+    // In order to prevent commit reveal griefing the first commit is a combined hash of the moves and the recipient.
     // In order to use the same commit mapping, we mark this hash simply as address(1) so it is no longer the equivalent of address(0)
-    function claimCloverSecurelyPartOne(bytes32 movesHashWithRecepient) public {
-        commits[movesHashWithRecepient] = address(1);
-        commits[keccak256(abi.encodePacked(msg.sender))] = address(block.number);
+    function claimCloverSecurelyPartOne(bytes32 movesHashWithRecipient, address recipient) public {
+        commits[movesHashWithRecipient] = address(1);
+        commits[keccak256(abi.encodePacked(recipient))] = address(block.number);
     }
 
-    // Once a commit has been made to guarantee the move hash is associated with the recepient we can make a commit on the hash of the moves themselves
+    // Once a commit has been made to guarantee the move hash is associated with the recipient we can make a commit on the hash of the moves themselves
     // If we were to make a claim on the moves in plaintext, the transaction could be front run on the claimCloverWithVerification or the claimCloverWithSignature
-    function claimCloverSecurelyPartTwo(bytes32 movesHash) public {
-        require(uint256(commits[keccak256(abi.encodePacked(msg.sender))]) < block.number, "Can't combine step1 with step2");
-        bytes32 commitHash = getMovesHashWithRecepient(movesHash, msg.sender);
-        address commitOfMovesHashWithRecepient = commits[commitHash];
+    function claimCloverSecurelyPartTwo(bytes32 movesHash, address recipient) public {
+        require(uint256(commits[keccak256(abi.encodePacked(recipient))]) < block.number, "Can't combine step1 with step2");
+        bytes32 commitHash = getMovesHashWithRecipient(movesHash, recipient);
+        address commitOfMovesHashWithRecipient = commits[commitHash];
         require(
-            address(commitOfMovesHashWithRecepient) == address(1),
-            "Invalid commitOfMovesHashWithRecepient, please do claimCloverSecurelyPartOne"
+            address(commitOfMovesHashWithRecipient) == address(1),
+            "Invalid commitOfMovesHashWithRecipient, please do claimCloverSecurelyPartOne"
         );
         delete(commits[commitHash]);
-        commits[movesHash] = msg.sender;
+        commits[movesHash] = recipient;
     }
 
-    function claimCloverWithVerification(bytes28[2] memory moves, bool keep) public payable returns (bool) {
+    function claimCloverWithVerification(bytes28[2] memory moves, bool keep, address recipient) public payable returns (bool) {
         bytes32 movesHash = getMovesHash(moves);
-        address committedRecepient = commits[movesHash];
-        require(committedRecepient == address(0) || committedRecepient == msg.sender, "Invalid committedRecepient");
+        address committedRecipient = commits[movesHash];
+        require(committedRecipient == address(0) || committedRecipient == recipient, "Invalid committedRecipient");
 
         Reversi.Game memory game = Reversi.playGame(moves);
         require(isValidGame(game.error, game.complete), "Invalid game");
@@ -164,7 +209,7 @@ contract CloversController is Ownable {
         require(!clovers.exists(tokenId), "Clover already exists");
 
         uint256 symmetries = Reversi.returnSymmetricals(game.RotSym, game.Y0Sym, game.X0Sym, game.XYSym, game.XnYSym);
-        require(_claimClover(tokenId, moves, symmetries, msg.sender, keep), "Claim must succeed");
+        require(_claimClover(tokenId, moves, symmetries, recipient, keep), "Claim must succeed");
         delete(commits[movesHash]);
         return true;
     }
@@ -181,16 +226,74 @@ contract CloversController is Ownable {
     * types.
     * @return A boolean representing whether or not the claim was successful.
     */
-    function claimCloverWithSignature(uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, bool keep, bytes memory signature) public payable notPaused returns (bool) {
-        address committedRecepient = commits[getMovesHash(moves)];
-        require(committedRecepient == address(0) || committedRecepient == msg.sender, "Invalid committedRecepient");
+    function claimCloverWithSignature(uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, bool keep, bytes memory signature, address recipient) public payable notPaused returns (bool) {
+        address committedRecipient = commits[getMovesHash(moves)];
+        require(committedRecipient == address(0) || committedRecipient == recipient, "Invalid committedRecipient");
         require(!clovers.exists(tokenId), "Clover already exists");
-        require(checkSignature(tokenId, moves, symmetries, keep, msg.sender, signature, oracle), "Invalid Signature");
-        require(_claimClover(tokenId, moves, symmetries, msg.sender, keep), "Claim must succeed");
+        require(checkSignature(tokenId, moves, symmetries, keep, recipient, signature, oracle), "Invalid Signature");
+        require(_claimClover(tokenId, moves, symmetries, recipient, keep), "Claim must succeed");
         return true;
     }
 
-    function _claimClover(uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, address recepient, bool keep) internal returns (bool) {
+    function estimateCashOut(uint256[] memory symmetries) public view returns (uint256) {
+        uint256 totalReward;
+        uint256 reward;
+        uint256 Symmetricals;
+        uint256 RotSym;
+        uint256 Y0Sym;
+        uint256 X0Sym;
+        uint256 XYSym;
+        uint256 XnYSym;
+        (Symmetricals,
+        RotSym,
+        Y0Sym,
+        X0Sym,
+        XYSym,
+        XnYSym) = clovers.getAllSymmetries();
+        for (uint64 i = 0; i < symmetries.length; i++) {
+            (reward,
+            Symmetricals,
+            RotSym,
+            Y0Sym,
+            X0Sym,
+            XYSym,
+            XnYSym) = calculateRewardFunctional(
+                symmetries[i],
+                Symmetricals,
+                RotSym,
+                Y0Sym,
+                X0Sym,
+                XYSym,
+                XnYSym
+            );
+            totalReward += reward;
+        }
+        return clubTokenController.getSell(totalReward);
+    }
+
+    function claimAndCashOut(uint256[] memory tokenId, bytes28[2][] memory moves, uint256[] memory symmetries, address payable recipient) public notPaused returns (bool) {
+        // uint256 beginGas = gasleft();
+        require(msg.sender == oracle, "Only oracle can do this");
+        require(tokenId.length == moves.length && moves.length == symmetries.length, "Some information missing");
+        for (uint64 i = 0; i < tokenId.length; i++) {
+            require(!clovers.exists(tokenId[i]), "Clover already exists");
+            require(_claimClover(tokenId[i], moves[i], symmetries[i], recipient, false), "Claim must succeed");
+        }
+        uint256 weiReturned = clubTokenController.sellOnBehalf(clubToken.balanceOf(recipient), recipient);
+
+        // uint256 endGas = gasleft();
+        // uint256 payBackToOracleRaw = beginGas - endGas + 2300 + 2300;
+        // uint256 payBackToOracleWithGas = payBackToOracleRaw;
+        // uint256 payBackToOracleWithGas = payBackToOracleRaw * tx.gasprice;
+        // require(weiReturned > payBackToOracleWithGas, "Not worth the gas to execute this tx");
+
+        // clubToken.moveEth(oracle, payBackToOracleWithGas);
+        // clubToken.moveEth(recipient, weiReturned - payBackToOracleWithGas);
+        clubToken.moveEth(recipient, weiReturned);
+        return true;
+    }
+
+    function _claimClover(uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, address recipient, bool keep) internal returns (bool) {
         clovers.setCloverMoves(tokenId, moves);
         clovers.setKeep(tokenId, keep);
         uint256 reward;
@@ -212,7 +315,7 @@ contract CloversController is Ownable {
 
         if (keep) {
             // If the user decided to keep the Clover
-            clovers.mint(recepient, tokenId);
+            clovers.mint(recipient, tokenId);
         } else {
             // If the user decided not to keep the Clover, they will
             // receive the reward price in club tokens, and the clover will
@@ -220,10 +323,10 @@ contract CloversController is Ownable {
             clovers.mint(address(clovers), tokenId);
             simpleCloversMarket.sell(tokenId, basePrice.add(reward.mul(priceMultiplier)));
             if (reward > 0) {
-                require(clubToken.mint(recepient, reward), "mint must succeed");
+                require(clubToken.mint(recipient, reward), "mint must succeed");
             }
         }
-        emit cloverClaimed(tokenId, moves, msg.sender, recepient, reward, symmetries, keep);
+        emit cloverClaimed(tokenId, moves, msg.sender, recipient, reward, symmetries, keep);
         return true;
     }
 
@@ -303,7 +406,7 @@ contract CloversController is Ownable {
     * @dev Updates oracle Address.
     * @param _oracle The new oracle Address.
     */
-    function updateOracle(address _oracle) public onlyOwner {
+    function updateOracle(address payable _oracle) public onlyOwner {
         oracle = _oracle;
     }
 
@@ -401,17 +504,17 @@ contract CloversController is Ownable {
         bytes28[2] memory moves,
         uint256 symmetries,
         bool keep,
-        address recepient,
+        address recipient,
         bytes memory signature,
         address signer
     ) public pure returns (bool) {
-        bytes32 hash = toEthSignedMessageHash(getHash(tokenId, moves, symmetries, keep, recepient));
+        bytes32 hash = toEthSignedMessageHash(getHash(tokenId, moves, symmetries, keep, recipient));
         address result = recover(hash, signature);
         return (result != address(0) && result == signer);
     }
 
-    function getHash(uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, bool keep, address recepient) public pure returns (bytes32) {
-        return keccak256(abi.encodePacked(tokenId, moves, symmetries, keep, recepient));
+    function getHash(uint256 tokenId, bytes28[2] memory moves, uint256 symmetries, bool keep, address recipient) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(tokenId, moves, symmetries, keep, recipient));
     }
     function recover(bytes32 hash, bytes memory signature) public pure returns (address) {
         return hash.recover(signature);

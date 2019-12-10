@@ -183,3 +183,37 @@ function decodeEventString(hexVal) {
     .map(a => String.fromCharCode(a))
     .join('')
 }
+
+function decodeRawLogEvent(tx, web3) {
+  const eventJsonInterfaceInputs = [
+    {
+      "indexed": false,
+      "name": "seller",
+      "type": "address"
+    },
+    {
+      "indexed": false,
+      "name": "tokens",
+      "type": "uint256"
+    },
+    {
+      "indexed": false,
+      "name": "value",
+      "type": "uint256"
+    },
+    {
+      "indexed": false,
+      "name": "poolBalance",
+      "type": "uint256"
+    },
+    {
+      "indexed": false,
+      "name": "tokenSupply",
+      "type": "uint256"
+    }
+  ]
+  let event = tx.receipt.rawLogs.filter(l => { return l.topics[0] === web3.utils.sha3("Sell(address,uint256,uint256,uint256,uint256)") })
+  let decoded = web3.eth.abi.decodeLog(eventJsonInterfaceInputs, event[0].data, event[0].topics.slice(1))
+  console.log({decoded})
+  return decoded
+}

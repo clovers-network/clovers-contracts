@@ -116,6 +116,7 @@ async function updateAllContracts({
         // Update ClubTokenController.sol
         totalGas = await updateClubTokenController({
             clubTokenController,
+            cloversController,
             simpleCloversMarket,
             accounts,
             verbose

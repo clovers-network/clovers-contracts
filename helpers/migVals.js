@@ -136,7 +136,7 @@ async function updateCloversController({
 
 async function updateClubTokenController({
   clubTokenController,
-  // curationMarket,
+  cloversController,
   simpleCloversMarket,
   accounts,
   verbose
@@ -164,10 +164,10 @@ async function updateClubTokenController({
     verbose && console.log(_ + 'simpleCloversMarket hasnt changed')
   }
 
-  // verbose && console.log(_ + 'clubTokenController.updateCurationMarket')
-  // var tx = await clubTokenController.updateCurationMarket(
-  //   curationMarket.address
-  // )
+  verbose && console.log(_ + 'clubTokenController.updateCloversController')
+  var tx = await clubTokenController.updateCloversController(
+    cloversController.address
+  )
 
   var currentReserveRatio = await clubTokenController.reserveRatio()
   if (!currentReserveRatio.eq(utils.toBN(vals.reserveRatio))) {

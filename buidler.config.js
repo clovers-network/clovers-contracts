@@ -27,7 +27,6 @@ const testnetAccounts = generateAddressesFromSeed(process.env.TRUFFLE_MNEMONIC, 
 // const mainnetAccounts = generateAddressesFromSeed(process.env.MAINNET_MNEMONIC, 10, '100000000000000000000')
 // const rinkebyAccounts = generateAddressesFromSeed(process.env.TESTNET_MNEMONIC, 2, '0')
 
-
 module.exports = {
   defaultNetwork: "buidlerevm",
 
@@ -35,7 +34,7 @@ module.exports = {
     ethermint: {
       chainId: 8,
       url: "http://localhost:8545",
-      accounts: [process.env.ETHERMINT_KEY]
+      // accounts: [process.env.ETHERMINT_KEY]
     },
     buidlerevm: {
       accounts: testnetAccounts

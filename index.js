@@ -1971,7 +1971,7 @@ module.exports = {
      "type": "bool"
     },
     {
-     "name": "recepient",
+     "name": "recipient",
      "type": "address"
     }
    ],
@@ -2004,7 +2004,7 @@ module.exports = {
    "constant": false,
    "inputs": [
     {
-     "name": "movesHashWithRecepient",
+     "name": "movesHashWithRecipient",
      "type": "bytes32"
     }
    ],
@@ -2034,7 +2034,7 @@ module.exports = {
      "type": "bool"
     },
     {
-     "name": "recepient",
+     "name": "recipient",
      "type": "address"
     },
     {
@@ -2414,11 +2414,11 @@ module.exports = {
      "type": "bytes32"
     },
     {
-     "name": "recepient",
+     "name": "recipient",
      "type": "address"
     }
    ],
-   "name": "getMovesHashWithRecepient",
+   "name": "getMovesHashWithRecipient",
    "outputs": [
     {
      "name": "",
@@ -2513,7 +2513,7 @@ module.exports = {
     },
     {
      "indexed": false,
-     "name": "recepient",
+     "name": "recipient",
      "type": "address"
     },
     {
@@ -2621,7 +2621,7 @@ module.exports = {
       },
       {
        "indexed": false,
-       "name": "recepient",
+       "name": "recipient",
        "type": "address"
       },
       {
@@ -2754,7 +2754,7 @@ module.exports = {
       },
       {
        "indexed": false,
-       "name": "recepient",
+       "name": "recipient",
        "type": "address"
       },
       {
@@ -2875,7 +2875,7 @@ module.exports = {
       },
       {
        "indexed": false,
-       "name": "recepient",
+       "name": "recipient",
        "type": "address"
       },
       {
